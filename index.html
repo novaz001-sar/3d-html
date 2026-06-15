@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- 针对移动端：禁止页面默认缩放，防止手势冲突 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>3D 心理旋转能力训练</title>
+  <title>3D Mental Rotation Training</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -92,7 +91,7 @@
     
     <div class="bg-white p-4 sm:p-6 md:p-12 rounded-2xl md:rounded-[3rem] shadow-2xl w-full max-w-5xl mb-6 md:mb-12 border-2 md:border-4 border-slate-200">
       <h2 class="text-2xl sm:text-3xl md:text-5xl font-extrabold mb-4 md:mb-10 text-center text-slate-700">{{ t('chooseLevel') }}</h2>
-      <div v-if="state.data.levels.length === 0" class="text-base sm:text-xl md:text-3xl text-red-500 text-center mb-4 md:mb-6 font-bold bg-red-50 py-3 md:py-8 rounded-xl md:rounded-2xl">暂无游戏数据，请先进入编辑器创建。</div>
+      <div v-if="state.data.levels.length === 0" class="text-base sm:text-xl md:text-3xl text-red-500 text-center mb-4 md:mb-6 font-bold bg-red-50 py-3 md:py-8 rounded-xl md:rounded-2xl">{{ t('noData') }}</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 max-h-[40vh] overflow-y-auto pr-2 md:pr-4">
         <button v-for="lvl in state.data.levels" :key="lvl.id" @click="startGame(lvl.id)" class="btn btn-success text-lg sm:text-2xl md:text-4xl h-16 sm:h-24 md:h-32 shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 border-b-4 md:border-b-[8px] border-green-700">
           🎮 {{ lvl.name }}
@@ -122,9 +121,9 @@
       <div class="w-full md:w-1/3 min-h-[45vh] md:min-h-0 flex-1 md:flex-none max-h-[50vh] md:max-h-none md:min-w-[300px] md:max-w-[450px] bg-white shadow-2xl p-4 md:p-10 flex flex-col gap-4 md:gap-8 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-slate-200 z-10">
         
         <div class="flex bg-slate-100 p-1 md:p-2 rounded-xl md:rounded-2xl border-2 md:border-4 border-slate-200 gap-1 md:gap-2">
-          <button @click="voxelState.tool = 'add'" :class="voxelState.tool === 'add' ? 'bg-blue-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">➕ 建造</button>
-          <button @click="voxelState.tool = 'delete'" :class="voxelState.tool === 'delete' ? 'bg-red-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🧽 擦除</button>
-          <button @click="voxelState.tool = 'rotate'" :class="voxelState.tool === 'rotate' ? 'bg-green-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🔄 视角</button>
+          <button @click="voxelState.tool = 'add'" :class="voxelState.tool === 'add' ? 'bg-blue-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">➕ {{ t('buildMode') }}</button>
+          <button @click="voxelState.tool = 'delete'" :class="voxelState.tool === 'delete' ? 'bg-red-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🧽 {{ t('eraseMode') }}</button>
+          <button @click="voxelState.tool = 'rotate'" :class="voxelState.tool === 'rotate' ? 'bg-green-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🔄 {{ t('rotateMode') }}</button>
         </div>
 
         <div><label>{{ t('name') }}</label><input v-model="voxelState.name" class="input-large bg-slate-50"></div>
@@ -181,9 +180,9 @@
             <div class="col-span-2"><label>⏭ {{ t('scoreSkip') }}</label><input type="number" v-model="state.editingPack.scoreSkip" class="input-large"></div>
           </div>
           <div class="bg-yellow-50 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 md:border-4 border-yellow-200 flex flex-col gap-2 md:gap-4">
-            <div><label>⭐ 一星要求</label><input type="number" v-model="state.editingPack.star1" class="input-large"></div>
-            <div><label>⭐⭐ 两星要求</label><input type="number" v-model="state.editingPack.star2" class="input-large"></div>
-            <div><label>⭐⭐⭐ 三星要求</label><input type="number" v-model="state.editingPack.star3" class="input-large"></div>
+            <div><label>⭐ {{ t('star1Req') }}</label><input type="number" v-model="state.editingPack.star1" class="input-large"></div>
+            <div><label>⭐⭐ {{ t('star2Req') }}</label><input type="number" v-model="state.editingPack.star2" class="input-large"></div>
+            <div><label>⭐⭐⭐ {{ t('star3Req') }}</label><input type="number" v-model="state.editingPack.star3" class="input-large"></div>
           </div>
           <button @click="savePack" class="btn btn-success w-full text-lg sm:text-2xl md:text-3xl py-3 md:py-6">{{ t('savePack') }}</button>
         </div>
@@ -198,7 +197,7 @@
           
           <div class="flex flex-col gap-2 md:gap-5 mb-6 md:mb-10">
             <div v-for="(q, i) in state.editingPack?.questions" :key="i" class="p-3 md:p-6 bg-slate-50 rounded-xl md:rounded-2xl text-sm sm:text-xl md:text-3xl border-2 md:border-4 border-slate-200 flex flex-col sm:flex-row justify-between items-center font-bold text-slate-700 gap-2 sm:gap-4">
-              <span>第 {{ i+1 }} 题 : {{ q.type === 'match' ? t('match') : t('mismatch') }}</span>
+              <span>{{ t('qPrefix') }} {{ i+1 }} {{ t('qSuffix') }} : {{ q.type === 'match' ? t('match') : t('mismatch') }}</span>
               <div class="flex gap-2 md:gap-4 w-full sm:w-auto">
                 <button @click="editQuestion(i)" class="btn btn-primary flex-1 sm:flex-none py-1.5 md:py-3 px-3 md:px-8 text-sm md:text-2xl">✏️ {{ t('edit') }}</button>
                 <button @click="deleteQuestion(i)" class="btn btn-danger flex-1 sm:flex-none py-1.5 md:py-3 px-3 md:px-8 text-sm md:text-2xl">🗑️ {{ t('del') }}</button>
@@ -207,7 +206,7 @@
           </div>
 
           <div v-if="state.editingQ" class="bg-blue-50 p-4 md:p-10 rounded-xl md:rounded-3xl border-4 md:border-8 border-blue-200 shadow-inner">
-            <h4 class="text-xl sm:text-3xl md:text-4xl font-black text-blue-900 mb-4 md:mb-8">{{ state.editingQIndex >= 0 ? '编辑题目' : '新建题目' }}</h4>
+            <h4 class="text-xl sm:text-3xl md:text-4xl font-black text-blue-900 mb-4 md:mb-8">{{ state.editingQIndex >= 0 ? t('editQ') : t('newQTitle') }}</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-8 mb-3 md:mb-4">
               <div>
                 <label>{{ t('type') }}</label>
@@ -283,7 +282,7 @@
           <span class="text-sm sm:text-xl md:text-3xl font-black text-slate-400 w-8 sm:w-12 md:w-20">{{ Math.round(state.zoom * 100) }}%</span>
         </div>
         
-        <div class="text-sm sm:text-2xl md:text-4xl font-bold text-slate-500">{{ state.currentQIndex + 1 }} / {{ state.currentGame?.questions?.length || 0 }}</div>
+        <div class="text-sm sm:text-2xl md:text-4xl font-bold text-slate-500">{{ t('qPrefix') }} {{ state.currentQIndex + 1 }} / {{ state.currentGame?.questions?.length || 0 }} {{ t('qSuffix') }}</div>
         <div class="text-lg sm:text-3xl md:text-5xl font-black text-blue-700 border-l-2 md:border-l-4 border-slate-300 pl-2 sm:pl-4 md:pl-8">🏆 {{ state.score }}</div>
         <div class="text-lg sm:text-3xl md:text-5xl font-black border-l-2 md:border-l-4 border-slate-300 pl-2 sm:pl-4 md:pl-8 flex items-center gap-1 md:gap-2" :class="state.timeLeft <= 10 ? 'text-red-600 animate-pulse' : 'text-slate-800'">
           ⏱️ {{ state.timeLeft }}s
@@ -313,7 +312,7 @@
       <button @click="answer(false)" class="btn bg-red-500 hover:bg-red-600 text-white text-xl sm:text-3xl md:text-5xl lg:text-6xl py-3 sm:py-6 md:py-8 px-6 sm:px-10 md:px-20 rounded-full font-black shadow-2xl border-b-4 md:border-b-[10px] border-red-700 w-[45%] sm:w-auto">✖️ {{ t('btnMismatch') }}</button>
       
       <div class="w-full sm:w-auto flex justify-center sm:absolute sm:right-4 md:right-10 lg:right-16 top-1/2 sm:-translate-y-1/2 mt-1 sm:mt-0">
-        <button @click="skip" class="btn bg-slate-400 hover:bg-slate-500 text-white text-base sm:text-2xl md:text-4xl py-2 sm:py-4 md:py-6 px-6 sm:px-10 md:px-12 rounded-full font-black shadow-xl border-b-[4px] md:border-b-[8px] border-slate-600">⏭️ Skip</button>
+        <button @click="skip" class="btn bg-slate-400 hover:bg-slate-500 text-white text-base sm:text-2xl md:text-4xl py-2 sm:py-4 md:py-6 px-6 sm:px-10 md:px-12 rounded-full font-black shadow-xl border-b-[4px] md:border-b-[8px] border-slate-600">⏭️ {{ t('skip') }}</button>
       </div>
     </div>
   </div>
@@ -342,12 +341,12 @@ const { createApp, ref, reactive, onMounted, nextTick, watch } = Vue;
 
 const defaultData = {
   objects: [
-    { id: "obj1", name: "木质L型积木", voxels: [{x:0,y:0,z:0,color:'#d97706',mat:'wood'},{x:1,y:0,z:0,color:'#d97706',mat:'wood'},{x:0,y:1,z:0,color:'#d97706',mat:'wood'}] },
-    { id: "obj2", name: "水晶十字块", voxels: [{x:0,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:-1,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:1,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:0,y:1,z:0,color:'#38bdf8',mat:'glass'}] }
+    { id: "obj1", name: "Wooden L-Block", voxels: [{x:0,y:0,z:0,color:'#d97706',mat:'wood'},{x:1,y:0,z:0,color:'#d97706',mat:'wood'},{x:0,y:1,z:0,color:'#d97706',mat:'wood'}] },
+    { id: "obj2", name: "Crystal Cross", voxels: [{x:0,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:-1,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:1,y:0,z:0,color:'#38bdf8',mat:'glass'},{x:0,y:1,z:0,color:'#38bdf8',mat:'glass'}] }
   ],
   levels: [
     {
-      id: "lvl1", name: "🏆 基础旋转练习", timeLimit: 60, speed: 4, scoreWin: 10, scoreLoss: 5, scoreSkip: -2, star1: 10, star2: 20, star3: 30,
+      id: "lvl1", name: "🏆 Basic Rotation", timeLimit: 60, speed: 4, scoreWin: 10, scoreLoss: 5, scoreSkip: -2, star1: 10, star2: 20, star3: 30,
       questions: [
         { type: 'match', obj1: 'obj1', obj2: 'obj1', rot1: [0,0,0,1], rot2: [0.12, 0.5, -0.2, 0.8] },
         { type: 'mismatch', obj1: 'obj1', obj2: 'obj2', rot1: [0,0,0,1], rot2: [0.3, -0.4, 0.8, 0.5] }
@@ -361,7 +360,7 @@ const i18n = {
     title: '3D 心理旋转训练', chooseLevel: '点击下方关卡开始训练', editor: '游戏与关卡总编辑器', 
     menu: '游戏菜单', resume: '继续游戏', backMenu: '返回主界面', export: '导出JSON', import: '导入JSON',
     vEditor: '三维物体编辑器', lEditor: '游戏机制编辑器', name: '物体命名', color: '选择颜色', material: '选择材质', wood: '木头', glass: '玻璃', gem: '宝石',
-    save: '💾 保存', clear: '清空', objList: '素材库', buildMode: '添加', eraseMode: '擦除',
+    save: '💾 保存', clear: '清空', objList: '素材库', buildMode: '建造', eraseMode: '擦除', rotateMode: '视角',
     vHint: '提示：请在左侧切换编辑模式。使用视角模式(或鼠标右键)旋转网格。',
     levelPacks: '关卡包', newPack: '新建关卡', packName: '名称', timeLimit: '时间(秒)', speed: '转速', scoreWin: '正确', scoreLoss: '错误', scoreSkip: '跳过',
     savePack: '保存修改', questions: '题目', newQ: '添加题目',
@@ -369,21 +368,25 @@ const i18n = {
     qHint: '⚠️ 自由旋转下方物体以定义发球角度。', saveQ: '保存题目',
     score: '得分', btnMatch: '相同', btnMismatch: '不同', escGameHint: '💡 点击右上角齿轮菜单暂停 (支持双指缩放)',
     leftHint: '👉 点击切换自动旋转方向', rightHint: '🖐️ 按住滑动旋转匹配左侧',
-    correct: '回答正确！', wrong: '回答错误！', gameOver: '训练结束', totalScore: '总得分', stars: '星级', edit: '编辑', del: '删除', confirmDel: '确定删除？'
+    correct: '回答正确！', wrong: '回答错误！', gameOver: '训练结束', totalScore: '总得分', stars: '星级', edit: '编辑', del: '删除', confirmDel: '确定删除？',
+    noData: '暂无游戏数据，请先进入编辑器创建。', star1Req: '一星要求', star2Req: '两星要求', star3Req: '三星要求',
+    qPrefix: '第', qSuffix: '题', editQ: '编辑题目', newQTitle: '新建题目', skip: '跳过', newPackDefault: '新练习包'
   },
   en: {
-    title: '3D Mental Rotation', chooseLevel: 'Select a Level', editor: 'Editor Hub', 
+    title: '3D Mental Rotation Training', chooseLevel: 'Select a Level', editor: 'Editor Hub', 
     menu: 'Menu', resume: 'Resume', backMenu: 'Main Menu', export: 'Export', import: 'Import',
     vEditor: '3D Voxel Editor', lEditor: 'Logic Editor', name: 'Name', color: 'Color', material: 'Material', wood: 'Wood', glass: 'Glass', gem: 'Gem',
-    save: 'Save', clear: 'Clear', objList: 'Library', buildMode: 'Build', eraseMode: 'Erase',
-    vHint: 'Select tool on the left. Use Rotate mode (or Right-Click) to move camera.',
+    save: 'Save', clear: 'Clear', objList: 'Library', buildMode: 'Build', eraseMode: 'Erase', rotateMode: 'Camera',
+    vHint: 'Select tool on the left. Use Camera mode (or Right-Click) to move view.',
     levelPacks: 'Levels', newPack: 'New', packName: 'Name', timeLimit: 'Time', speed: 'Speed', scoreWin: 'Win', scoreLoss: 'Loss', scoreSkip: 'Skip',
     savePack: 'Save Pack', questions: 'Q&A', newQ: 'New Q',
     type: 'Type', match: 'Match', mismatch: 'Mismatch', obj1: 'Left', obj2: 'Right', colorSyncHint: '💡 Note: Right object colors and materials sync to the Left.',
     qHint: 'Rotate objects to set start orientations.', saveQ: 'Save Q',
     score: 'Score', btnMatch: 'Same', btnMismatch: 'Diff', escGameHint: 'Tap top-right gear to pause (Pinch to Zoom)',
     leftHint: 'Tap to toggle auto rotation', rightHint: 'Drag to match left view',
-    correct: 'Correct!', wrong: 'Wrong!', gameOver: 'Finish', totalScore: 'Score', stars: 'Stars', edit: 'Edit', del: 'Del', confirmDel: 'Confirm Delete?'
+    correct: 'Correct!', wrong: 'Wrong!', gameOver: 'Finish', totalScore: 'Score', stars: 'Stars', edit: 'Edit', del: 'Del', confirmDel: 'Confirm Delete?',
+    noData: 'No game data. Please create in the editor first.', star1Req: '1-Star Req', star2Req: '2-Star Req', star3Req: '3-Star Req',
+    qPrefix: 'Question', qSuffix: '', editQ: 'Edit Question', newQTitle: 'New Question', skip: 'Skip', newPackDefault: 'New Level Pack'
   }
 };
 
@@ -454,7 +457,7 @@ class VoxelEditor {
           return;
       }
       const rect = this.container.getBoundingClientRect();
-      if(rect.width === 0 || rect.height === 0) return; // 修复：防止容器不可见时引发计算错误
+      if(rect.width === 0 || rect.height === 0) return; 
       this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -527,7 +530,6 @@ class ObjectViewer {
     this.container.addEventListener('contextmenu', e => e.preventDefault());
     this.scene = new THREE.Scene(); 
     this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth/this.container.clientHeight, 0.1, 100);
-    // 修复：将默认相机拉近1.5倍（从15变成10）
     this.camera.position.set(0, 0, 10);
     
     this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
@@ -561,7 +563,6 @@ class ObjectViewer {
     this.autoRotateState = 0; this.rotSeconds = 3; this.clock = new THREE.Clock(); this.animate();
   }
   
-  // 修复：更新基于拉近视角后的缩放基数，配合视图更新矩阵
   setZoom(val) { 
     if (this.camera) {
         this.camera.position.z = 10 / val; 
@@ -604,7 +605,7 @@ class ObjectViewer {
 const app = createApp({
   setup() {
     const state = reactive({
-      lang: 'zh', screen: 'main', editorTab: 'voxel', isEscOpen: false, 
+      lang: 'en', screen: 'main', editorTab: 'voxel', isEscOpen: false, 
       data: loadData(), 
       currentGame: null, currentQIndex: 0, score: 0, timeLeft: 0, timer: null, showFeedback: '', stars: 0,
       currentPackIndex: -1, editingPack: null, editingQ: null, editingQIndex: -1,
@@ -636,7 +637,6 @@ const app = createApp({
 
     const resizeAll = async () => {
       await nextTick();
-      // 等待 Flex 布局动画过渡完成后重绘画布，防止比例失调
       setTimeout(() => {
         [voxelEngine, logicLeftEngine, logicRightEngine, gameLeftEngine, gameRightEngine].forEach(e => e?.resize());
       }, 50);
@@ -650,7 +650,6 @@ const app = createApp({
       if (gameRightEngine) gameRightEngine.setZoom(val);
     });
 
-    // 修复：提高最大放大倍数到 3.5
     const handleWheelZoom = (e) => {
       const step = 0.1;
       let newZoom = state.zoom + (e.deltaY < 0 ? step : -step);
@@ -697,7 +696,7 @@ const app = createApp({
     const loadVoxel = (obj) => { if(voxelEngine) { voxelEngine.load(obj.voxels); voxelState.name = obj.name; } };
     const deleteVoxel = (id) => { if(confirm(t('confirmDel'))) state.data.objects = state.data.objects.filter(o => o.id !== id); };
 
-    const newPack = () => { state.editingPack = { id: Date.now().toString(), name: '新练习包', timeLimit: 60, speed: 3, scoreWin: 10, scoreLoss: 5, scoreSkip: 0, star1: 30, star2: 60, star3: 100, questions: [] }; state.currentPackIndex = -1; state.editingQ = null; };
+    const newPack = () => { state.editingPack = { id: Date.now().toString(), name: t('newPackDefault'), timeLimit: 60, speed: 3, scoreWin: 10, scoreLoss: 5, scoreSkip: 0, star1: 30, star2: 60, star3: 100, questions: [] }; state.currentPackIndex = -1; state.editingQ = null; };
     const editPack = (idx) => { state.currentPackIndex = idx; state.editingPack = JSON.parse(JSON.stringify(state.data.levels[idx])); state.editingQ = null; };
     const savePack = () => {
       if (!state.editingPack?.name) return;
