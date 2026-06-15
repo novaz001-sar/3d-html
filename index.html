@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <!-- 针对平板：禁止页面默认缩放，防止手势冲突 -->
+  <!-- 针对移动端：禁止页面默认缩放，防止手势冲突 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>3D 心理旋转能力训练</title>
   
@@ -23,29 +23,38 @@
     canvas { outline: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
     
     /* 适老化大号无障碍按钮与动画 */
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 2rem; font-size: 1.5rem; border-radius: 1.5rem; font-weight: 900; transition: all 0.15s; box-shadow: 0 6px 10px rgba(0,0,0,0.15); cursor: pointer; border: none; outline: none; -webkit-tap-highlight-color: transparent; }
-    @media (min-width: 768px) { .btn { padding: 1.25rem 2.5rem; font-size: 1.75rem; } }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; font-size: 1.125rem; border-radius: 1.25rem; font-weight: 900; transition: all 0.15s; box-shadow: 0 4px 6px rgba(0,0,0,0.15); cursor: pointer; border: none; outline: none; -webkit-tap-highlight-color: transparent; }
+    @media (min-width: 640px) { .btn { padding: 1rem 2rem; font-size: 1.5rem; border-radius: 1.5rem; } }
+    @media (min-width: 768px) { .btn { padding: 1.25rem 2.5rem; font-size: 1.75rem; box-shadow: 0 6px 10px rgba(0,0,0,0.15); } }
     .btn:active { transform: translateY(4px); box-shadow: none; }
-    .btn-primary { background-color: #2563eb; color: white; border-bottom: 6px solid #1e40af; }
-    .btn-success { background-color: #16a34a; color: white; border-bottom: 6px solid #14532d; }
-    .btn-danger { background-color: #dc2626; color: white; border-bottom: 6px solid #7f1d1d; }
-    .btn-secondary { background-color: #64748b; color: white; border-bottom: 6px solid #334155; }
+    .btn-primary { background-color: #2563eb; color: white; border-bottom: 4px solid #1e40af; }
+    @media (min-width: 768px) { .btn-primary { border-bottom-width: 6px; } }
+    .btn-success { background-color: #16a34a; color: white; border-bottom: 4px solid #14532d; }
+    @media (min-width: 768px) { .btn-success { border-bottom-width: 6px; } }
+    .btn-danger { background-color: #dc2626; color: white; border-bottom: 4px solid #7f1d1d; }
+    @media (min-width: 768px) { .btn-danger { border-bottom-width: 6px; } }
+    .btn-secondary { background-color: #64748b; color: white; border-bottom: 4px solid #334155; }
     
     /* 适老化输入框 */
-    .input-large { font-size: 1.25rem; padding: 0.75rem; border-radius: 1rem; border: 4px solid #cbd5e1; width: 100%; box-sizing: border-box; font-weight: bold; color: #1e293b; transition: border-color 0.2s; }
+    .input-large { font-size: 1rem; padding: 0.5rem; border-radius: 0.75rem; border: 2px solid #cbd5e1; width: 100%; box-sizing: border-box; font-weight: bold; color: #1e293b; transition: border-color 0.2s; }
+    @media (min-width: 640px) { .input-large { font-size: 1.25rem; padding: 0.75rem; border-radius: 1rem; border-width: 4px; } }
     @media (min-width: 768px) { .input-large { font-size: 1.5rem; padding: 1rem; } }
     .input-large:focus { border-color: #3b82f6; outline: none; }
-    label { font-size: 1.25rem; font-weight: 900; color: #334155; margin-bottom: 0.5rem; display: block; }
+    label { font-size: 1rem; font-weight: 900; color: #334155; margin-bottom: 0.25rem; display: block; }
+    @media (min-width: 640px) { label { font-size: 1.25rem; margin-bottom: 0.5rem; } }
     @media (min-width: 768px) { label { font-size: 1.5rem; } }
     
     /* 自定义大号滑块样式 */
-    .range-slider { -webkit-appearance: none; width: 100%; height: 20px; background: #e2e8f0; border-radius: 10px; outline: none; }
-    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 40px; height: 40px; background: #2563eb; cursor: pointer; border-radius: 50%; border: 4px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .range-slider { -webkit-appearance: none; width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; outline: none; }
+    @media (min-width: 768px) { .range-slider { height: 20px; border-radius: 10px; } }
+    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: #2563eb; cursor: pointer; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    @media (min-width: 768px) { .range-slider::-webkit-slider-thumb { width: 40px; height: 40px; border-width: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); } }
     
     .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     
-    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar { width: 8px; }
+    @media (min-width: 768px) { ::-webkit-scrollbar { width: 12px; } }
     ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 6px; }
     ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 6px; }
   </style>
@@ -55,21 +64,21 @@
 <div id="app" class="w-screen h-screen flex flex-col relative overflow-hidden">
 
   <!-- 系统菜单与语言切换 -->
-  <div v-if="state.screen !== 'editor'" class="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex gap-4 md:gap-6">
-    <button @click="state.isEscOpen = !state.isEscOpen" class="btn bg-white text-slate-800 border-4 border-slate-300 shadow-xl px-4 py-2 md:px-8 md:py-3 text-lg md:text-2xl">⚙️ {{ t('menu') }}</button>
-    <button @click="toggleLang" class="btn bg-slate-800 text-white border-4 border-slate-800 shadow-xl px-4 py-2 md:px-8 md:py-3 text-lg md:text-2xl">🌐 {{ state.lang === 'en' ? '中' : 'EN' }}</button>
+  <div v-if="state.screen !== 'editor'" class="absolute top-2 right-2 sm:top-4 sm:right-4 md:top-8 md:right-8 z-40 flex gap-2 md:gap-6">
+    <button @click="state.isEscOpen = !state.isEscOpen" class="btn bg-white text-slate-800 border-2 md:border-4 border-slate-300 shadow-xl px-3 py-1 md:px-8 md:py-3 text-sm sm:text-lg md:text-2xl">⚙️ {{ t('menu') }}</button>
+    <button @click="toggleLang" class="btn bg-slate-800 text-white border-2 md:border-4 border-slate-800 shadow-xl px-3 py-1 md:px-8 md:py-3 text-sm sm:text-lg md:text-2xl">🌐 {{ state.lang === 'en' ? '中' : 'EN' }}</button>
   </div>
 
   <!-- 暂停菜单 -->
   <transition name="fade">
     <div v-show="state.isEscOpen" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-80 backdrop-blur-md p-4">
-      <div class="bg-white p-8 md:p-16 rounded-[2rem] md:rounded-[3rem] text-center shadow-2xl w-full max-w-2xl border-8 border-slate-200 flex flex-col gap-6 md:gap-8">
-        <h2 class="text-4xl md:text-6xl font-black mb-4 md:mb-8 text-blue-800">{{ t('menu') }}</h2>
-        <button @click="state.isEscOpen = false" class="btn btn-success w-full text-2xl md:text-4xl py-4 md:py-6">▶ {{ t('resume') }}</button>
-        <button @click="state.screen = 'main'; state.isEscOpen = false; stopTimer();" class="btn btn-primary w-full text-2xl md:text-3xl py-4 md:py-6">🏠 {{ t('backMenu') }}</button>
-        <div class="flex flex-col md:flex-row gap-4 md:gap-6 mt-2 md:mt-4">
-          <button @click="exportJson" class="btn bg-indigo-600 hover:bg-indigo-700 text-white flex-1 text-xl md:text-2xl border-b-8 border-indigo-800 py-4">📤 {{ t('export') }}</button>
-          <label class="btn bg-teal-600 hover:bg-teal-700 text-white flex-1 cursor-pointer text-xl md:text-2xl m-0 border-b-8 border-teal-800 py-4">
+      <div class="bg-white p-6 md:p-16 rounded-2xl md:rounded-[3rem] text-center shadow-2xl w-full max-w-2xl border-4 md:border-8 border-slate-200 flex flex-col gap-4 md:gap-8">
+        <h2 class="text-3xl sm:text-4xl md:text-6xl font-black mb-2 md:mb-8 text-blue-800">{{ t('menu') }}</h2>
+        <button @click="state.isEscOpen = false" class="btn btn-success w-full text-xl md:text-4xl py-3 md:py-6">▶ {{ t('resume') }}</button>
+        <button @click="state.screen = 'main'; state.isEscOpen = false; stopTimer();" class="btn btn-primary w-full text-xl md:text-3xl py-3 md:py-6">🏠 {{ t('backMenu') }}</button>
+        <div class="flex flex-col md:flex-row gap-3 md:gap-6 mt-2 md:mt-4">
+          <button @click="exportJson" class="btn bg-indigo-600 hover:bg-indigo-700 text-white flex-1 text-lg md:text-2xl border-b-4 md:border-b-8 border-indigo-800 py-3 md:py-4">📤 {{ t('export') }}</button>
+          <label class="btn bg-teal-600 hover:bg-teal-700 text-white flex-1 cursor-pointer text-lg md:text-2xl m-0 border-b-4 md:border-b-8 border-teal-800 py-3 md:py-4">
             📥 {{ t('import') }} <input type="file" class="hidden" accept=".json" @change="importJson">
           </label>
         </div>
@@ -79,48 +88,47 @@
 
   <!-- 主界面 -->
   <div v-show="state.screen === 'main'" class="flex flex-col items-center justify-center h-full bg-slate-100 p-4">
-    <h1 class="text-5xl md:text-[5rem] text-center font-black text-blue-800 mb-8 md:mb-16 drop-shadow-xl tracking-wider">{{ t('title') }}</h1>
+    <h1 class="text-4xl sm:text-5xl md:text-[5rem] text-center font-black text-blue-800 mb-6 md:mb-16 drop-shadow-xl tracking-wider">{{ t('title') }}</h1>
     
-    <div class="bg-white p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] shadow-2xl w-full max-w-5xl mb-8 md:mb-12 border-4 border-slate-200">
-      <h2 class="text-3xl md:text-5xl font-extrabold mb-6 md:mb-10 text-center text-slate-700">{{ t('chooseLevel') }}</h2>
-      <div v-if="state.data.levels.length === 0" class="text-xl md:text-3xl text-red-500 text-center mb-6 font-bold bg-red-50 py-4 md:py-8 rounded-2xl">暂无游戏数据，请先进入编辑器创建。</div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-h-[40vh] overflow-y-auto pr-2 md:pr-4">
-        <button v-for="lvl in state.data.levels" :key="lvl.id" @click="startGame(lvl.id)" class="btn btn-success text-2xl md:text-4xl h-24 md:h-32 shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 border-b-[6px] md:border-b-[8px] border-green-700">
+    <div class="bg-white p-4 sm:p-6 md:p-12 rounded-2xl md:rounded-[3rem] shadow-2xl w-full max-w-5xl mb-6 md:mb-12 border-2 md:border-4 border-slate-200">
+      <h2 class="text-2xl sm:text-3xl md:text-5xl font-extrabold mb-4 md:mb-10 text-center text-slate-700">{{ t('chooseLevel') }}</h2>
+      <div v-if="state.data.levels.length === 0" class="text-base sm:text-xl md:text-3xl text-red-500 text-center mb-4 md:mb-6 font-bold bg-red-50 py-3 md:py-8 rounded-xl md:rounded-2xl">暂无游戏数据，请先进入编辑器创建。</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 max-h-[40vh] overflow-y-auto pr-2 md:pr-4">
+        <button v-for="lvl in state.data.levels" :key="lvl.id" @click="startGame(lvl.id)" class="btn btn-success text-lg sm:text-2xl md:text-4xl h-16 sm:h-24 md:h-32 shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 border-b-4 md:border-b-[8px] border-green-700">
           🎮 {{ lvl.name }}
         </button>
       </div>
     </div>
     
-    <button @click="state.screen = 'editor'" class="btn bg-slate-700 text-white hover:bg-slate-800 text-2xl md:text-4xl py-4 px-12 md:py-8 md:px-24 rounded-full border-b-[6px] md:border-b-[8px] border-slate-900 shadow-2xl">⚙️ {{ t('editor') }}</button>
+    <button @click="state.screen = 'editor'" class="btn bg-slate-700 text-white hover:bg-slate-800 text-xl sm:text-2xl md:text-4xl py-3 px-8 sm:px-12 md:py-8 md:px-24 rounded-full border-b-4 md:border-b-[8px] border-slate-900 shadow-2xl">⚙️ {{ t('editor') }}</button>
   </div>
 
   <!-- 编辑器界面 -->
   <div v-show="state.screen === 'editor'" class="flex flex-col h-full bg-slate-50">
-    <div class="bg-slate-800 text-white p-4 md:p-6 flex flex-wrap gap-4 md:gap-8 items-center justify-between shadow-xl z-20">
-      <div class="flex items-center gap-4">
-        <button @click="state.screen = 'main'" class="px-4 py-2 md:px-8 md:py-4 hover:bg-slate-700 rounded-xl md:rounded-2xl bg-slate-600 font-bold text-xl md:text-3xl transition">← {{ t('backMenu') }}</button>
-        <div class="text-2xl md:text-4xl font-black px-4 md:px-8 border-l-4 border-slate-600 hidden md:block">{{ t('editor') }}</div>
+    <div class="bg-slate-800 text-white p-3 md:p-6 flex flex-wrap gap-2 md:gap-8 items-center justify-between shadow-xl z-20">
+      <div class="flex items-center gap-2 md:gap-4">
+        <button @click="state.screen = 'main'" class="px-3 py-1.5 md:px-8 md:py-4 hover:bg-slate-700 rounded-lg md:rounded-2xl bg-slate-600 font-bold text-sm md:text-3xl transition">← {{ t('backMenu') }}</button>
+        <div class="text-lg md:text-4xl font-black px-2 md:px-8 border-l-2 md:border-l-4 border-slate-600 hidden sm:block">{{ t('editor') }}</div>
       </div>
       <div class="flex gap-2 md:gap-6">
-        <button @click="state.editorTab = 'voxel'" :class="state.editorTab === 'voxel' ? 'bg-blue-500 scale-105' : 'bg-slate-600'" class="px-4 py-2 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-bold text-lg md:text-3xl shadow-lg transition">🧱 {{ t('vEditor') }}</button>
-        <button @click="state.editorTab = 'logic'" :class="state.editorTab === 'logic' ? 'bg-blue-500 scale-105' : 'bg-slate-600'" class="px-4 py-2 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-bold text-lg md:text-3xl shadow-lg transition">⚙️ {{ t('lEditor') }}</button>
+        <button @click="state.editorTab = 'voxel'" :class="state.editorTab === 'voxel' ? 'bg-blue-500 scale-105' : 'bg-slate-600'" class="px-3 py-1.5 md:px-10 md:py-4 rounded-lg md:rounded-2xl font-bold text-sm md:text-3xl shadow-lg transition">🧱 {{ t('vEditor') }}</button>
+        <button @click="state.editorTab = 'logic'" :class="state.editorTab === 'logic' ? 'bg-blue-500 scale-105' : 'bg-slate-600'" class="px-3 py-1.5 md:px-10 md:py-4 rounded-lg md:rounded-2xl font-bold text-sm md:text-3xl shadow-lg transition">⚙️ {{ t('lEditor') }}</button>
       </div>
     </div>
     
     <!-- 三维物体编辑器 -->
     <div v-show="state.editorTab === 'voxel'" class="flex flex-col md:flex-row flex-1 overflow-hidden">
-      <!-- 针对平板侧边栏调整为自适应宽度 -->
-      <div class="w-full md:w-1/3 min-w-[300px] max-w-[450px] bg-white shadow-2xl p-6 md:p-10 flex flex-col gap-6 md:gap-8 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-slate-200 z-10">
+      <!-- 针对手机端限制侧边栏最大高度，给画布留空间 -->
+      <div class="w-full md:w-1/3 min-h-[45vh] md:min-h-0 flex-1 md:flex-none max-h-[50vh] md:max-h-none md:min-w-[300px] md:max-w-[450px] bg-white shadow-2xl p-4 md:p-10 flex flex-col gap-4 md:gap-8 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-slate-200 z-10">
         
-        <!-- 构造/擦除/旋转 模式切换 (新增旋转模式适应平板) -->
-        <div class="flex bg-slate-100 p-2 rounded-2xl border-4 border-slate-200 gap-2">
-          <button @click="voxelState.tool = 'add'" :class="voxelState.tool === 'add' ? 'bg-blue-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-2 md:py-4 text-lg md:text-xl font-bold rounded-xl transition cursor-pointer">➕ 建造</button>
-          <button @click="voxelState.tool = 'delete'" :class="voxelState.tool === 'delete' ? 'bg-red-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-2 md:py-4 text-lg md:text-xl font-bold rounded-xl transition cursor-pointer">🧽 擦除</button>
-          <button @click="voxelState.tool = 'rotate'" :class="voxelState.tool === 'rotate' ? 'bg-green-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-2 md:py-4 text-lg md:text-xl font-bold rounded-xl transition cursor-pointer">🔄 视角</button>
+        <div class="flex bg-slate-100 p-1 md:p-2 rounded-xl md:rounded-2xl border-2 md:border-4 border-slate-200 gap-1 md:gap-2">
+          <button @click="voxelState.tool = 'add'" :class="voxelState.tool === 'add' ? 'bg-blue-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">➕ 建造</button>
+          <button @click="voxelState.tool = 'delete'" :class="voxelState.tool === 'delete' ? 'bg-red-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🧽 擦除</button>
+          <button @click="voxelState.tool = 'rotate'" :class="voxelState.tool === 'rotate' ? 'bg-green-500 text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-200'" class="flex-1 py-1.5 md:py-4 text-sm sm:text-lg md:text-xl font-bold rounded-lg md:rounded-xl transition cursor-pointer">🔄 视角</button>
         </div>
 
         <div><label>{{ t('name') }}</label><input v-model="voxelState.name" class="input-large bg-slate-50"></div>
-        <div v-show="voxelState.tool !== 'rotate'"><label>{{ t('color') }}</label><input type="color" v-model="voxelState.color" class="w-full h-16 md:h-24 rounded-2xl cursor-pointer border-4 border-slate-300"></div>
+        <div v-show="voxelState.tool !== 'rotate'"><label>{{ t('color') }}</label><input type="color" v-model="voxelState.color" class="w-full h-12 md:h-24 rounded-lg md:rounded-2xl cursor-pointer border-2 md:border-4 border-slate-300"></div>
         <div v-show="voxelState.tool !== 'rotate'">
           <label>{{ t('material') }}</label>
           <select v-model="voxelState.mat" class="input-large bg-slate-50 cursor-pointer">
@@ -129,20 +137,21 @@
             <option value="gem">💎 {{ t('gem') }}</option>
           </select>
         </div>
-        <button @click="saveVoxel" class="btn btn-success w-full text-2xl md:text-3xl py-4 md:py-6">{{ t('save') }}</button>
-        <button @click="clearVoxel" class="btn text-slate-700 bg-slate-200 hover:bg-slate-300 border-b-4 border-slate-400 w-full py-3 md:py-4 text-xl md:text-2xl">🗑️ {{ t('clear') }}</button>
+        <button @click="saveVoxel" class="btn btn-success w-full text-lg sm:text-2xl md:text-3xl py-2 md:py-6">{{ t('save') }}</button>
+        <button @click="clearVoxel" class="btn text-slate-700 bg-slate-200 hover:bg-slate-300 border-b-2 md:border-b-4 border-slate-400 w-full py-2 md:py-4 text-base md:text-2xl">🗑️ {{ t('clear') }}</button>
         
-        <hr class="border-4 border-slate-100 my-2 rounded-full">
-        <h3 class="text-3xl md:text-4xl font-black text-slate-800">{{ t('objList') }}</h3>
-        <div class="flex flex-col gap-4 pb-10">
+        <hr class="border-2 md:border-4 border-slate-100 my-1 md:my-2 rounded-full">
+        <h3 class="text-xl sm:text-3xl md:text-4xl font-black text-slate-800">{{ t('objList') }}</h3>
+        <div class="flex flex-col gap-2 md:gap-4 pb-4 md:pb-10">
           <div v-for="obj in state.data.objects" :key="obj.id" class="flex gap-2">
-            <button @click="loadVoxel(obj)" class="btn bg-slate-100 border-4 border-slate-200 text-slate-800 text-left hover:bg-blue-100 hover:border-blue-400 text-xl md:text-2xl font-bold py-3 md:py-4 flex-1 truncate">📦 {{ obj.name }}</button>
-            <button @click="deleteVoxel(obj.id)" class="btn btn-danger px-4 md:px-6 text-xl md:text-2xl">🗑️</button>
+            <button @click="loadVoxel(obj)" class="btn bg-slate-100 border-2 md:border-4 border-slate-200 text-slate-800 text-left hover:bg-blue-100 hover:border-blue-400 text-sm sm:text-xl md:text-2xl font-bold py-2 md:py-4 flex-1 truncate">📦 {{ obj.name }}</button>
+            <button @click="deleteVoxel(obj.id)" class="btn btn-danger px-3 md:px-6 text-sm sm:text-xl md:text-2xl">🗑️</button>
           </div>
         </div>
       </div>
-      <div class="flex-1 flex flex-col relative bg-slate-200 touch-none">
-        <div class="bg-blue-100 text-blue-800 text-lg md:text-2xl font-bold p-4 text-center shadow-md z-10 border-b-4 border-blue-200">
+      <!-- 强制 flex-1 和最低高度确保 3D 渲染区域在手机上可见 -->
+      <div class="flex-1 min-h-[40vh] md:min-h-0 flex flex-col relative bg-slate-200 touch-none">
+        <div class="bg-blue-100 text-blue-800 text-xs sm:text-lg md:text-2xl font-bold p-2 md:p-4 text-center shadow-md z-10 border-b-2 md:border-b-4 border-blue-200">
           {{ t('vHint') }}
         </div>
         <div id="voxel-canvas" class="flex-1 relative cursor-crosshair"></div>
@@ -151,54 +160,55 @@
     
     <!-- 练习机制编辑器 -->
     <div v-show="state.editorTab === 'logic'" class="flex flex-col md:flex-row flex-1 overflow-hidden">
-      <div class="w-full md:w-1/3 min-w-[320px] max-w-[480px] bg-white shadow-2xl p-6 md:p-10 flex flex-col gap-6 md:gap-8 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-slate-200 z-10">
-        <h2 class="text-3xl md:text-4xl font-black text-slate-800">{{ t('levelPacks') }}</h2>
-        <button @click="newPack" class="btn btn-primary w-full text-2xl md:text-3xl py-4 md:py-6">+ {{ t('newPack') }}</button>
-        <div class="flex flex-col gap-4">
+      <!-- 同理，限制侧边高度 -->
+      <div class="w-full md:w-1/3 min-h-[40vh] md:min-h-0 flex-1 md:flex-none max-h-[50vh] md:max-h-none md:min-w-[320px] md:max-w-[480px] bg-white shadow-2xl p-4 md:p-10 flex flex-col gap-4 md:gap-8 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-slate-200 z-10">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-800">{{ t('levelPacks') }}</h2>
+        <button @click="newPack" class="btn btn-primary w-full text-lg sm:text-2xl md:text-3xl py-3 md:py-6">+ {{ t('newPack') }}</button>
+        <div class="flex flex-col gap-2 md:gap-4">
           <div v-for="(pack, idx) in state.data.levels" :key="pack.id" class="flex gap-2">
-            <button @click="editPack(idx)" :class="state.currentPackIndex === idx ? 'bg-blue-200 border-blue-500' : 'bg-slate-100 border-slate-200'" class="btn border-4 text-slate-800 text-left hover:bg-blue-100 text-xl md:text-2xl font-bold py-3 md:py-4 flex-1">⚙️ {{ pack.name }}</button>
-            <button @click="deletePack(idx)" class="btn btn-danger px-4 md:px-6 text-xl md:text-2xl">🗑️</button>
+            <button @click="editPack(idx)" :class="state.currentPackIndex === idx ? 'bg-blue-200 border-blue-500' : 'bg-slate-100 border-slate-200'" class="btn border-2 md:border-4 text-slate-800 text-left hover:bg-blue-100 text-sm sm:text-xl md:text-2xl font-bold py-2 md:py-4 flex-1">⚙️ {{ pack.name }}</button>
+            <button @click="deletePack(idx)" class="btn btn-danger px-3 md:px-6 text-sm sm:text-xl md:text-2xl">🗑️</button>
           </div>
         </div>
 
-        <div v-if="state.editingPack" class="flex flex-col gap-4 md:gap-6 mt-4 md:mt-6 border-t-8 border-slate-100 pt-6 md:pt-8 pb-10">
+        <div v-if="state.editingPack" class="flex flex-col gap-3 md:gap-6 mt-2 md:mt-6 border-t-4 md:border-t-8 border-slate-100 pt-4 md:pt-8 pb-6 md:pb-10">
           <div><label>{{ t('packName') }}</label><input v-model="state.editingPack.name" class="input-large bg-blue-50"></div>
-          <div class="grid grid-cols-2 gap-4 md:gap-6">
+          <div class="grid grid-cols-2 gap-3 md:gap-6">
             <div><label>⏱ {{ t('timeLimit') }}</label><input type="number" v-model="state.editingPack.timeLimit" class="input-large"></div>
             <div><label>🔄 {{ t('speed') }}</label><input type="number" v-model="state.editingPack.speed" class="input-large"></div>
             <div><label>✅ {{ t('scoreWin') }}</label><input type="number" v-model="state.editingPack.scoreWin" class="input-large text-green-700 bg-green-50 border-green-300"></div>
             <div><label>❌ {{ t('scoreLoss') }}</label><input type="number" v-model="state.editingPack.scoreLoss" class="input-large text-red-700 bg-red-50 border-red-300"></div>
             <div class="col-span-2"><label>⏭ {{ t('scoreSkip') }}</label><input type="number" v-model="state.editingPack.scoreSkip" class="input-large"></div>
           </div>
-          <div class="bg-yellow-50 p-4 md:p-6 rounded-2xl border-4 border-yellow-200 flex flex-col gap-4">
+          <div class="bg-yellow-50 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 md:border-4 border-yellow-200 flex flex-col gap-2 md:gap-4">
             <div><label>⭐ 一星要求</label><input type="number" v-model="state.editingPack.star1" class="input-large"></div>
             <div><label>⭐⭐ 两星要求</label><input type="number" v-model="state.editingPack.star2" class="input-large"></div>
             <div><label>⭐⭐⭐ 三星要求</label><input type="number" v-model="state.editingPack.star3" class="input-large"></div>
           </div>
-          <button @click="savePack" class="btn btn-success w-full text-2xl md:text-3xl py-4 md:py-6">{{ t('savePack') }}</button>
+          <button @click="savePack" class="btn btn-success w-full text-lg sm:text-2xl md:text-3xl py-3 md:py-6">{{ t('savePack') }}</button>
         </div>
       </div>
       
-      <div v-if="state.editingPack" class="flex-1 p-4 md:p-10 overflow-y-auto bg-slate-100">
-        <div class="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border-4 border-slate-200">
-          <div class="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 border-b-4 border-slate-100 pb-4 md:pb-6 gap-4">
-            <h3 class="text-3xl md:text-5xl font-black text-slate-800 w-full md:w-auto">📝 {{ t('questions') }} ({{ state.editingPack?.questions?.length || 0 }})</h3>
-            <button @click="addQuestion" class="btn btn-primary w-full md:w-auto text-2xl md:text-3xl px-8 md:px-10 py-4 md:py-5">+ {{ t('newQ') }}</button>
+      <div v-if="state.editingPack" class="flex-1 min-h-[40vh] md:min-h-0 p-3 md:p-10 overflow-y-auto bg-slate-100">
+        <div class="bg-white p-4 md:p-10 rounded-xl md:rounded-[2rem] shadow-xl border-2 md:border-4 border-slate-200">
+          <div class="flex flex-col sm:flex-row justify-between items-center mb-4 md:mb-10 border-b-2 md:border-b-4 border-slate-100 pb-3 md:pb-6 gap-2 sm:gap-4">
+            <h3 class="text-xl sm:text-3xl md:text-5xl font-black text-slate-800 w-full sm:w-auto">📝 {{ t('questions') }} ({{ state.editingPack?.questions?.length || 0 }})</h3>
+            <button @click="addQuestion" class="btn btn-primary w-full sm:w-auto text-base sm:text-2xl md:text-3xl px-4 md:px-10 py-2 md:py-5">+ {{ t('newQ') }}</button>
           </div>
           
-          <div class="flex flex-col gap-4 md:gap-5 mb-8 md:mb-10">
-            <div v-for="(q, i) in state.editingPack?.questions" :key="i" class="p-4 md:p-6 bg-slate-50 rounded-2xl text-xl md:text-3xl border-4 border-slate-200 flex flex-col md:flex-row justify-between items-center font-bold text-slate-700 gap-4">
+          <div class="flex flex-col gap-2 md:gap-5 mb-6 md:mb-10">
+            <div v-for="(q, i) in state.editingPack?.questions" :key="i" class="p-3 md:p-6 bg-slate-50 rounded-xl md:rounded-2xl text-sm sm:text-xl md:text-3xl border-2 md:border-4 border-slate-200 flex flex-col sm:flex-row justify-between items-center font-bold text-slate-700 gap-2 sm:gap-4">
               <span>第 {{ i+1 }} 题 : {{ q.type === 'match' ? t('match') : t('mismatch') }}</span>
-              <div class="flex gap-4 w-full md:w-auto">
-                <button @click="editQuestion(i)" class="btn btn-primary flex-1 md:flex-none py-2 md:py-3 px-4 md:px-8 text-lg md:text-2xl">✏️ {{ t('edit') }}</button>
-                <button @click="deleteQuestion(i)" class="btn btn-danger flex-1 md:flex-none py-2 md:py-3 px-4 md:px-8 text-lg md:text-2xl">🗑️ {{ t('del') }}</button>
+              <div class="flex gap-2 md:gap-4 w-full sm:w-auto">
+                <button @click="editQuestion(i)" class="btn btn-primary flex-1 sm:flex-none py-1.5 md:py-3 px-3 md:px-8 text-sm md:text-2xl">✏️ {{ t('edit') }}</button>
+                <button @click="deleteQuestion(i)" class="btn btn-danger flex-1 sm:flex-none py-1.5 md:py-3 px-3 md:px-8 text-sm md:text-2xl">🗑️ {{ t('del') }}</button>
               </div>
             </div>
           </div>
 
-          <div v-if="state.editingQ" class="bg-blue-50 p-6 md:p-10 rounded-3xl border-8 border-blue-200 shadow-inner">
-            <h4 class="text-3xl md:text-4xl font-black text-blue-900 mb-6 md:mb-8">{{ state.editingQIndex >= 0 ? '编辑题目' : '新建题目' }}</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-4">
+          <div v-if="state.editingQ" class="bg-blue-50 p-4 md:p-10 rounded-xl md:rounded-3xl border-4 md:border-8 border-blue-200 shadow-inner">
+            <h4 class="text-xl sm:text-3xl md:text-4xl font-black text-blue-900 mb-4 md:mb-8">{{ state.editingQIndex >= 0 ? '编辑题目' : '新建题目' }}</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-8 mb-3 md:mb-4">
               <div>
                 <label>{{ t('type') }}</label>
                 <select v-model="state.editingQ.type" @change="onObjChange" class="input-large bg-white cursor-pointer">
@@ -221,22 +231,22 @@
             </div>
 
             <!-- 同色说明提示 -->
-            <div class="text-lg md:text-xl text-slate-500 font-bold mb-6 md:mb-8 pl-2">{{ t('colorSyncHint') }}</div>
+            <div class="text-sm md:text-xl text-slate-500 font-bold mb-4 md:mb-8 pl-1 md:pl-2">{{ t('colorSyncHint') }}</div>
             
-            <div class="bg-yellow-100 text-yellow-800 text-lg md:text-2xl font-bold py-4 md:py-5 px-6 md:px-8 rounded-2xl mb-6 md:mb-8 border-4 border-yellow-300">
+            <div class="bg-yellow-100 text-yellow-800 text-sm sm:text-lg md:text-2xl font-bold py-2 md:py-5 px-3 md:px-8 rounded-lg md:rounded-2xl mb-4 md:mb-8 border-2 md:border-4 border-yellow-300">
               {{ t('qHint') }}
             </div>
             
-            <!-- 逻辑视口区，平板需要足够高度 -->
-            <div class="flex flex-col md:flex-row h-[600px] md:h-[450px] gap-6 md:gap-8 mb-6 md:mb-8">
-              <div class="flex-1 flex flex-col bg-white rounded-3xl shadow-lg border-4 border-slate-300 overflow-hidden relative touch-none">
+            <!-- 逻辑视口区 -->
+            <div class="flex flex-col sm:flex-row h-[50vh] md:h-[450px] gap-3 md:gap-8 mb-4 md:mb-8">
+              <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-3xl shadow-lg border-2 md:border-4 border-slate-300 overflow-hidden relative touch-none">
                 <div id="logic-left" class="flex-1 cursor-grab active:cursor-grabbing"></div>
               </div>
-              <div class="flex-1 flex flex-col bg-white rounded-3xl shadow-lg border-4 border-slate-300 overflow-hidden relative touch-none">
+              <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-3xl shadow-lg border-2 md:border-4 border-slate-300 overflow-hidden relative touch-none">
                 <div id="logic-right" class="flex-1 cursor-grab active:cursor-grabbing"></div>
               </div>
             </div>
-            <button @click="saveQuestion" class="btn btn-success w-full text-3xl md:text-4xl py-4 md:py-6 border-b-8 border-green-800 shadow-2xl">💾 {{ t('saveQ') }}</button>
+            <button @click="saveQuestion" class="btn btn-success w-full text-lg sm:text-3xl md:text-4xl py-3 md:py-6 border-b-4 md:border-b-8 border-green-800 shadow-2xl">💾 {{ t('saveQ') }}</button>
           </div>
         </div>
       </div>
@@ -252,73 +262,73 @@
           'bg-green-500 shadow-green-500/50': state.showFeedback === t('correct'),
           'bg-red-500 shadow-red-500/50': state.showFeedback === t('wrong'),
           'bg-yellow-500 shadow-yellow-500/50': state.showFeedback === '⏭️'
-        }" class="text-white text-[6rem] md:text-[12rem] font-black px-16 md:px-32 py-10 md:py-20 rounded-[3rem] md:rounded-[4rem] shadow-2xl border-[8px] md:border-[12px] border-white/30 text-center">
+        }" class="text-white text-[3rem] sm:text-[6rem] md:text-[12rem] font-black px-8 sm:px-16 md:px-32 py-6 sm:py-10 md:py-20 rounded-[2rem] md:rounded-[4rem] shadow-2xl border-[6px] md:border-[12px] border-white/30 text-center">
           {{ state.showFeedback }}
         </div>
       </div>
     </transition>
 
-    <!-- 顶部状态栏 -->
-    <div class="bg-white px-6 py-4 md:px-12 md:py-8 flex flex-col md:flex-row justify-between items-center shadow-lg z-10 border-b-4 md:border-b-8 border-slate-200 gap-4">
-      <div class="flex flex-col items-center md:items-start">
-        <div class="text-4xl md:text-6xl font-black text-slate-800 mb-1 md:mb-2">{{ state.currentGame?.name }}</div>
-        <div class="text-lg md:text-2xl font-bold text-slate-400">{{ t('escGameHint') }}</div>
+    <!-- 顶部状态栏（针对手机自适应） -->
+    <div class="bg-white px-3 py-3 sm:px-6 sm:py-4 md:px-12 md:py-8 flex flex-col items-center shadow-lg z-10 border-b-4 md:border-b-8 border-slate-200 gap-2 sm:gap-4">
+      <div class="flex flex-col items-center w-full">
+        <div class="text-2xl sm:text-4xl md:text-6xl font-black text-slate-800 mb-0 md:mb-2 text-center">{{ state.currentGame?.name }}</div>
+        <div class="text-xs sm:text-lg md:text-2xl font-bold text-slate-400 text-center mt-1">{{ t('escGameHint') }}</div>
       </div>
       
-      <div class="flex flex-wrap justify-center gap-4 md:gap-8 items-center bg-slate-50 px-6 py-3 md:px-10 md:py-4 rounded-[2rem] md:rounded-[2.5rem] border-4 border-slate-200 shadow-inner">
-        <div class="flex items-center gap-2 md:gap-4 pr-4 md:pr-8 border-r-4 border-slate-300">
-          <span class="text-2xl md:text-4xl">🔍</span>
-          <input type="range" v-model.number="state.zoom" min="0.5" max="2.5" step="0.1" class="range-slider w-32 md:w-48">
-          <span class="text-xl md:text-3xl font-black text-slate-400 w-12 md:w-20">{{ Math.round(state.zoom * 100) }}%</span>
+      <!-- 计分数据流式布局防重叠 -->
+      <div class="flex flex-wrap justify-center gap-2 sm:gap-4 md:gap-8 items-center bg-slate-50 px-3 py-2 sm:px-6 md:px-10 md:py-4 rounded-[1.5rem] md:rounded-[2.5rem] border-2 md:border-4 border-slate-200 shadow-inner w-full sm:w-auto">
+        <div class="flex items-center gap-1 sm:gap-2 md:gap-4 pr-2 sm:pr-4 md:pr-8 border-r-2 md:border-r-4 border-slate-300">
+          <span class="text-xl sm:text-2xl md:text-4xl">🔍</span>
+          <input type="range" v-model.number="state.zoom" min="0.5" max="3.5" step="0.1" class="range-slider w-20 sm:w-32 md:w-48">
+          <span class="text-sm sm:text-xl md:text-3xl font-black text-slate-400 w-8 sm:w-12 md:w-20">{{ Math.round(state.zoom * 100) }}%</span>
         </div>
         
-        <div class="text-2xl md:text-4xl font-bold text-slate-500">{{ state.currentQIndex + 1 }} / {{ state.currentGame?.questions?.length || 0 }}</div>
-        <div class="text-3xl md:text-5xl font-black text-blue-700 border-l-4 border-slate-300 pl-4 md:pl-8">🏆 {{ state.score }}</div>
-        <div class="text-3xl md:text-5xl font-black border-l-4 border-slate-300 pl-4 md:pl-8 flex items-center gap-2" :class="state.timeLeft <= 10 ? 'text-red-600 animate-pulse' : 'text-slate-800'">
+        <div class="text-sm sm:text-2xl md:text-4xl font-bold text-slate-500">{{ state.currentQIndex + 1 }} / {{ state.currentGame?.questions?.length || 0 }}</div>
+        <div class="text-lg sm:text-3xl md:text-5xl font-black text-blue-700 border-l-2 md:border-l-4 border-slate-300 pl-2 sm:pl-4 md:pl-8">🏆 {{ state.score }}</div>
+        <div class="text-lg sm:text-3xl md:text-5xl font-black border-l-2 md:border-l-4 border-slate-300 pl-2 sm:pl-4 md:pl-8 flex items-center gap-1 md:gap-2" :class="state.timeLeft <= 10 ? 'text-red-600 animate-pulse' : 'text-slate-800'">
           ⏱️ {{ state.timeLeft }}s
         </div>
       </div>
     </div>
     
-    <!-- 游戏画面区域：在平板上保持左右对比更重要，因此尽量用 flex-row -->
-    <div class="flex-1 flex flex-row p-4 md:p-12 gap-4 md:gap-12 overflow-hidden touch-none" 
+    <!-- 游戏画面区域 -->
+    <div class="flex-1 flex flex-row p-2 sm:p-4 md:p-12 gap-2 sm:gap-4 md:gap-12 overflow-hidden touch-none" 
          @wheel.prevent="handleWheelZoom" 
          @touchstart="handleTouchStart" 
          @touchmove="handleTouchMove" 
          @touchend="handleTouchEnd">
-      <div class="flex-1 flex flex-col relative shadow-2xl rounded-[2rem] md:rounded-[3rem]">
-        <div class="bg-blue-100 text-blue-800 text-xl md:text-4xl font-black p-3 md:p-6 text-center rounded-t-[2rem] md:rounded-t-[3rem] border-4 md:border-8 border-b-0 border-blue-300 tracking-wide">{{ t('leftHint') }}</div>
-        <div id="game-left" class="flex-1 bg-white border-4 md:border-8 border-blue-300 rounded-b-[2rem] md:rounded-b-[3rem] cursor-pointer"></div>
+      <div class="flex-1 flex flex-col relative shadow-2xl rounded-xl md:rounded-[3rem]">
+        <div class="bg-blue-100 text-blue-800 text-xs sm:text-xl md:text-4xl font-black p-1 sm:p-3 md:p-6 text-center rounded-t-xl md:rounded-t-[3rem] border-2 sm:border-4 md:border-8 border-b-0 border-blue-300 tracking-wide">{{ t('leftHint') }}</div>
+        <div id="game-left" class="flex-1 bg-white border-2 sm:border-4 md:border-8 border-blue-300 rounded-b-xl md:rounded-b-[3rem] cursor-pointer"></div>
       </div>
-      <div class="flex-1 flex flex-col relative shadow-2xl rounded-[2rem] md:rounded-[3rem]">
-        <div class="bg-emerald-100 text-emerald-800 text-xl md:text-4xl font-black p-3 md:p-6 text-center rounded-t-[2rem] md:rounded-t-[3rem] border-4 md:border-8 border-b-0 border-emerald-300 tracking-wide">{{ t('rightHint') }}</div>
-        <div id="game-right" class="flex-1 bg-white border-4 md:border-8 border-emerald-300 rounded-b-[2rem] md:rounded-b-[3rem] cursor-grab active:cursor-grabbing"></div>
+      <div class="flex-1 flex flex-col relative shadow-2xl rounded-xl md:rounded-[3rem]">
+        <div class="bg-emerald-100 text-emerald-800 text-xs sm:text-xl md:text-4xl font-black p-1 sm:p-3 md:p-6 text-center rounded-t-xl md:rounded-t-[3rem] border-2 sm:border-4 md:border-8 border-b-0 border-emerald-300 tracking-wide">{{ t('rightHint') }}</div>
+        <div id="game-right" class="flex-1 bg-white border-2 sm:border-4 md:border-8 border-emerald-300 rounded-b-xl md:rounded-b-[3rem] cursor-grab active:cursor-grabbing"></div>
       </div>
     </div>
     
-    <!-- 底部操作按钮：采用 Flex 包裹，防重叠 -->
-    <div class="bg-white p-6 md:p-10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-10 flex flex-wrap justify-center items-center gap-4 md:gap-16 border-t-8 border-slate-200 relative">
-      <button @click="answer(true)" class="btn bg-green-500 hover:bg-green-600 text-white text-3xl md:text-5xl lg:text-6xl py-6 md:py-8 px-10 md:px-20 rounded-full font-black shadow-2xl border-b-[8px] md:border-b-[10px] border-green-700">✔️ {{ t('btnMatch') }}</button>
-      <button @click="answer(false)" class="btn bg-red-500 hover:bg-red-600 text-white text-3xl md:text-5xl lg:text-6xl py-6 md:py-8 px-10 md:px-20 rounded-full font-black shadow-2xl border-b-[8px] md:border-b-[10px] border-red-700">✖️ {{ t('btnMismatch') }}</button>
+    <!-- 底部操作按钮 -->
+    <div class="bg-white p-3 sm:p-6 md:p-10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-10 flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-16 border-t-4 md:border-t-8 border-slate-200 relative">
+      <button @click="answer(true)" class="btn bg-green-500 hover:bg-green-600 text-white text-xl sm:text-3xl md:text-5xl lg:text-6xl py-3 sm:py-6 md:py-8 px-6 sm:px-10 md:px-20 rounded-full font-black shadow-2xl border-b-4 md:border-b-[10px] border-green-700 w-[45%] sm:w-auto">✔️ {{ t('btnMatch') }}</button>
+      <button @click="answer(false)" class="btn bg-red-500 hover:bg-red-600 text-white text-xl sm:text-3xl md:text-5xl lg:text-6xl py-3 sm:py-6 md:py-8 px-6 sm:px-10 md:px-20 rounded-full font-black shadow-2xl border-b-4 md:border-b-[10px] border-red-700 w-[45%] sm:w-auto">✖️ {{ t('btnMismatch') }}</button>
       
-      <!-- Skip 按钮在桌面靠右绝对定位，平板和手机变成流式布局 -->
-      <div class="w-full flex justify-center md:absolute md:w-auto md:right-10 lg:right-16 md:top-1/2 md:-translate-y-1/2 mt-2 md:mt-0">
-        <button @click="skip" class="btn bg-slate-400 hover:bg-slate-500 text-white text-2xl md:text-4xl py-4 md:py-6 px-10 md:px-12 rounded-full font-black shadow-xl border-b-[8px] border-slate-600">⏭️ Skip</button>
+      <div class="w-full sm:w-auto flex justify-center sm:absolute sm:right-4 md:right-10 lg:right-16 top-1/2 sm:-translate-y-1/2 mt-1 sm:mt-0">
+        <button @click="skip" class="btn bg-slate-400 hover:bg-slate-500 text-white text-base sm:text-2xl md:text-4xl py-2 sm:py-4 md:py-6 px-6 sm:px-10 md:px-12 rounded-full font-black shadow-xl border-b-[4px] md:border-b-[8px] border-slate-600">⏭️ Skip</button>
       </div>
     </div>
   </div>
 
   <!-- 结果界面 -->
   <div v-show="state.screen === 'result'" class="flex flex-col items-center justify-center h-full bg-slate-900 bg-opacity-95 absolute inset-0 z-50 backdrop-blur-md p-4">
-    <div class="bg-white p-12 md:p-24 rounded-[3rem] md:rounded-[4rem] shadow-2xl text-center border-8 border-yellow-400 max-w-5xl w-full flex flex-col items-center">
-      <h1 class="text-5xl md:text-[7rem] font-black text-slate-800 mb-8 md:mb-12">{{ t('gameOver') }}</h1>
-      <div class="text-[6rem] md:text-[12rem] mb-10 md:mb-16 flex justify-center gap-6 md:gap-10 text-yellow-400 drop-shadow-2xl">
+    <div class="bg-white p-8 sm:p-12 md:p-24 rounded-3xl md:rounded-[4rem] shadow-2xl text-center border-4 md:border-8 border-yellow-400 max-w-5xl w-full flex flex-col items-center">
+      <h1 class="text-4xl sm:text-5xl md:text-[7rem] font-black text-slate-800 mb-4 sm:mb-8 md:mb-12">{{ t('gameOver') }}</h1>
+      <div class="text-[4rem] sm:text-[6rem] md:text-[12rem] mb-6 sm:mb-10 md:mb-16 flex justify-center gap-4 sm:gap-6 md:gap-10 text-yellow-400 drop-shadow-2xl">
         <span v-for="i in 3" :key="i" :class="i <= state.stars ? 'opacity-100 transform scale-110' : 'opacity-20 grayscale'">⭐</span>
       </div>
-      <div class="text-3xl md:text-[5rem] font-extrabold text-slate-700 mb-12 md:mb-20 bg-blue-50 px-10 md:px-20 py-8 md:py-10 rounded-[2rem] md:rounded-[3rem] border-8 border-blue-200 shadow-inner flex items-center gap-6">
-        {{ t('totalScore') }}: <span class="text-blue-600 text-6xl md:text-[8rem] drop-shadow-md">{{ state.score }}</span>
+      <div class="text-xl sm:text-3xl md:text-[5rem] font-extrabold text-slate-700 mb-8 sm:mb-12 md:mb-20 bg-blue-50 px-6 sm:px-10 md:px-20 py-4 sm:py-8 md:py-10 rounded-[1.5rem] md:rounded-[3rem] border-4 md:border-8 border-blue-200 shadow-inner flex flex-col sm:flex-row items-center gap-2 sm:gap-6">
+        {{ t('totalScore') }}: <span class="text-blue-600 text-4xl sm:text-6xl md:text-[8rem] drop-shadow-md">{{ state.score }}</span>
       </div>
-      <button @click="state.screen = 'main'" class="btn btn-primary text-4xl md:text-6xl py-8 md:py-10 px-20 md:px-32 rounded-full font-black shadow-2xl w-full border-b-[10px] border-blue-800">🏠 {{ t('backMenu') }}</button>
+      <button @click="state.screen = 'main'" class="btn btn-primary text-2xl sm:text-4xl md:text-6xl py-4 sm:py-8 md:py-10 px-12 sm:px-20 md:px-32 rounded-full font-black shadow-2xl w-full border-b-[6px] md:border-b-[10px] border-blue-800">🏠 {{ t('backMenu') }}</button>
     </div>
   </div>
 
@@ -398,14 +408,13 @@ class VoxelEditor {
     this.container.appendChild(this.renderer.domElement);
     
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    // 配置控制器以完美兼容平板与鼠标
     this.controls.mouseButtons = {
-        LEFT: THREE.MOUSE.NONE, // 左键留给手动画图
+        LEFT: THREE.MOUSE.NONE, 
         MIDDLE: THREE.MOUSE.DOLLY,
-        RIGHT: THREE.MOUSE.ROTATE // 桌面端保留右键随时旋转
+        RIGHT: THREE.MOUSE.ROTATE 
     };
     this.controls.touches = {
-        ONE: THREE.TOUCH.NONE, // 单指留给手动画图（默认）
+        ONE: THREE.TOUCH.NONE, 
         TWO: THREE.TOUCH.DOLLY_PAN
     };
     
@@ -427,7 +436,7 @@ class VoxelEditor {
     this.scene.add(this.rollOverMesh);
     
     this.currentColor = '#d97706'; this.currentMat = 'wood';
-    this.tool = 'add'; // 模式区分
+    this.tool = 'add'; 
     this.initEvents(); this.animate();
   }
   
@@ -440,12 +449,12 @@ class VoxelEditor {
 
   initEvents() {
     this.container.addEventListener('pointermove', (e) => {
-      // 旋转工具下，停止方块高亮逻辑
       if (this.tool === 'rotate') {
           this.rollOverMesh.visible = false;
           return;
       }
       const rect = this.container.getBoundingClientRect();
+      if(rect.width === 0 || rect.height === 0) return; // 修复：防止容器不可见时引发计算错误
       this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -467,9 +476,7 @@ class VoxelEditor {
     });
     
     this.container.addEventListener('pointerdown', (e) => {
-      // 在视角模式下，直接交给 OrbitControls 处理，不执行任何画图逻辑
       if (this.tool === 'rotate') return;
-      // 允许鼠标右击不触发画图，直接交给 OrbitControls
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       
       this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -505,7 +512,7 @@ class VoxelEditor {
   }); }
   exportData() { return this.voxels.map(v => ({ x: v.position.x, y: v.position.y, z: v.position.z, color: v.userData.color, mat: v.userData.mat })); }
   resize() { 
-    if(!this.container) return;
+    if(!this.container || this.container.clientWidth === 0) return;
     this.camera.aspect = this.container.clientWidth / this.container.clientHeight; 
     this.camera.updateProjectionMatrix(); 
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight); 
@@ -520,7 +527,8 @@ class ObjectViewer {
     this.container.addEventListener('contextmenu', e => e.preventDefault());
     this.scene = new THREE.Scene(); 
     this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth/this.container.clientHeight, 0.1, 100);
-    this.camera.position.set(0, 0, 15);
+    // 修复：将默认相机拉近1.5倍（从15变成10）
+    this.camera.position.set(0, 0, 10);
     
     this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
@@ -539,7 +547,6 @@ class ObjectViewer {
     this.isDragging = false; this.prevMouse = { x: 0, y: 0 };
     if (allowDragRotate) {
       this.container.addEventListener('pointerdown', e => { 
-          // 确保不受多指影响，只用单指旋转
           this.isDragging=true; this.prevMouse={x: e.clientX, y: e.clientY}; this.container.setPointerCapture(e.pointerId); 
       });
       this.container.addEventListener('pointermove', e => {
@@ -553,7 +560,14 @@ class ObjectViewer {
     }
     this.autoRotateState = 0; this.rotSeconds = 3; this.clock = new THREE.Clock(); this.animate();
   }
-  setZoom(val) { if (this.camera) this.camera.position.z = 15 / val; }
+  
+  // 修复：更新基于拉近视角后的缩放基数，配合视图更新矩阵
+  setZoom(val) { 
+    if (this.camera) {
+        this.camera.position.z = 10 / val; 
+        this.camera.updateProjectionMatrix();
+    }
+  }
   
   loadVoxelData(voxels, initialRotationArray = [0,0,0,1], overrideColor = null, overrideMat = null) {
     while(this.group.children.length > 0) this.group.remove(this.group.children[0]);
@@ -573,7 +587,7 @@ class ObjectViewer {
     this.group.children.forEach(c => c.position.sub(center));
     this.group.quaternion.fromArray(initialRotationArray);
   }
-  resize() { if(!this.container) return; this.camera.aspect = this.container.clientWidth / this.container.clientHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(this.container.clientWidth, this.container.clientHeight); }
+  resize() { if(!this.container || this.container.clientWidth === 0) return; this.camera.aspect = this.container.clientWidth / this.container.clientHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(this.container.clientWidth, this.container.clientHeight); }
   animate() {
     requestAnimationFrame(this.animate.bind(this));
     if(!this.container || this.container.offsetParent === null) return;
@@ -602,13 +616,11 @@ const app = createApp({
 
     let voxelEngine, logicLeftEngine, logicRightEngine, gameLeftEngine, gameRightEngine;
     
-    // 更新工具栏模式
     const voxelState = reactive({ name: '', color: '#d97706', mat: 'wood', tool: 'add' });
 
     watch(() => voxelState.color, (val) => { if(voxelEngine) voxelEngine.currentColor = val; });
     watch(() => voxelState.mat, (val) => { if(voxelEngine) voxelEngine.currentMat = val; });
     
-    // 监听工具切换（建造/擦除/旋转），修改控制器响应
     watch(() => voxelState.tool, (val) => { 
         if(voxelEngine) { 
             voxelEngine.tool = val; 
@@ -624,7 +636,10 @@ const app = createApp({
 
     const resizeAll = async () => {
       await nextTick();
-      [voxelEngine, logicLeftEngine, logicRightEngine, gameLeftEngine, gameRightEngine].forEach(e => e?.resize());
+      // 等待 Flex 布局动画过渡完成后重绘画布，防止比例失调
+      setTimeout(() => {
+        [voxelEngine, logicLeftEngine, logicRightEngine, gameLeftEngine, gameRightEngine].forEach(e => e?.resize());
+      }, 50);
     };
     watch(() => state.screen, resizeAll);
     watch(() => state.editorTab, resizeAll);
@@ -635,10 +650,11 @@ const app = createApp({
       if (gameRightEngine) gameRightEngine.setZoom(val);
     });
 
+    // 修复：提高最大放大倍数到 3.5
     const handleWheelZoom = (e) => {
       const step = 0.1;
       let newZoom = state.zoom + (e.deltaY < 0 ? step : -step);
-      state.zoom = Math.max(0.5, Math.min(2.5, Math.round(newZoom * 10) / 10));
+      state.zoom = Math.max(0.5, Math.min(3.5, Math.round(newZoom * 10) / 10));
     };
 
     let initialPinchDistance = null;
@@ -656,14 +672,13 @@ const app = createApp({
 
     const handleTouchMove = (e) => {
       if (e.touches.length === 2 && initialPinchDistance) {
-        // e.preventDefault() 已经被CSS touch-none 接管，此处计算缩放即可
         const currentDistance = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
         const scale = currentDistance / initialPinchDistance;
         let newZoom = initialZoom * scale;
-        state.zoom = Math.max(0.5, Math.min(2.5, Math.round(newZoom * 100) / 100));
+        state.zoom = Math.max(0.5, Math.min(3.5, Math.round(newZoom * 100) / 100));
       }
     };
 
@@ -835,7 +850,6 @@ const app = createApp({
       gameRightEngine = new ObjectViewer('game-right', true);
       const gl = document.getElementById('game-left');
       if(gl) gl.addEventListener('pointerdown', () => { if(gameLeftEngine) gameLeftEngine.autoRotateState = (gameLeftEngine.autoRotateState + 1) % 3; });
-      // 保留ESC快捷键（如果有实体键盘的平板用户依然可以触发）
       window.addEventListener('keydown', e => { if (e.key === 'Escape') state.isEscOpen = !state.isEscOpen; });
     });
 
