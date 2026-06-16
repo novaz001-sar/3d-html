@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>3D 心理旋转训练｜积木星球离线版</title>
+  <title>积木星球｜3D 心理旋转训练</title>
   <!--
     视觉优化离线版 / Visual Offline Edition
     - 界面响应式升级：解决移动端卡片挤压消失、按钮重叠、无法滚动等问题。
@@ -258,8 +258,15 @@
       height: 28px;
     }
 
-    /* 桌面端高度 100% 保持内部滚动 */
-    .editor-shell { display: flex; flex-direction: column; gap: 16px; height: 100%; padding-top: 86px; }
+    /* 保证编辑器主体自身可以滚动 */
+    .editor-shell { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 16px; 
+      height: 100%; 
+      padding-top: 86px;
+      overflow-y: auto; 
+    }
     .editor-top {
       position: absolute;
       left: clamp(12px, 2vw, 24px);
@@ -277,13 +284,15 @@
       display: grid;
       grid-template-columns: minmax(310px, 420px) 1fr;
       gap: clamp(14px, 2vw, 24px);
-      min-height: 0;
+      min-height: min-content; /* 允许撑开 */
       flex: 1;
     }
-    .side, .work { min-height: 0; overflow: auto; }
-    .side { display: flex; flex-direction: column; gap: 16px; }
-    .work { display: flex; flex-direction: column; gap: 16px; }
-    .tool-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    
+    /* 让侧边栏和工作区在桌面端也可以内部滚动，手机端由外层接管 */
+    .side, .work { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+    
+    /* 侧边栏工具隐藏掉无用的擦除，因为现在点击即擦除 */
+    .tool-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .tool-btn {
       padding: 12px 8px;
       border-radius: 18px;
@@ -297,6 +306,7 @@
     .tool-btn.active { color: #fff; border-color: rgba(255,255,255,.9); background: linear-gradient(180deg, #60a5fa, #2563eb); box-shadow: 0 10px 24px rgba(37,99,235,.22); }
     .tool-btn.danger.active { background: linear-gradient(180deg, #fb7185, #dc2626); }
     .tool-btn.green.active { background: linear-gradient(180deg, #4ade80, #16a34a); }
+    
     .list { display: flex; flex-direction: column; gap: 10px; }
     .list-item {
       display: flex;
@@ -309,7 +319,7 @@
       box-shadow: var(--soft-shadow);
     }
     .list-title { flex: 1; font-weight: 1000; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(1rem, 1.6vw, 1.2rem); }
-    .mini-muted { font-weight: 800; color: var(--muted); font-size: .95rem; }
+    
     .canvas-card {
       position: relative;
       overflow: hidden;
@@ -344,12 +354,13 @@
       font-weight: 1000;
       pointer-events: none;
     }
+    
     .voxel-work-grid {
       display: grid;
       grid-template-columns: 1.15fr .85fr;
       gap: clamp(14px, 2vw, 24px);
       flex: 1;
-      min-height: 0;
+      min-height: min-content; /* 允许撑开 */
     }
     .grid-canvas-wrap { min-height: 420px; }
     .preview-canvas-wrap { min-height: 420px; }
@@ -369,7 +380,7 @@
     .q-controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
     /* 桌面端高度 100% 保持内部滚动 */
-    .game-shell { display: flex; flex-direction: column; height: 100%; gap: clamp(12px, 1.8vw, 22px); padding-bottom: calc(12px + var(--safe-bottom)); }
+    .game-shell { display: flex; flex-direction: column; height: 100%; gap: clamp(12px, 1.8vw, 22px); padding-bottom: calc(12px + var(--safe-bottom)); overflow-y: auto;}
     .hud {
       display: flex;
       flex-direction: column;
@@ -412,7 +423,7 @@
     }
     .game-stage {
       flex: 1;
-      min-height: 0;
+      min-height: min-content;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: clamp(12px, 2vw, 24px);
@@ -604,16 +615,16 @@
 
   const I18N = {
     zh: {
-      title: '3D 心理旋转训练', edition: '积木星球离线版', choose: '选择一个关卡开始训练', editor: '编辑器', menu: '菜单', lang: 'EN',
+      title: '积木星球', edition: '3D 心理旋转训练', choose: '选择一个关卡开始训练', editor: '编辑器', menu: '菜单', lang: 'EN',
       offline: '单文件离线运行', noNet: '无外部图片 / 字体 / CDN', gentle: '大按钮、高清对比、适合触控', start: '开始', back: '返回主界面', export: '导出 JSON', import: '导入 JSON',
-      voxelEditor: '三维物体编辑器', logicEditor: '关卡机制编辑器', build: '建造', erase: '擦除', camera: '旋转预览', name: '名称', color: '颜色', material: '材质', wood: '木头', glass: '玻璃', gem: '宝石', saveObj: '保存物体', clear: '清空', library: '素材库', layer: '深度层 Z', gridHint: '点击左侧网格添加/擦除方块；右侧预览可拖拽旋转。',
+      voxelEditor: '三维物体编辑器', logicEditor: '关卡机制编辑器', build: '建造/擦除', erase: '擦除', camera: '旋转预览', name: '名称', color: '颜色', material: '材质', wood: '木头', glass: '玻璃', gem: '宝石', saveObj: '保存物体', clear: '清空', library: '素材库', layer: '深度层 Z', gridHint: '点击网格：空白处添加，已有方块处消除；右侧预览可拖拽旋转。',
       levels: '关卡包', newPack: '新建关卡', packName: '关卡名称', time: '时间(秒)', speed: '自动旋转秒/圈', win: '正确加分', loss: '错误扣分', skipScore: '跳过得分', star1: '一星要求', star2: '二星要求', star3: '三星要求', savePack: '保存关卡', questions: '题目', addQ: '添加题目', type: '类型', match: '相同', mismatch: '不同', leftObj: '左侧物体', rightObj: '右侧物体', saveQ: '保存题目', dragSet: '拖拽两个预览图，设置题目初始角度。右侧颜色会跟随左侧，避免颜色干扰。',
       score: '得分', timeLeft: '剩余', question: '第', qUnit: '题', leftHint: '点击切换自动旋转', rightHint: '拖动旋转观察', same: '相同', different: '不同', skip: '跳过', pause: '暂停', resume: '继续游戏', correct: '回答正确！', wrong: '回答错误！', skipped: '已跳过', finish: '训练结束', totalScore: '总得分', deleteConfirm: '确定删除吗？', noData: '暂无关卡，请先进入编辑器创建。', emptyObj: '请先创建至少一个物体。', emptyQuestions: '这个关卡还没有题目。'
     },
     en: {
-      title: '3D Mental Rotation Training', edition: 'Toy Planet Offline Edition', choose: 'Choose a level to start', editor: 'Editor', menu: 'Menu', lang: '中',
+      title: 'Toy Planet', edition: '3D Mental Rotation', choose: 'Choose a level to start', editor: 'Editor', menu: 'Menu', lang: '中',
       offline: 'Single-file offline', noNet: 'No images / fonts / CDN', gentle: 'Large buttons and touch-friendly contrast', start: 'Start', back: 'Main Menu', export: 'Export JSON', import: 'Import JSON',
-      voxelEditor: '3D Object Editor', logicEditor: 'Level Logic Editor', build: 'Build', erase: 'Erase', camera: 'Rotate Preview', name: 'Name', color: 'Color', material: 'Material', wood: 'Wood', glass: 'Glass', gem: 'Gem', saveObj: 'Save Object', clear: 'Clear', library: 'Library', layer: 'Depth Z Layer', gridHint: 'Tap the grid to add/erase cubes; drag the preview to rotate it.',
+      voxelEditor: '3D Object Editor', logicEditor: 'Level Logic Editor', build: 'Build/Erase', erase: 'Erase', camera: 'Rotate Preview', name: 'Name', color: 'Color', material: 'Material', wood: 'Wood', glass: 'Glass', gem: 'Gem', saveObj: 'Save Object', clear: 'Clear', library: 'Library', layer: 'Depth Z Layer', gridHint: 'Tap grid: empty to add, existing to erase; drag the preview to rotate it.',
       levels: 'Level Packs', newPack: 'New Level', packName: 'Level Name', time: 'Time', speed: 'Auto seconds/turn', win: 'Correct +', loss: 'Wrong -', skipScore: 'Skip score', star1: '1 Star', star2: '2 Stars', star3: '3 Stars', savePack: 'Save Level', questions: 'Questions', addQ: 'Add Question', type: 'Type', match: 'Same', mismatch: 'Different', leftObj: 'Left Object', rightObj: 'Right Object', saveQ: 'Save Question', dragSet: 'Drag both previews to set starting rotations. Right colors sync with the left object.',
       score: 'Score', timeLeft: 'Time', question: 'Q', qUnit: '', leftHint: 'Tap to change auto rotation', rightHint: 'Drag to inspect', same: 'Same', different: 'Different', skip: 'Skip', pause: 'Pause', resume: 'Resume', correct: 'Correct!', wrong: 'Wrong!', skipped: 'Skipped', finish: 'Finished', totalScore: 'Score', deleteConfirm: 'Delete?', noData: 'No levels yet. Create one in the editor.', emptyObj: 'Create at least one object first.', emptyQuestions: 'This level has no questions yet.'
     }
@@ -736,7 +747,6 @@
         <aside class="glass panel-tight side">
           <div class="tool-row">
             <button class="tool-btn ${v.tool === 'build' ? 'active' : ''}" data-tool="build">➕ ${t('build')}</button>
-            <button class="tool-btn danger ${v.tool === 'erase' ? 'active' : ''}" data-tool="erase">🧽 ${t('erase')}</button>
             <button class="tool-btn green ${v.tool === 'camera' ? 'active' : ''}" data-tool="camera">🔄 ${t('camera')}</button>
           </div>
           <div class="field"><label>${t('name')}</label><input id="voxel-name" class="input" value="${esc(v.name)}" placeholder="例如：红色楼梯"></div>
@@ -768,7 +778,7 @@
         </aside>
         <section class="work">
           <div class="voxel-work-grid">
-            <div class="canvas-card grid-canvas-wrap"><div class="canvas-label">🧩 ${t('build')} / ${t('erase')}</div><canvas id="voxel-grid"></canvas></div>
+            <div class="canvas-card grid-canvas-wrap"><div class="canvas-label">🧩 ${t('build')}</div><canvas id="voxel-grid"></canvas></div>
             <div class="canvas-card preview-canvas-wrap"><div class="canvas-label">✨ ${t('camera')}</div><canvas id="voxel-preview"></canvas></div>
           </div>
         </section>
@@ -1049,13 +1059,13 @@
     const y = half - gy;
     const z = state.voxel.layer;
     const idx = state.voxel.voxels.findIndex(v => v.x === x && v.y === y && v.z === z);
-    if (state.voxel.tool === 'erase') {
-      if (idx >= 0) state.voxel.voxels.splice(idx, 1);
-    } else if (state.voxel.tool === 'build') {
+    
+    if (state.voxel.tool === 'build') {
       if (idx >= 0) {
-        state.voxel.voxels[idx].color = state.voxel.color;
-        state.voxel.voxels[idx].mat = state.voxel.mat;
+        // [修改核心] 如果当前处于建造模式，并且点击的地方已经有当前层级的方块，则将其删除（实现点击消除）
+        state.voxel.voxels.splice(idx, 1);
       } else {
+        // 空白处则添加
         state.voxel.voxels.push({ x, y, z, color: state.voxel.color, mat: state.voxel.mat });
       }
     }
