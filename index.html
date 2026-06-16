@@ -6,9 +6,9 @@
   <title>3D 心理旋转训练｜积木星球离线版</title>
   <!--
     视觉优化离线版 / Visual Offline Edition
-    - 界面响应式升级：解决移动端卡片挤压消失、按钮重叠等问题。
+    - 界面响应式升级：解决移动端卡片挤压消失、按钮重叠、无法滚动等问题。
+    - 强制游戏内两侧物体平行比对。
     - 兼容原始 MR_GAME_DATA 数据结构，可导入/导出 JSON。
-    - 3D 立方体由 Canvas 计算绘制，支持拖拽旋转、自动旋转、缩放、关卡与素材编辑。
   -->
   <style>
     :root {
@@ -112,15 +112,15 @@
     .float-shape.three { left: 9%; bottom: 10%; width: 68px; height: 68px; animation-delay: -5s; }
     .float-shape.four { right: 18%; bottom: 13%; width: 94px; height: 94px; animation-delay: -2s; }
 
+    /* 让 Screen 全局接管内部滚动 */
     .screen {
-      position: relative;
+      position: absolute;
+      inset: 0;
       z-index: 1;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: clamp(14px, 2vw, 30px);
     }
-    .screen-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .topbar {
       position: absolute;
       z-index: 30;
@@ -172,25 +172,6 @@
       font-size: clamp(1.1rem, 2.3vw, 2rem);
       font-weight: 800;
       line-height: 1.35;
-    }
-    .badge-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 22px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(239, 246, 255, .88);
-      border: 2px solid rgba(147, 197, 253, .55);
-      color: #1d4ed8;
-      font-weight: 900;
-      font-size: clamp(.95rem, 1.6vw, 1.25rem);
     }
     .level-panel { width: min(1020px, 100%); }
     .level-grid {
@@ -277,6 +258,7 @@
       height: 28px;
     }
 
+    /* 桌面端高度 100% 保持内部滚动 */
     .editor-shell { display: flex; flex-direction: column; gap: 16px; height: 100%; padding-top: 86px; }
     .editor-top {
       position: absolute;
@@ -386,7 +368,8 @@
     .question-editor { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2vw, 24px); min-height: 380px; }
     .q-controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-    .game-shell { display: flex; flex-direction: column; gap: clamp(12px, 1.8vw, 22px); padding-bottom: calc(12px + var(--safe-bottom)); }
+    /* 桌面端高度 100% 保持内部滚动 */
+    .game-shell { display: flex; flex-direction: column; height: 100%; gap: clamp(12px, 1.8vw, 22px); padding-bottom: calc(12px + var(--safe-bottom)); }
     .hud {
       display: flex;
       flex-direction: column;
@@ -456,10 +439,12 @@
       border-radius: 34px;
     }
     .zoom-box { display: flex; align-items: center; gap: 10px; min-width: min(360px, 100%); flex: 1; max-width: 520px; }
+    
+    /* 强制使用 fixed，防止由于屏幕滑动导致弹窗滚出视野外 */
     .feedback {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 80;
+      z-index: 9999;
       display: none;
       align-items: center;
       justify-content: center;
@@ -492,9 +477,9 @@
     .score-big { font-size: clamp(4rem, 13vw, 12rem); font-weight: 1000; color: #2563eb; line-height: 1; }
 
     .modal-layer {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 70;
+      z-index: 9990;
       display: grid;
       place-items: center;
       padding: 20px;
@@ -513,17 +498,11 @@
     @media (max-width: 920px) {
       body { overflow: hidden; } /* 阻止 iOS 橡皮筋过度回弹 */
       
-      /* 允许所有主屏在内容超出时顺滑滚动，放弃强行拉伸挤压 */
       .screen { 
         padding: 12px; 
-        height: 100%; 
-        overflow-y: auto; 
-        display: flex; 
-        flex-direction: column; 
-        flex-wrap: nowrap;
       }
       
-      /* 顶部栏排版自适应 */
+      /* 顶部栏排版自适应，跟随文档流滚动 */
       .topbar, .editor-top { 
         position: relative; 
         top: auto; left: auto; right: auto; 
@@ -532,58 +511,55 @@
         margin-bottom: 12px; 
       }
       
-      .hero { justify-content: flex-start; height: auto; flex: none; min-height: 100%; }
+      .hero { justify-content: flex-start; height: auto; min-height: 100%; flex: none; }
       
-      /* 编辑器移动端堆叠及滚动 */
-      .editor-shell { padding-top: 0; overflow-y: auto; display: flex; }
+      /* 【核心修复 1】 解除外壳固定高度限制，让内部内容撑开由最外层进行滚动 */
+      .editor-shell, .game-shell { 
+        height: auto; 
+        min-height: 100%; 
+        padding-top: 0; 
+      }
+      
       .editor-layout { display: flex; flex-direction: column; flex: none; overflow: visible; }
       .side, .work { overflow: visible; height: auto; flex: none; }
+      
       .voxel-work-grid { display: flex; flex-direction: column; }
-      
-      /* [核心修复] 强制画布容器保持正方形，不再被缩小至 0 高度 */
       .grid-canvas-wrap, .preview-canvas-wrap { 
-        min-height: auto; 
         aspect-ratio: 1 / 1; 
+        min-height: auto;
+        height: auto;
         width: 100%; 
         flex-shrink: 0; 
       }
       
-      .question-editor { display: flex; flex-direction: column; }
-      .question-editor .canvas-card { 
-        aspect-ratio: 1 / 1; 
-        width: 100%; 
-        flex-shrink: 0; 
-      }
-
-      /* 游戏端移动端布局修复 */
-      .game-shell { display: flex; flex-direction: column; justify-content: flex-start; }
-      .hud { flex: none; }
-      .game-stage { 
-        display: flex; 
-        flex-direction: column; 
+      /* 【核心修复 2】 强制游戏关卡界面和题目编辑器的物体进行“左右比对” */
+      .game-stage, .question-editor { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px; 
         height: auto; 
         overflow: visible; 
         flex: none; 
       }
       
-      /* [核心修复] 游戏 3D 预览区设定正方形，强制渲染，不会消失 */
-      .viewer-card { 
-        min-height: auto; 
-        aspect-ratio: 1 / 1; 
-        width: 100%; 
-        flex-shrink: 0; 
+      /* 画布容器自适应垂直空间 */
+      .viewer-card, .question-editor .canvas-card {
+        aspect-ratio: 1 / 1.25; /* 根据手机屏幕略微拉长提供上下留白 */
+        min-height: auto;
+        height: auto;
+        width: 100%;
+        flex-shrink: 0;
       }
       
       .bottom-actions { flex: none; margin-top: 16px; border-radius: 26px; }
-      .btn-giant { width: calc(50% - 8px); padding-inline: 10px; }
+      .btn-giant { width: calc(50% - 8px); padding-inline: 10px; font-size: 1.35rem; min-height: 64px; }
+      .zoom-box { order: 9; width: 100%; }
     }
     
     @media (max-width: 560px) {
       .float-shape { opacity: .35; }
       .two-col, .three-col { grid-template-columns: 1fr; }
       .level-grid { grid-template-columns: 1fr; max-height: none; }
-      .btn-giant { width: 100%; }
-      .zoom-box { order: 9; width: 100%; }
     }
   </style>
 </head>
