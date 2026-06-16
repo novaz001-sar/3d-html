@@ -6,7 +6,7 @@
   <title>3D 心理旋转训练｜积木星球离线版</title>
   <!--
     视觉优化离线版 / Visual Offline Edition
-    - 单文件运行：不加载 CDN、图片、网络字体或外部音频。
+    - 界面响应式升级：解决移动端卡片挤压消失、按钮重叠等问题。
     - 兼容原始 MR_GAME_DATA 数据结构，可导入/导出 JSON。
     - 3D 立方体由 Canvas 计算绘制，支持拖拽旋转、自动旋转、缩放、关卡与素材编辑。
   -->
@@ -501,30 +501,83 @@
       background: rgba(15,23,42,.44);
       backdrop-filter: blur(14px);
     }
-    .modal-card { width: min(620px, 100%); display: flex; flex-direction: column; gap: 16px; text-align: center; }
+    .modal-card { width: min(620px, 100%); display: flex; flex-direction: column; gap: 16px; text-align: center; max-height: 90vh; overflow-y: auto; }
 
     ::-webkit-scrollbar { width: 14px; height: 14px; }
     ::-webkit-scrollbar-track { background: rgba(226,232,240,.55); border-radius: 999px; }
     ::-webkit-scrollbar-thumb { background: rgba(100,116,139,.55); border-radius: 999px; border: 3px solid rgba(255,255,255,.6); }
 
+    /* =========================================
+       移动端自适应核心修复 (Mobile Responsive Fixes)
+       ========================================= */
     @media (max-width: 920px) {
-      body { overflow: hidden; }
-      .screen { padding: 12px; }
-      .topbar { position: relative; top: auto; right: auto; justify-content: center; margin-bottom: 8px; }
-      .hero { justify-content: flex-start; overflow-y: auto; }
-      .editor-shell { padding-top: 0; overflow-y: auto; }
-      .editor-top { position: relative; top: auto; left: auto; right: auto; }
-      .editor-layout { grid-template-columns: 1fr; overflow: visible; }
-      .side, .work { overflow: visible; }
-      .voxel-work-grid { grid-template-columns: 1fr; }
-      .grid-canvas-wrap, .preview-canvas-wrap { min-height: 340px; }
-      .q-controls { grid-template-columns: 1fr; }
-      .question-editor { grid-template-columns: 1fr; }
-      .game-stage { grid-template-columns: 1fr; overflow-y: auto; }
-      .viewer-card { min-height: 38vh; }
-      .bottom-actions { border-radius: 26px; }
+      body { overflow: hidden; } /* 阻止 iOS 橡皮筋过度回弹 */
+      
+      /* 允许所有主屏在内容超出时顺滑滚动，放弃强行拉伸挤压 */
+      .screen { 
+        padding: 12px; 
+        height: 100%; 
+        overflow-y: auto; 
+        display: flex; 
+        flex-direction: column; 
+        flex-wrap: nowrap;
+      }
+      
+      /* 顶部栏排版自适应 */
+      .topbar, .editor-top { 
+        position: relative; 
+        top: auto; left: auto; right: auto; 
+        flex: none; 
+        justify-content: center; 
+        margin-bottom: 12px; 
+      }
+      
+      .hero { justify-content: flex-start; height: auto; flex: none; min-height: 100%; }
+      
+      /* 编辑器移动端堆叠及滚动 */
+      .editor-shell { padding-top: 0; overflow-y: auto; display: flex; }
+      .editor-layout { display: flex; flex-direction: column; flex: none; overflow: visible; }
+      .side, .work { overflow: visible; height: auto; flex: none; }
+      .voxel-work-grid { display: flex; flex-direction: column; }
+      
+      /* [核心修复] 强制画布容器保持正方形，不再被缩小至 0 高度 */
+      .grid-canvas-wrap, .preview-canvas-wrap { 
+        min-height: auto; 
+        aspect-ratio: 1 / 1; 
+        width: 100%; 
+        flex-shrink: 0; 
+      }
+      
+      .question-editor { display: flex; flex-direction: column; }
+      .question-editor .canvas-card { 
+        aspect-ratio: 1 / 1; 
+        width: 100%; 
+        flex-shrink: 0; 
+      }
+
+      /* 游戏端移动端布局修复 */
+      .game-shell { display: flex; flex-direction: column; justify-content: flex-start; }
+      .hud { flex: none; }
+      .game-stage { 
+        display: flex; 
+        flex-direction: column; 
+        height: auto; 
+        overflow: visible; 
+        flex: none; 
+      }
+      
+      /* [核心修复] 游戏 3D 预览区设定正方形，强制渲染，不会消失 */
+      .viewer-card { 
+        min-height: auto; 
+        aspect-ratio: 1 / 1; 
+        width: 100%; 
+        flex-shrink: 0; 
+      }
+      
+      .bottom-actions { flex: none; margin-top: 16px; border-radius: 26px; }
       .btn-giant { width: calc(50% - 8px); padding-inline: 10px; }
     }
+    
     @media (max-width: 560px) {
       .float-shape { opacity: .35; }
       .two-col, .three-col { grid-template-columns: 1fr; }
