@@ -1,4 +1,4 @@
-/* Cartoon effects layer: motion, comic feedback, and playful interaction details. */
+/* Cat Planet layer: global logo, animated figure, comic feedback, and mobile fit. */
 
 :root {
   --cartoon-ink: #20263f;
@@ -6,11 +6,13 @@
   --cartoon-yellow: #ffd84f;
   --cartoon-pink: #ff6aa2;
   --cartoon-green: #89f071;
-  --cartoon-shadow: 0 8px 0 rgba(32, 38, 63, 0.12), 0 24px 44px rgba(32, 38, 63, 0.16);
-}
-
-body {
-  cursor: default;
+  --cat-cream: #fff3c7;
+  --cat-orange: #ffb24d;
+  --cat-shadow: 0 8px 0 rgba(32, 38, 63, 0.12), 0 24px 44px rgba(32, 38, 63, 0.16);
+  --cat-look-x: 0px;
+  --cat-look-y: 0px;
+  --cat-parallax-x: 0px;
+  --cat-parallax-y: 0px;
 }
 
 button,
@@ -21,8 +23,7 @@ button,
 .option-card,
 .choice,
 .answer-option {
-  border-bottom-width: max(2px, 0.16rem);
-  transform-origin: 50% 72%;
+  transform-origin: center;
 }
 
 button:active,
@@ -33,7 +34,7 @@ button:active,
 .option-card:active,
 .choice:active,
 .answer-option:active {
-  transform: translateY(3px) scale(0.97, 1.04);
+  transform: none;
 }
 
 .cartoon-layer {
@@ -42,6 +43,398 @@ button:active,
   z-index: 9999;
   pointer-events: none;
   overflow: hidden;
+}
+
+.cat-planet-logo {
+  position: fixed;
+  top: clamp(0.8rem, 2vw, 1.35rem);
+  left: clamp(0.8rem, 2vw, 1.35rem);
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 3.4rem;
+  padding: 0.42rem 0.88rem 0.42rem 0.48rem;
+  border: 3px solid var(--cartoon-ink);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 18% 15%, rgba(255, 255, 255, 0.96), transparent 1.6rem),
+    linear-gradient(135deg, #ffffff, #fff1b5 42%, #dff8ff);
+  box-shadow: 4px 5px 0 rgba(32, 38, 63, 0.16), 0 16px 38px rgba(32, 38, 63, 0.12);
+  color: var(--cartoon-ink);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-16px) scale(0.94);
+  transition: filter 180ms ease, box-shadow 180ms ease;
+  animation: catLogoIn 640ms cubic-bezier(0.16, 1.42, 0.32, 1) 120ms forwards;
+}
+
+.cat-planet-logo:hover,
+.cat-planet-logo:focus-visible {
+  filter: saturate(1.12);
+  box-shadow: 5px 6px 0 rgba(32, 38, 63, 0.18), 0 20px 44px rgba(57, 200, 255, 0.18);
+}
+
+.cat-logo-mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--cartoon-ink);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cat-orange), var(--cat-cream));
+  box-shadow: inset 0 0 0 0.22rem rgba(255, 255, 255, 0.26);
+}
+
+.cat-logo-orbit {
+  position: absolute;
+  inset: 0.42rem -0.38rem;
+  border: 3px solid rgba(32, 38, 63, 0.86);
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-18deg);
+  animation: catOrbitSpin 5.8s linear infinite;
+}
+
+.cat-logo-face {
+  position: relative;
+  width: 1.18rem;
+  height: 1rem;
+}
+
+.cat-logo-face::before,
+.cat-logo-face::after {
+  position: absolute;
+  top: 0.25rem;
+  width: 0.24rem;
+  height: 0.34rem;
+  border-radius: 999px;
+  background: var(--cartoon-ink);
+  content: "";
+}
+
+.cat-logo-face::before {
+  left: 0.18rem;
+}
+
+.cat-logo-face::after {
+  right: 0.18rem;
+}
+
+.cat-logo-face > span {
+  position: absolute;
+  left: 50%;
+  bottom: 0.08rem;
+  width: 0.46rem;
+  height: 0.22rem;
+  border: 2px solid var(--cartoon-ink);
+  border-top: 0;
+  border-radius: 0 0 999px 999px;
+  transform: translateX(-50%);
+}
+
+.cat-logo-copy {
+  display: grid;
+  line-height: 1;
+  text-align: left;
+}
+
+.cat-logo-copy strong {
+  font-size: clamp(0.86rem, 1.6vw, 1rem);
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.cat-logo-copy small {
+  margin-top: 0.2rem;
+  color: rgba(32, 38, 63, 0.64);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cat-planet-logo.is-twinkling .cat-logo-mark {
+  animation: catLogoTwinkle 720ms cubic-bezier(0.16, 1.42, 0.32, 1);
+}
+
+.cat-planet-figure {
+  position: fixed;
+  right: clamp(0.9rem, 3vw, 2rem);
+  bottom: clamp(0.9rem, 3vw, 2rem);
+  z-index: 9998;
+  width: clamp(7.4rem, 15vw, 10.5rem);
+  aspect-ratio: 1;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  overflow: visible;
+  opacity: 0;
+  transform:
+    translate(var(--cat-parallax-x), calc(1rem + var(--cat-parallax-y)))
+    scale(0.9);
+  animation: catPlanetIn 780ms cubic-bezier(0.16, 1.42, 0.32, 1) 220ms forwards, catPlanetFloat 4.8s ease-in-out 1s infinite;
+}
+
+.cat-planet-figure:hover,
+.cat-planet-figure:focus-visible {
+  filter: saturate(1.14);
+}
+
+.cat-planet-halo {
+  position: absolute;
+  inset: 20% -8%;
+  border: 4px solid var(--cartoon-ink);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cat-planet-halo-one {
+  background: linear-gradient(90deg, transparent 4%, rgba(57, 200, 255, 0.34), transparent 86%);
+  transform: rotate(-16deg);
+  animation: catHaloSpin 7.2s linear infinite;
+}
+
+.cat-planet-halo-two {
+  inset: 27% -3%;
+  border-width: 3px;
+  border-color: rgba(32, 38, 63, 0.46);
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  transform: rotate(23deg);
+  animation: catHaloSpinReverse 8.6s linear infinite;
+}
+
+.cat-planet-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cat-planet-stars i {
+  position: absolute;
+  width: 0.72rem;
+  height: 0.72rem;
+  background: var(--cartoon-yellow);
+  clip-path: polygon(50% 0, 62% 34%, 100% 35%, 69% 56%, 82% 100%, 50% 72%, 18% 100%, 31% 56%, 0 35%, 38% 34%);
+  filter: drop-shadow(2px 3px 0 rgba(32, 38, 63, 0.12));
+  animation: catStarBlink 1.9s ease-in-out infinite;
+}
+
+.cat-planet-stars i:nth-child(1) {
+  top: 3%;
+  left: 8%;
+}
+
+.cat-planet-stars i:nth-child(2) {
+  right: 0;
+  top: 28%;
+  width: 0.55rem;
+  height: 0.55rem;
+  animation-delay: 0.42s;
+}
+
+.cat-planet-stars i:nth-child(3) {
+  left: 12%;
+  bottom: 12%;
+  width: 0.5rem;
+  height: 0.5rem;
+  animation-delay: 0.8s;
+}
+
+.cat-planet-body {
+  position: absolute;
+  inset: 16%;
+  border: 4px solid var(--cartoon-ink);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0 0.8rem, transparent 0.86rem),
+    radial-gradient(circle at 73% 28%, rgba(255, 210, 92, 0.88) 0 1.2rem, transparent 1.28rem),
+    linear-gradient(135deg, var(--cat-orange), var(--cat-cream) 58%, #ffe27a);
+  box-shadow: var(--cat-shadow), inset -0.55rem -0.72rem 0 rgba(255, 137, 69, 0.20);
+}
+
+.cat-ear {
+  position: absolute;
+  top: -0.72rem;
+  width: 1.65rem;
+  height: 1.75rem;
+  border: 4px solid var(--cartoon-ink);
+  border-bottom: 0;
+  border-radius: 1.2rem 1.2rem 0 0;
+  background: linear-gradient(135deg, var(--cat-orange), #ffd483);
+  transform-origin: bottom center;
+}
+
+.cat-ear::after {
+  position: absolute;
+  inset: 0.42rem 0.34rem auto;
+  height: 0.72rem;
+  border-radius: 999px 999px 0 0;
+  background: rgba(255, 106, 162, 0.52);
+  content: "";
+}
+
+.cat-ear-left {
+  left: 1.15rem;
+  transform: rotate(-18deg);
+}
+
+.cat-ear-right {
+  right: 1.15rem;
+  transform: rotate(18deg);
+}
+
+.cat-face {
+  position: absolute;
+  inset: 28% 20% 18%;
+}
+
+.cat-eye {
+  position: absolute;
+  top: 0.3rem;
+  width: 0.7rem;
+  height: 0.92rem;
+  border-radius: 999px;
+  background: var(--cartoon-ink);
+  box-shadow: inset 0.18rem 0.14rem 0 rgba(255, 255, 255, 0.82);
+  transform: translate(var(--cat-look-x), var(--cat-look-y));
+  animation: catBlink 5.5s ease-in-out infinite;
+}
+
+.cat-eye-left {
+  left: 0.52rem;
+}
+
+.cat-eye-right {
+  right: 0.52rem;
+}
+
+.cat-nose {
+  position: absolute;
+  left: 50%;
+  top: 1.38rem;
+  width: 0.54rem;
+  height: 0.42rem;
+  border-radius: 50% 50% 62% 62%;
+  background: var(--cartoon-pink);
+  transform: translateX(-50%);
+}
+
+.cat-mouth {
+  position: absolute;
+  left: 50%;
+  top: 1.72rem;
+  width: 1.1rem;
+  height: 0.55rem;
+  border: 3px solid var(--cartoon-ink);
+  border-top: 0;
+  border-radius: 0 0 999px 999px;
+  transform: translateX(-50%);
+}
+
+.cat-whiskers {
+  position: absolute;
+  top: 1.58rem;
+  width: 1.18rem;
+  height: 0.54rem;
+  border-top: 3px solid var(--cartoon-ink);
+  border-bottom: 3px solid var(--cartoon-ink);
+}
+
+.cat-whiskers::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  border-top: 3px solid var(--cartoon-ink);
+  content: "";
+  transform: translateY(-50%);
+}
+
+.cat-whiskers-left {
+  left: -0.78rem;
+  transform: rotate(8deg);
+}
+
+.cat-whiskers-right {
+  right: -0.78rem;
+  transform: rotate(-8deg);
+}
+
+.cat-planet-tail {
+  position: absolute;
+  right: 6%;
+  bottom: 18%;
+  width: 2.15rem;
+  height: 3.3rem;
+  border: 4px solid var(--cartoon-ink);
+  border-left: 0;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(135deg, #ffbf63, #fff0aa);
+  transform-origin: 18% 84%;
+  animation: catTailWave 2.4s ease-in-out infinite;
+}
+
+.cat-planet-shadow {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  bottom: 0;
+  height: 0.68rem;
+  border-radius: 50%;
+  background: rgba(32, 38, 63, 0.18);
+  filter: blur(4px);
+  animation: catShadowPulse 4.8s ease-in-out infinite;
+}
+
+.cat-planet-bubble {
+  position: absolute;
+  right: 75%;
+  bottom: 74%;
+  min-width: 4.4rem;
+  padding: 0.42rem 0.68rem;
+  border: 3px solid var(--cartoon-ink);
+  border-radius: 999px 999px 0.34rem 999px;
+  background: #ffffff;
+  box-shadow: 4px 5px 0 rgba(32, 38, 63, 0.14);
+  color: var(--cartoon-ink);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  transform: rotate(-5deg);
+  pointer-events: none;
+}
+
+.cat-planet-figure[data-mood="1"] .cat-planet-body {
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0 0.8rem, transparent 0.86rem),
+    linear-gradient(135deg, var(--cartoon-blue), #e7fbff 58%, var(--cartoon-green));
+}
+
+.cat-planet-figure[data-mood="2"] .cat-planet-body {
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0 0.8rem, transparent 0.86rem),
+    linear-gradient(135deg, var(--cartoon-pink), #fff0be 58%, var(--cartoon-yellow));
+}
+
+.cat-planet-figure[data-mood="3"] .cat-planet-body {
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0 0.8rem, transparent 0.86rem),
+    linear-gradient(135deg, var(--cartoon-green), #f2ffc9 58%, var(--cartoon-blue));
+}
+
+.cat-planet-figure.is-reacting .cat-planet-body {
+  animation: catPlanetReact 780ms cubic-bezier(0.16, 1.42, 0.32, 1);
+}
+
+.cat-planet-figure.is-reacting .cat-ear-left,
+.cat-planet-figure.is-reacting .cat-ear-right {
+  animation: catEarWiggle 720ms cubic-bezier(0.16, 1.42, 0.32, 1);
 }
 
 .cartoon-word-pop {
@@ -63,7 +456,8 @@ button:active,
 }
 
 .cartoon-spark,
-.cartoon-boing-ring {
+.cartoon-boing-ring,
+.cat-paw-pop {
   position: absolute;
   pointer-events: none;
 }
@@ -106,132 +500,17 @@ button:active,
   animation: cartoonBoingRing 700ms ease-out forwards;
 }
 
-.cartoon-mascot {
-  position: fixed;
-  right: clamp(1rem, 3vw, 2rem);
-  bottom: clamp(1rem, 3vw, 2rem);
-  z-index: 9998;
-  width: 4.8rem;
-  height: 4.8rem;
-  border: 4px solid var(--cartoon-ink);
-  border-radius: 1.35rem 1.35rem 1.7rem 1.7rem;
+.cat-paw-pop {
+  width: 1rem;
+  height: 0.88rem;
   background:
-    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.92) 0 0.42rem, transparent 0.46rem),
-    linear-gradient(135deg, var(--cartoon-yellow), #ff9f43 58%, var(--cartoon-pink));
-  box-shadow: var(--cartoon-shadow);
-  cursor: pointer;
-  overflow: visible;
-  isolation: isolate;
-  animation: mascotIdle 3.2s ease-in-out infinite;
-}
-
-.cartoon-mascot::before,
-.cartoon-mascot::after {
-  position: absolute;
-  top: -0.72rem;
-  width: 1.15rem;
-  height: 1.35rem;
-  border: 4px solid var(--cartoon-ink);
-  border-bottom: 0;
-  border-radius: 999px 999px 0 0;
-  background: var(--cartoon-yellow);
-  content: "";
-  z-index: -1;
-}
-
-.cartoon-mascot::before {
-  left: 0.8rem;
-  transform: rotate(-14deg);
-}
-
-.cartoon-mascot::after {
-  right: 0.8rem;
-  transform: rotate(14deg);
-}
-
-.cartoon-mascot:hover {
-  filter: saturate(1.16);
-  transform: translateY(-5px) rotate(-3deg) scale(1.04);
-}
-
-.cartoon-mascot-face {
-  position: absolute;
-  inset: 0.7rem 0.58rem 0.7rem;
-  border-radius: 1.05rem 1.05rem 1.38rem 1.38rem;
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.cartoon-mascot-face::before,
-.cartoon-mascot-face::after {
-  position: absolute;
-  top: 1.12rem;
-  width: 0.62rem;
-  height: 0.78rem;
-  border-radius: 999px;
-  background: var(--cartoon-ink);
-  box-shadow: inset 0.16rem 0.12rem 0 rgba(255, 255, 255, 0.70);
-  content: "";
-}
-
-.cartoon-mascot-face::before {
-  left: 0.78rem;
-}
-
-.cartoon-mascot-face::after {
-  right: 0.78rem;
-}
-
-.cartoon-mascot-face > span {
-  position: absolute;
-  left: 50%;
-  bottom: 0.72rem;
-  width: 1.32rem;
-  height: 0.62rem;
-  border: 4px solid var(--cartoon-ink);
-  border-top: 0;
-  border-radius: 0 0 999px 999px;
-  transform: translateX(-50%);
-}
-
-.cartoon-mascot-bubble {
-  position: absolute;
-  right: 3.2rem;
-  bottom: 3.5rem;
-  min-width: 4.5rem;
-  padding: 0.4rem 0.66rem;
-  border: 3px solid var(--cartoon-ink);
-  border-radius: 999px 999px 0.3rem 999px;
-  background: #ffffff;
-  box-shadow: 4px 5px 0 rgba(32, 38, 63, 0.14);
-  color: var(--cartoon-ink);
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.04em;
-  transform: rotate(-4deg);
-}
-
-.cartoon-mascot[data-mood="1"] {
-  background: linear-gradient(135deg, var(--cartoon-blue), #7ce8ff 58%, var(--cartoon-green));
-}
-
-.cartoon-mascot[data-mood="2"] {
-  background: linear-gradient(135deg, var(--cartoon-pink), #ffb3d0 58%, var(--cartoon-yellow));
-}
-
-.cartoon-mascot[data-mood="3"] {
-  background: linear-gradient(135deg, var(--cartoon-green), #d7ff74 58%, var(--cartoon-blue));
-}
-
-.cartoon-mascot.is-jumping {
-  animation: mascotJump 520ms cubic-bezier(0.16, 1.42, 0.32, 1), mascotIdle 3.2s ease-in-out 540ms infinite;
-}
-
-.cartoon-wiggle {
-  animation: cartoonWiggle 480ms cubic-bezier(0.2, 1.55, 0.4, 1) both;
-}
-
-.cartoon-pop {
-  animation: cartoonButtonPop 360ms cubic-bezier(0.18, 1.4, 0.32, 1) both;
+    radial-gradient(circle at 22% 24%, var(--cartoon-ink) 0 0.13rem, transparent 0.15rem),
+    radial-gradient(circle at 50% 12%, var(--cartoon-ink) 0 0.13rem, transparent 0.15rem),
+    radial-gradient(circle at 78% 24%, var(--cartoon-ink) 0 0.13rem, transparent 0.15rem),
+    radial-gradient(ellipse at 50% 70%, var(--cartoon-ink) 0 0.34rem, transparent 0.36rem);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  animation: catPawPop 860ms ease-out var(--paw-delay) forwards;
 }
 
 .cartoon-tilt {
@@ -239,7 +518,7 @@ button:active,
     perspective(900px)
     rotateX(var(--cartoon-tilt-x, 0deg))
     rotateY(var(--cartoon-tilt-y, 0deg))
-    translateY(-4px);
+    translateY(-3px);
 }
 
 .cartoon-tilt::after {
@@ -307,7 +586,7 @@ button:active,
   background: #fff;
   box-shadow: 3px 4px 0 rgba(32, 38, 63, 0.13);
   color: var(--cartoon-ink);
-  content: "BOING!";
+  content: "MEOW!";
   font-size: 0.78rem;
   font-weight: 950;
   letter-spacing: 0.04em;
@@ -348,6 +627,153 @@ canvas,
 .game-canvas,
 .editor-canvas {
   border: 4px solid rgba(32, 38, 63, 0.08);
+}
+
+@keyframes catLogoIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes catPlanetIn {
+  to {
+    opacity: 1;
+    transform:
+      translate(var(--cat-parallax-x), var(--cat-parallax-y))
+      scale(1);
+  }
+}
+
+@keyframes catPlanetFloat {
+  0%,
+  100% {
+    transform: translate(var(--cat-parallax-x), var(--cat-parallax-y)) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(var(--cat-parallax-x), calc(var(--cat-parallax-y) - 8px)) rotate(2deg);
+  }
+}
+
+@keyframes catHaloSpin {
+  to {
+    transform: rotate(344deg);
+  }
+}
+
+@keyframes catHaloSpinReverse {
+  to {
+    transform: rotate(-337deg);
+  }
+}
+
+@keyframes catOrbitSpin {
+  to {
+    transform: rotate(342deg);
+  }
+}
+
+@keyframes catLogoTwinkle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(-12deg) scale(1.16);
+  }
+}
+
+@keyframes catStarBlink {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.82) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.18) rotate(18deg);
+  }
+}
+
+@keyframes catBlink {
+  0%,
+  92%,
+  100% {
+    transform: translate(var(--cat-look-x), var(--cat-look-y)) scaleY(1);
+  }
+
+  95% {
+    transform: translate(var(--cat-look-x), var(--cat-look-y)) scaleY(0.12);
+  }
+}
+
+@keyframes catTailWave {
+  0%,
+  100% {
+    transform: rotate(4deg);
+  }
+
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes catShadowPulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scaleX(0.82);
+    opacity: 0.5;
+  }
+}
+
+@keyframes catPlanetReact {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  36% {
+    transform: scale(1.08, 0.94) rotate(-5deg);
+  }
+
+  72% {
+    transform: scale(0.98, 1.05) rotate(3deg);
+  }
+}
+
+@keyframes catEarWiggle {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  45% {
+    translate: 0 -0.28rem;
+  }
+}
+
+@keyframes catPawPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--paw-x)), calc(-50% + var(--paw-y))) scale(1.06) rotate(18deg);
+  }
 }
 
 @keyframes cartoonSpark {
@@ -391,69 +817,6 @@ canvas,
   }
 }
 
-@keyframes cartoonWiggle {
-  0%,
-  100% {
-    transform: rotate(0deg) scale(1);
-  }
-
-  22% {
-    transform: rotate(-3deg) scale(1.03, 0.98);
-  }
-
-  48% {
-    transform: rotate(3deg) scale(0.99, 1.04);
-  }
-
-  72% {
-    transform: rotate(-1.5deg) scale(1.02);
-  }
-}
-
-@keyframes cartoonButtonPop {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  45% {
-    transform: scale(0.94, 1.08) translateY(2px);
-  }
-
-  70% {
-    transform: scale(1.06, 0.96) translateY(-3px);
-  }
-}
-
-@keyframes mascotIdle {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-5px) rotate(2deg);
-  }
-}
-
-@keyframes mascotJump {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-
-  42% {
-    transform: translateY(-26px) rotate(-8deg) scale(1.08, 0.92);
-  }
-
-  72% {
-    transform: translateY(4px) scale(0.94, 1.08);
-  }
-
-  100% {
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes labelBob {
   0%,
   100% {
@@ -465,18 +828,136 @@ canvas,
   }
 }
 
+@media (max-width: 920px) {
+  .cat-planet-logo {
+    top: 0.7rem;
+    left: 0.7rem;
+    min-height: 3rem;
+    padding: 0.35rem 0.72rem 0.35rem 0.4rem;
+  }
+
+  .cat-logo-mark {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .cat-planet-figure {
+    width: 7.2rem;
+    right: 0.7rem;
+    bottom: 0.7rem;
+  }
+
+  .cat-planet-bubble {
+    right: 68%;
+    bottom: 78%;
+    min-width: 3.8rem;
+    font-size: 0.68rem;
+  }
+}
+
 @media (max-width: 720px) {
-  .cartoon-mascot {
-    width: 4rem;
-    height: 4rem;
+  body {
+    padding-bottom: 4.8rem;
+  }
+
+  .cat-planet-logo {
+    max-width: calc(100vw - 6.7rem);
+    min-height: 2.7rem;
+    border-width: 2px;
+    gap: 0.46rem;
+    box-shadow: 3px 4px 0 rgba(32, 38, 63, 0.14), 0 10px 26px rgba(32, 38, 63, 0.10);
+  }
+
+  .cat-logo-mark {
+    width: 2rem;
+    height: 2rem;
+    border-width: 2px;
+  }
+
+  .cat-logo-orbit {
+    border-width: 2px;
+  }
+
+  .cat-logo-copy strong {
+    font-size: 0.78rem;
+  }
+
+  .cat-logo-copy small {
+    display: none;
+  }
+
+  .cat-planet-figure {
+    width: 5.7rem;
+    right: 0.58rem;
+    bottom: 0.58rem;
+  }
+
+  .cat-planet-body,
+  .cat-ear,
+  .cat-planet-halo {
     border-width: 3px;
   }
 
-  .cartoon-mascot-bubble {
-    right: 2.6rem;
-    bottom: 3rem;
-    min-width: 3.8rem;
-    font-size: 0.68rem;
+  .cat-ear {
+    width: 1.15rem;
+    height: 1.25rem;
+    top: -0.48rem;
+  }
+
+  .cat-ear-left {
+    left: 0.78rem;
+  }
+
+  .cat-ear-right {
+    right: 0.78rem;
+  }
+
+  .cat-eye {
+    width: 0.5rem;
+    height: 0.68rem;
+  }
+
+  .cat-nose {
+    top: 1rem;
+    width: 0.42rem;
+    height: 0.32rem;
+  }
+
+  .cat-mouth {
+    top: 1.25rem;
+    width: 0.78rem;
+    height: 0.38rem;
+    border-width: 2px;
+  }
+
+  .cat-whiskers {
+    top: 1.13rem;
+    width: 0.72rem;
+    height: 0.4rem;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+  }
+
+  .cat-whiskers::after {
+    border-top-width: 2px;
+  }
+
+  .cat-whiskers-left {
+    left: -0.42rem;
+  }
+
+  .cat-whiskers-right {
+    right: -0.42rem;
+  }
+
+  .cat-planet-tail {
+    width: 1.3rem;
+    height: 2.1rem;
+    border-width: 3px;
+  }
+
+  .cat-planet-bubble {
+    display: none;
   }
 
   .game-stage::after,
@@ -485,12 +966,45 @@ canvas,
   .canvas-shell::after {
     display: none;
   }
+
+  .answer-card:hover,
+  .option-card:hover,
+  .choice:hover,
+  .answer-option:hover {
+    outline: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .cat-logo-copy strong {
+    max-width: 5.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cat-planet-figure {
+    width: 5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cartoon-layer,
-  .cartoon-mascot {
+  .cartoon-layer {
     display: none;
+  }
+
+  .cat-planet-logo,
+  .cat-planet-figure,
+  .cat-planet-logo *,
+  .cat-planet-figure * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cat-planet-logo,
+  .cat-planet-figure {
+    opacity: 1;
+    transform: none;
   }
 
   .cartoon-tilt {
