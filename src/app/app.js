@@ -1,7 +1,8 @@
 import { bindEditor, renderEditor } from '../features/editor/index.js';
 import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } from '../features/game/index.js';
-import { saveData, saveFontScale, saveLanguage } from '../services/storage.js';
+import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
+import { syncMenuMusic } from '../services/menuMusic.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
 import { createInitialState } from './state.js';
@@ -27,6 +28,7 @@ export function createApp(root) {
     if (state.screen === 'main') bindHome(ctx);
     if (state.screen === 'editor') bindEditor(ctx);
     if (state.screen === 'game') bindGame(ctx);
+    syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled });
   }
 
   function bindGlobalActions() {
@@ -45,6 +47,11 @@ export function createApp(root) {
       state.fontScale = Number(event.target.value);
       saveFontScale(state.fontScale);
       applyUiPreferences();
+    }));
+    document.querySelectorAll('[data-action="music"]').forEach(el => el.addEventListener('click', () => {
+      state.musicEnabled = !state.musicEnabled;
+      saveMenuMusicEnabled(state.musicEnabled);
+      render();
     }));
   }
 

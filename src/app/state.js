@@ -1,9 +1,10 @@
-import { loadData, loadFontScale, loadLanguage } from '../services/storage.js';
+import { loadData, loadFontScale, loadLanguage, loadMenuMusicEnabled } from '../services/storage.js';
 
 export function createInitialState() {
   return {
     lang: loadLanguage(),
     fontScale: loadFontScale(),
+    musicEnabled: loadMenuMusicEnabled(),
     screen: 'main',
     editorTab: 'objects',
     paused: false,

@@ -3,8 +3,9 @@ import { ensureLevelNames } from '../domain/levels.js';
 import { clone } from '../shared/utils.js';
 
 export const STORAGE_KEY = 'MR_GAME_DATA';
-export const LANG_KEY = 'MR_LANG_V2';
+export const LANG_KEY = 'MR_LANG_V3';
 export const FONT_SCALE_KEY = 'MR_FONT_SCALE';
+export const MENU_MUSIC_KEY = 'MR_MENU_MUSIC';
 
 export function loadData() {
   try {
@@ -33,6 +34,14 @@ export function loadFontScale() {
 
 export function saveFontScale(scale) {
   localStorage.setItem(FONT_SCALE_KEY, String(Math.min(1.28, Math.max(0.88, Number(scale) || 1))));
+}
+
+export function loadMenuMusicEnabled() {
+  return localStorage.getItem(MENU_MUSIC_KEY) !== 'off';
+}
+
+export function saveMenuMusicEnabled(enabled) {
+  localStorage.setItem(MENU_MUSIC_KEY, enabled ? 'on' : 'off');
 }
 
 export function normalizeData(data) {
