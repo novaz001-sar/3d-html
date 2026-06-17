@@ -2,7 +2,7 @@ import { DEFAULT_DATA } from '../data/defaultData.js';
 import { clone } from '../shared/utils.js';
 
 export const STORAGE_KEY = 'MR_GAME_DATA';
-export const LANG_KEY = 'MR_LANG';
+export const LANG_KEY = 'MR_LANG_V2';
 export const FONT_SCALE_KEY = 'MR_FONT_SCALE';
 
 export function loadData() {

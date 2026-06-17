@@ -118,7 +118,7 @@ p,
     0 4px 13px rgba(255, 111, 159, 0.22);
 }
 
-.level-card > span:first-child {
+.level-card .level-number {
   display: inline-grid;
   place-items: center;
   min-width: 2.1rem;
