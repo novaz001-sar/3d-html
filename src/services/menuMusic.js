@@ -1,188 +1,235 @@
 const DEFAULT_MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
+const UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'click', 'keydown'];
 
 let audio;
-let unlockBound = false;
 let shouldPlayWhenUnlocked = false;
 let currentVolume = 0.5;
-let unmuteTimers = [];
 let currentSrc = DEFAULT_MENU_MUSIC_SRC;
 let currentStart = 0;
 let currentLoop = true;
+let unlockEventsBound = false;
+const preloadedSources = new Set();
 
 export function primeMenuMusic({ enabled, volume, config = {} }) {
   applyMenuConfig(config);
-  currentVolume = normalizeVolume(volume);
-  clearUnmuteTimers();
+  setMenuMusicVolume(volume);
+  preloadMenuSource(currentSrc);
+  bindUnlockEvents();
+
+  const player = getAudio();
+  player.preload = 'auto';
+  safeLoad(player);
+
   if (!enabled) {
-    shouldPlayWhenUnlocked = false;
     pauseMenuMusic();
     return;
   }
 
   shouldPlayWhenUnlocked = true;
-  bindUnlockEvents();
-  playMenuMusic({ bootstrap: true });
+  attemptAudiblePlay().then((played) => {
+    if (!played && shouldPlayWhenUnlocked) {
+      warmMutedPlayback();
+    }
+  });
 }
 
 export function syncMenuMusic({ active, enabled, volume, config = {} }) {
   applyMenuConfig(config);
-  currentVolume = normalizeVolume(volume);
+  setMenuMusicVolume(volume);
+  preloadMenuSource(currentSrc);
+  bindUnlockEvents();
 
   if (!active || !enabled) {
-    shouldPlayWhenUnlocked = false;
-    clearUnmuteTimers();
     pauseMenuMusic();
     return;
   }
 
   shouldPlayWhenUnlocked = true;
-  bindUnlockEvents();
-  playMenuMusic({ bootstrap: true });
+  attemptAudiblePlay().then((played) => {
+    if (!played && shouldPlayWhenUnlocked) {
+      warmMutedPlayback();
+    }
+  });
 }
 
 export function setMenuMusicVolume(volume) {
   currentVolume = normalizeVolume(volume);
-  if (!audio) return;
-  audio.volume = currentVolume;
-  audio.muted = currentVolume <= 0;
+  if (audio) {
+    audio.volume = currentVolume;
+  }
 }
 
 export function unlockMenuMusic() {
-  if (!shouldPlayWhenUnlocked) return;
+  if (!shouldPlayWhenUnlocked) return Promise.resolve(true);
   const player = getAudio();
-  player.muted = false;
-  player.volume = currentVolume;
-  playMenuMusic();
+  player.preload = 'auto';
+  safeLoad(player);
+  return attemptAudiblePlay();
 }
 
 export function pauseMenuMusic() {
+  shouldPlayWhenUnlocked = false;
   if (!audio) return;
   audio.pause();
-}
-
-function playMenuMusic({ bootstrap = false } = {}) {
-  const player = getAudio();
-  player.volume = currentVolume;
-  if (!player.dataset.started) seekAudio(player, currentStart);
-
-  if (bootstrap) {
-    player.muted = false;
-    attemptPlay(player, () => {
-      player.dataset.started = 'true';
-      player.volume = currentVolume;
-      player.muted = currentVolume <= 0;
-    }, () => {
-      startMutedBootstrap(player);
-    });
-    return;
-  }
-
-  player.muted = currentVolume <= 0;
-  attemptPlay(player, () => {
-    player.dataset.started = 'true';
-  }, bindUnlockEvents);
-}
-
-function attemptPlay(player, onSuccess, onFailure) {
-  const playPromise = player.play();
-  if (playPromise?.then) {
-    playPromise
-      .then(() => {
-        onSuccess?.();
-      })
-      .catch(() => {
-        onFailure?.();
-      });
-    return;
-  }
-
-  onSuccess?.();
-}
-
-function startMutedBootstrap(player) {
-  player.muted = true;
-  player.volume = 0;
-
-  attemptPlay(player, () => {
-    player.dataset.started = 'true';
-    scheduleUnmuteAttempts(player);
-  }, bindUnlockEvents);
-}
-
-function scheduleUnmuteAttempts(player) {
-  clearUnmuteTimers();
-  [120, 420, 1100, 2200].forEach(delay => {
-    unmuteTimers.push(window.setTimeout(() => {
-      if (!shouldPlayWhenUnlocked || player.paused) return;
-      player.volume = currentVolume;
-      player.muted = currentVolume <= 0;
-      player.play().catch(bindUnlockEvents);
-    }, delay));
-  });
-}
-
-function clearUnmuteTimers() {
-  unmuteTimers.forEach(timer => window.clearTimeout(timer));
-  unmuteTimers = [];
+  audio.muted = false;
 }
 
 function getAudio() {
-  if (audio) return audio;
-
-  audio = document.createElement('audio');
-  audio.src = currentSrc;
-  audio.loop = currentLoop;
-  audio.preload = 'auto';
-  audio.autoplay = true;
-  audio.hidden = true;
-  audio.volume = currentVolume;
-  audio.setAttribute('playsinline', '');
-  document.body?.append(audio);
+  if (!audio) {
+    audio = new Audio();
+    audio.id = 'menu-music';
+    audio.preload = 'auto';
+    audio.playsInline = true;
+    audio.src = currentSrc;
+    audio.loop = currentLoop && currentStart <= 0;
+    audio.volume = currentVolume;
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('canplay', handleCanPlay);
+  }
   return audio;
 }
 
 function applyMenuConfig(config = {}) {
   const nextSrc = String(config.src || DEFAULT_MENU_MUSIC_SRC);
-  const nextStart = Number(config.start);
+  const nextStart = normalizeStart(config.start);
+  const nextLoop = config.loop !== false;
+  const srcChanged = nextSrc !== currentSrc;
+
   currentSrc = nextSrc;
-  currentStart = Number.isFinite(nextStart) ? Math.max(0, nextStart) : 0;
-  currentLoop = config.loop !== false;
+  currentStart = nextStart;
+  currentLoop = nextLoop;
 
   if (!audio) return;
 
-  const resolvedCurrent = new URL(audio.getAttribute('src') || audio.src, window.location.href).href;
-  const resolvedNext = new URL(currentSrc, window.location.href).href;
-  if (resolvedCurrent !== resolvedNext) {
+  if (srcChanged || audio.getAttribute('src') !== currentSrc) {
     audio.pause();
-    audio.remove();
-    audio = null;
+    audio.src = currentSrc;
+    audio.preload = 'auto';
+    safeLoad(audio);
+  }
+
+  audio.loop = currentLoop && currentStart <= 0;
+}
+
+function attemptAudiblePlay() {
+  const player = getAudio();
+  player.muted = false;
+  player.volume = currentVolume;
+  seekToStart(player);
+
+  try {
+    const playResult = player.play();
+    if (!playResult || typeof playResult.then !== 'function') {
+      shouldPlayWhenUnlocked = false;
+      return Promise.resolve(true);
+    }
+
+    return playResult.then(
+      () => {
+        shouldPlayWhenUnlocked = false;
+        return true;
+      },
+      () => {
+        shouldPlayWhenUnlocked = true;
+        return false;
+      }
+    );
+  } catch {
+    shouldPlayWhenUnlocked = true;
+    return Promise.resolve(false);
+  }
+}
+
+function warmMutedPlayback() {
+  if (!shouldPlayWhenUnlocked) return Promise.resolve(false);
+
+  const player = getAudio();
+  player.muted = true;
+  player.volume = 0;
+  seekToStart(player);
+
+  try {
+    const playResult = player.play();
+    if (!playResult || typeof playResult.then !== 'function') {
+      player.volume = currentVolume;
+      return Promise.resolve(true);
+    }
+
+    return playResult.then(
+      () => {
+        player.volume = currentVolume;
+        return true;
+      },
+      () => false
+    );
+  } catch {
+    return Promise.resolve(false);
+  }
+}
+
+function handleCanPlay() {
+  if (!shouldPlayWhenUnlocked || audio?.muted || document.hidden) return;
+  attemptAudiblePlay();
+}
+
+function handleEnded() {
+  if (!currentLoop || !audio) return;
+  seekToStart(audio, true);
+  if (shouldPlayWhenUnlocked) {
+    warmMutedPlayback();
+    return;
+  }
+  attemptAudiblePlay();
+}
+
+function seekToStart(player, force = false) {
+  if (!currentStart && !force) return;
+  const seek = () => {
+    try {
+      if (force || player.currentTime < currentStart || Math.abs(player.currentTime - currentStart) > 0.75) {
+        player.currentTime = currentStart;
+      }
+    } catch {
+      // Some mobile browsers reject currentTime before metadata is ready.
+    }
+  };
+
+  if (player.readyState >= 1) {
+    seek();
+  } else {
+    player.addEventListener('loadedmetadata', seek, { once: true });
+  }
+}
+
+function preloadMenuSource(src) {
+  if (typeof document === 'undefined' || !src || src.startsWith('data:') || src.startsWith('blob:') || preloadedSources.has(src)) {
     return;
   }
 
-  audio.loop = currentLoop;
+  preloadedSources.add(src);
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'audio';
+  link.href = src;
+  if (/\.m4a($|\?)/i.test(src) || /\.mp4($|\?)/i.test(src)) {
+    link.type = 'audio/mp4';
+  }
+  document.head.appendChild(link);
 }
 
-function seekAudio(player, seconds) {
-  if (!seconds) return;
+function safeLoad(player) {
   try {
-    player.currentTime = seconds;
+    player.load();
   } catch {
-    player.addEventListener('loadedmetadata', () => {
-      player.currentTime = seconds;
-    }, { once: true });
+    // load() can throw when a custom admin URL is temporarily invalid.
   }
 }
 
 function bindUnlockEvents() {
-  if (unlockBound) return;
-  unlockBound = true;
-
-  const unlock = () => {
-    unlockMenuMusic();
-  };
-
-  ['pointerdown', 'mousedown', 'click', 'keydown', 'touchstart', 'touchend'].forEach(eventName => {
-    window.addEventListener(eventName, unlock, true);
+  if (unlockEventsBound || typeof document === 'undefined') return;
+  unlockEventsBound = true;
+  UNLOCK_EVENTS.forEach((eventName) => {
+    document.addEventListener(eventName, unlockMenuMusic, { passive: true, capture: true });
   });
 }
 
@@ -190,4 +237,10 @@ function normalizeVolume(volume) {
   const value = Number(volume);
   if (!Number.isFinite(value) || value <= 0) return 0.5;
   return Math.min(1, Math.max(0, value));
+}
+
+function normalizeStart(value) {
+  const start = Number(value);
+  if (!Number.isFinite(start) || start < 0) return 0;
+  return start;
 }
