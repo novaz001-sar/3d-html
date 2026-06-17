@@ -49,6 +49,33 @@ h1,
   letter-spacing: -0.025em;
 }
 
+html[data-lang="zh"] .hero h1 {
+  font-family: var(--font-cute-title-zh, "ZCOOL QingKe HuangYou"), var(--font-cute-cjk), "Microsoft YaHei", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: #ff78a8;
+  -webkit-text-fill-color: #ff78a8;
+  text-shadow:
+    0 1px 0 #ffffff,
+    0 4px 0 rgba(255, 216, 79, 0.46),
+    0 12px 26px rgba(255, 120, 168, 0.20);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, calc(8vw * var(--ui-font-scale, 1)), 6.2rem);
+}
+
+.screen,
+.button,
+.segment,
+.list-item,
+.level-card,
+.manual,
+.game-hud,
+.answer-bar {
+  font-size: calc(1rem * var(--ui-font-scale, 1));
+}
+
 h2,
 h3,
 .section-title,

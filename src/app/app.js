@@ -1,6 +1,6 @@
 import { bindEditor, renderEditor } from '../features/editor/index.js';
 import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } from '../features/game/index.js';
-import { saveData, saveLanguage } from '../services/storage.js';
+import { saveData, saveFontScale, saveLanguage } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
@@ -17,6 +17,7 @@ export function createApp(root) {
   };
 
   function render() {
+    applyUiPreferences();
     if (state.screen !== 'game') stopTimer(ctx);
     if (state.screen === 'main') root.innerHTML = renderShell(renderHome(ctx));
     if (state.screen === 'editor') root.innerHTML = renderShell(renderEditor(ctx));
@@ -40,6 +41,16 @@ export function createApp(root) {
       saveLanguage(state.lang);
       render();
     }));
+    document.querySelectorAll('[data-action="font-scale"]').forEach(el => el.addEventListener('input', event => {
+      state.fontScale = Number(event.target.value);
+      saveFontScale(state.fontScale);
+      applyUiPreferences();
+    }));
+  }
+
+  function applyUiPreferences() {
+    document.documentElement.dataset.lang = state.lang;
+    document.documentElement.style.setProperty('--ui-font-scale', String(state.fontScale || 1));
   }
 
   function loop(ts) {
@@ -51,12 +62,6 @@ export function createApp(root) {
     start() {
       window.addEventListener('resize', () => {
         if (state.screen === 'game') bindGame(ctx);
-      });
-      document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && state.screen === 'game') {
-          state.paused = !state.paused;
-          render();
-        }
       });
       render();
       requestAnimationFrame(loop);

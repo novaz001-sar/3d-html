@@ -11,6 +11,10 @@ export function renderHome(ctx) {
         <button class="button ghost" data-home-action="export">${t('export')}</button>
         <label class="button ghost">${t('import')}<input id="import-file" type="file" accept=".json,application/json" hidden /></label>
         <button class="button ghost" data-action="lang">${t('lang')}</button>
+        <label class="font-scale-control">
+          <span>${t('fontSize')}</span>
+          <input type="range" min="0.88" max="1.28" step="0.04" value="${state.fontScale}" data-action="font-scale" />
+        </label>
       </header>
       <section class="hero">
         <div>

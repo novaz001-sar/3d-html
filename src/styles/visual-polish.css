@@ -114,19 +114,7 @@ main,
 .hero::before,
 .home-hero::before,
 .landing-hero::before {
-  position: absolute;
-  inset: -35% -8% auto auto;
-  width: 28rem;
-  height: 28rem;
-  border-radius: 7rem;
-  background:
-    linear-gradient(135deg, rgba(76, 216, 255, 0.34), rgba(255, 140, 207, 0.18)),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 8px, transparent 8px 16px);
-  box-shadow: var(--glow-cyan);
-  transform: rotate(18deg);
-  content: "";
-  z-index: -1;
-  animation: cubeFloat 9s ease-in-out infinite;
+  content: none;
 }
 
 .hero::after,
