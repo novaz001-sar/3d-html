@@ -2,7 +2,7 @@ import { clone, clamp } from '../../shared/utils.js';
 import { currentQuestion, getQuestionObjects } from '../../domain/questions.js';
 import { applyAnswerScore, applySkipScore, isCorrectAnswer, starsForScore } from '../../domain/scoring.js';
 import { drawObject, makeDragRotator, normalizeQuat, stepAutoRotation, syncVoxels } from '../../render/index.js';
-import { playCorrect, playLevelComplete, playLevelSelect, playWrong } from '../../services/sound.js';
+import { playCorrect, playLevelSelect, playWrong } from '../../services/sound.js';
 
 export function startGame(ctx, levelId) {
   const level = ctx.state.data.levels.find(item => item.id === levelId);
@@ -164,7 +164,6 @@ function showFeedback(ctx, text, kind, delay) {
 
 function endGame(ctx) {
   stopTimer(ctx);
-  playLevelComplete();
   const game = ctx.state.game;
   ctx.state.result.score = game.score;
   ctx.state.result.stars = starsForScore(game.level, game.score);

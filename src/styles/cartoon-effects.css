@@ -1114,8 +1114,8 @@ button.cat-integrated-control {
   right: clamp(0.8rem, 3vw, 2rem);
   top: 48%;
   z-index: 28;
-  width: clamp(7.8rem, 16vw, 11.5rem);
-  aspect-ratio: 1.22 / 1;
+  width: clamp(9rem, 18vw, 13.5rem);
+  aspect-ratio: 1.38 / 1;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -1126,14 +1126,14 @@ button.cat-integrated-control {
 
 .cat-companion-image {
   position: absolute;
-  inset: -12% -18%;
+  inset: -28% -34%;
   background: var(--cat-planet-asset) center / contain no-repeat;
   pointer-events: none;
 }
 
 .cat-companion-orbit {
   position: absolute;
-  inset: 30% -8%;
+  inset: 34% -18%;
   border: 3px solid rgba(66, 200, 255, 0.42);
   border-top-color: transparent;
   border-bottom-color: transparent;
@@ -1179,18 +1179,18 @@ button.cat-integrated-control {
 .cat-companion[data-screen="game"] {
   top: 54%;
   right: clamp(0.5rem, 1.6vw, 1.1rem);
-  width: clamp(6.2rem, 12vw, 8.4rem);
+  width: clamp(7.2rem, 13vw, 9.8rem);
 }
 
 .cat-companion[data-screen="editor"] {
   top: 72%;
-  width: clamp(5.8rem, 11vw, 8rem);
+  width: clamp(6.8rem, 12vw, 9rem);
 }
 
 .cat-companion[data-screen="result"] {
   top: 34%;
   right: clamp(1rem, 8vw, 7rem);
-  width: clamp(8rem, 18vw, 12rem);
+  width: clamp(9.2rem, 20vw, 14rem);
 }
 
 .cat-companion[data-mood="music"] .cat-companion-badge,
@@ -1249,7 +1249,7 @@ button.cat-integrated-control {
     top: auto;
     right: 0.7rem;
     bottom: 4.9rem;
-    width: 5.4rem;
+    width: 6.4rem;
     transform: translate(var(--cat-float-x), var(--cat-float-y));
   }
 
@@ -1259,7 +1259,7 @@ button.cat-integrated-control {
     top: auto;
     right: 0.7rem;
     bottom: 4.9rem;
-    width: 5.4rem;
+    width: 6.4rem;
   }
 
   .cat-companion-bubble {
