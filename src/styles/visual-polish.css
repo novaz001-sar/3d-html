@@ -8,7 +8,7 @@
   --glass-fill: rgba(255, 255, 255, 0.72);
   --ink-soft: rgba(35, 43, 67, 0.74);
   --pop-blue: #4cd8ff;
-  --pop-lime: #a8ff78;
+  --pop-lime: #ff8ccf;
   --pop-gold: #ffc457;
   --pop-coral: #ff6c7e;
   --pop-berry: #7d5cff;
@@ -18,7 +18,7 @@ html {
   background:
     radial-gradient(circle at 12% 8%, rgba(255, 196, 87, 0.34), transparent 28rem),
     radial-gradient(circle at 86% 18%, rgba(76, 216, 255, 0.30), transparent 26rem),
-    radial-gradient(circle at 52% 86%, rgba(168, 255, 120, 0.18), transparent 26rem),
+    radial-gradient(circle at 52% 86%, rgba(255, 140, 207, 0.14), transparent 26rem),
     linear-gradient(135deg, #f9f0d5 0%, #e9f7ff 45%, #f6f2ff 100%);
 }
 
@@ -120,7 +120,7 @@ main,
   height: 28rem;
   border-radius: 7rem;
   background:
-    linear-gradient(135deg, rgba(76, 216, 255, 0.48), rgba(168, 255, 120, 0.30)),
+    linear-gradient(135deg, rgba(76, 216, 255, 0.34), rgba(255, 140, 207, 0.18)),
     repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 8px, transparent 8px 16px);
   box-shadow: var(--glow-cyan);
   transform: rotate(18deg);
