@@ -3,6 +3,7 @@ const RESULT_TRACKS = {
   2: '/assets/audio/2-stars.m4a',
   3: '/assets/audio/3-stars.m4a'
 };
+const RESULT_MUSIC_START_SECONDS = 2;
 
 let resultAudio;
 let currentStars = 0;
@@ -24,6 +25,7 @@ export function syncResultMusic({ active, stars }) {
   resultAudio = new Audio(RESULT_TRACKS[normalizedStars]);
   resultAudio.preload = 'auto';
   resultAudio.volume = 0.72;
+  seekAudio(resultAudio, RESULT_MUSIC_START_SECONDS);
 
   const playPromise = resultAudio.play();
   if (playPromise?.catch) {
@@ -44,6 +46,7 @@ export function stopResultMusic() {
 function bindResultUnlock() {
   const unlock = () => {
     if (resultAudio) {
+      seekAudio(resultAudio, RESULT_MUSIC_START_SECONDS);
       resultAudio.play().catch(() => {});
     }
 
@@ -55,4 +58,14 @@ function bindResultUnlock() {
   window.addEventListener('pointerdown', unlock, true);
   window.addEventListener('keydown', unlock, true);
   window.addEventListener('touchstart', unlock, true);
+}
+
+function seekAudio(audio, seconds) {
+  try {
+    audio.currentTime = seconds;
+  } catch {
+    audio.addEventListener('loadedmetadata', () => {
+      audio.currentTime = seconds;
+    }, { once: true });
+  }
 }

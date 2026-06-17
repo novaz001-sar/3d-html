@@ -1136,14 +1136,7 @@ button.cat-integrated-control {
 }
 
 .cat-companion-orbit {
-  position: absolute;
-  inset: 39% 0;
-  border: 3px solid rgba(66, 200, 255, 0.42);
-  border-top-color: transparent;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  transform: rotate(-12deg);
-  animation: catOrbitTurn 8s linear infinite;
+  display: none !important;
 }
 
 .cat-companion-badge {

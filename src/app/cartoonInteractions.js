@@ -105,7 +105,6 @@ function createCatCompanion(layer) {
   companion.type = 'button';
   companion.setAttribute('aria-label', 'Cat Planet helper');
   companion.innerHTML = [
-    '<span class="cat-companion-orbit"></span>',
     '<span class="cat-companion-image"></span>',
     '<span class="cat-companion-badge">CAT</span>',
     '<span class="cat-companion-bubble">Tap me!</span>'
@@ -247,7 +246,33 @@ function updateCompanionScreen(companion) {
   else setCompanionMood(companion, 'home', 'Pick a stage');
 
   if (companion.classList.contains('is-positioned')) {
-    window.requestAnimationFrame(() => clampCompanionIntoViewport(companion));
+    window.requestAnimationFrame(() => {
+      clampCompanionIntoViewport(companion);
+      avoidHomeControls(companion);
+      saveCompanionPosition(companion);
+    });
+  }
+}
+
+function avoidHomeControls(companion) {
+  if (companion.dataset.screen !== 'home' || !window.matchMedia('(max-width: 860px)').matches) {
+    return;
+  }
+
+  const topbar = document.querySelector('.home-screen .topbar');
+  if (!topbar) return;
+
+  const rect = companion.getBoundingClientRect();
+  const guard = topbar.getBoundingClientRect();
+  const gap = 12;
+  const overlaps =
+    rect.left < guard.right + gap &&
+    rect.right > guard.left - gap &&
+    rect.top < guard.bottom + gap &&
+    rect.bottom > guard.top - gap;
+
+  if (overlaps) {
+    moveCompanionTo(companion, 12, window.innerHeight - rect.height - 16);
   }
 }
 

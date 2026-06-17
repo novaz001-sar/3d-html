@@ -17,7 +17,17 @@
   box-shadow: 0 10px 24px rgba(65, 85, 110, .09);
 }
 .font-scale-control span { color: var(--muted); font-weight: 900; }
-.font-scale-control input { width: min(150px, 32vw); min-height: auto; padding: 0; box-shadow: none; accent-color: #ff7a9e; }
+.font-scale-control input {
+  position: relative;
+  z-index: 34;
+  width: min(150px, 32vw);
+  min-height: 32px;
+  height: 32px;
+  padding: 0;
+  box-shadow: none;
+  accent-color: #ff7a9e;
+  touch-action: pan-x;
+}
 .volume-control input { accent-color: #42c8ff; }
 .music-toggle.is-on {
   border-color: rgba(255, 122, 158, .32);
@@ -25,4 +35,22 @@
 }
 .music-toggle.is-off {
   opacity: .72;
+}
+
+@media (max-width: 560px) {
+  .font-scale-control {
+    width: min(100%, 430px);
+    justify-content: space-between;
+  }
+
+  .font-scale-control input {
+    flex: 1;
+    width: auto;
+    min-width: 150px;
+  }
+
+  .volume-control {
+    position: relative;
+    z-index: 35;
+  }
 }
