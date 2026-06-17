@@ -28,10 +28,11 @@ export function startGame(ctx, levelId) {
 
 export function bindGame(ctx) {
   const stage = document.querySelector('.game-stage');
-  document.querySelector('[data-game-action="pause"]')?.addEventListener('click', () => {
-    ctx.state.paused = !ctx.state.paused;
-    ctx.render();
-  });
+  bindPauseShortcuts(ctx);
+  document.querySelector('[data-game-action="pause"]')?.addEventListener('click', () => openPauseMenu(ctx));
+  document.querySelector('[data-game-action="resume"]')?.addEventListener('click', () => closePauseMenu(ctx));
+  document.querySelector('[data-game-action="reset"]')?.addEventListener('click', () => resetGame(ctx));
+  document.querySelector('[data-game-action="exit"]')?.addEventListener('click', () => exitGame(ctx));
   document.querySelector('[data-game-action="skip"]')?.addEventListener('click', () => skipQuestion(ctx));
   document.querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => answer(ctx, btn.dataset.answer === 'same')));
   document.getElementById('game-zoom')?.addEventListener('input', event => ctx.state.game.zoom = Number(event.target.value));
@@ -44,6 +45,40 @@ export function bindGame(ctx) {
     if (slider) slider.value = ctx.state.game.zoom;
   }, { passive: false });
   drawGame(ctx);
+}
+
+function bindPauseShortcuts(ctx) {
+  if (ctx.state.game.escapeBound) return;
+  ctx.state.game.escapeBound = true;
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || ctx.state.screen !== 'game') return;
+    event.preventDefault();
+    ctx.state.paused = !ctx.state.paused;
+    ctx.render();
+  });
+}
+
+function openPauseMenu(ctx) {
+  ctx.state.paused = true;
+  ctx.render();
+}
+
+function closePauseMenu(ctx) {
+  ctx.state.paused = false;
+  ctx.render();
+}
+
+function resetGame(ctx) {
+  const levelId = ctx.state.game.level?.id;
+  if (!levelId) return exitGame(ctx);
+  startGame(ctx, levelId);
+}
+
+function exitGame(ctx) {
+  stopTimer(ctx);
+  ctx.state.paused = false;
+  ctx.state.screen = 'main';
+  ctx.render();
 }
 
 export function tickGame(ctx, ts) {
@@ -95,7 +130,7 @@ function drawGame(ctx) {
 
 function answer(ctx, isSame) {
   const game = ctx.state.game;
-  if (game.feedback) return;
+  if (ctx.state.paused || game.feedback) return;
   const correct = isCorrectAnswer(currentQuestion(game), isSame);
   applyAnswerScore(game, correct);
   showFeedback(ctx, correct ? 'Correct' : 'Wrong', correct ? 'good' : 'bad', 800);
@@ -103,7 +138,7 @@ function answer(ctx, isSame) {
 
 function skipQuestion(ctx) {
   const game = ctx.state.game;
-  if (game.feedback) return;
+  if (ctx.state.paused || game.feedback) return;
   applySkipScore(game);
   showFeedback(ctx, ctx.t('skip'), 'skip', 600);
 }

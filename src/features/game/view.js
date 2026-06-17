@@ -11,7 +11,7 @@ export function renderGame(ctx) {
           <h1>${esc(game.level?.name || '')}</h1>
           <p>${t('score')}: <strong id="hud-score">${game.score}</strong> · ${t('timeLeft')}: <strong id="hud-time">${Math.max(0, game.timeLeft)}</strong>s · ${game.qIndex + 1}/${total}</p>
         </div>
-        <button class="button secondary" data-game-action="pause">${state.paused ? t('resume') : t('pause')}</button>
+        <button class="button secondary" data-game-action="pause" aria-haspopup="dialog">${t('pause')}</button>
       </header>
       <section class="game-stage">
         <div class="viewer"><canvas id="game-left"></canvas></div>
@@ -24,6 +24,19 @@ export function renderGame(ctx) {
         <label class="zoom-control">Zoom<input id="game-zoom" type="range" min="0.55" max="2.8" step="0.05" value="${game.zoom}" /></label>
       </footer>
       ${game.feedback ? `<div class="feedback ${game.feedbackKind}">${esc(game.feedback)}</div>` : ''}
+      ${state.paused ? `
+        <div class="modal pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <section class="panel pause-menu">
+            <h2 id="pause-title">${t('pauseMenu')}</h2>
+            <p>${t('pauseTip')}</p>
+            <div class="pause-menu-actions">
+              <button class="button primary" data-game-action="resume">${t('continueGame')}</button>
+              <button class="button secondary" data-game-action="reset">${t('resetGame')}</button>
+              <button class="button danger" data-game-action="exit">${t('exitGame')}</button>
+            </div>
+          </section>
+        </div>
+      ` : ''}
     </main>
   `;
 }
