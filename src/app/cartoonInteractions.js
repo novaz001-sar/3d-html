@@ -26,24 +26,15 @@ const TILT_SELECTOR = [
 ].join(',');
 
 export function mountCartoonInteractions() {
-  if (document.documentElement.dataset.cartoonInteractions === 'standalone-cat-planet') {
+  if (document.documentElement.dataset.cartoonInteractions === 'background-cat-planet') {
     return;
   }
 
-  document.documentElement.dataset.cartoonInteractions = 'standalone-cat-planet';
+  document.documentElement.dataset.cartoonInteractions = 'background-cat-planet';
 
   const layer = document.createElement('div');
   layer.className = 'cartoon-layer';
   document.body.append(layer);
-
-  const companion = createCatCompanion(layer);
-  updateCompanionScreen(companion);
-
-  const root = document.getElementById('app') || document.body;
-  const observer = new MutationObserver(() => {
-    updateCompanionScreen(companion);
-  });
-  observer.observe(root, { childList: true, subtree: true });
 
   document.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary) return;
@@ -51,19 +42,13 @@ export function mountCartoonInteractions() {
     const target = event.target instanceof Element ? event.target : null;
     const levelCard = target?.closest(LEVEL_SELECTOR);
 
-    if (target?.closest('.cat-companion')) {
-      return;
-    }
-
     if (levelCard) {
-      reactCompanion(companion, layer, 'level', levelCard.getBoundingClientRect());
       makeLevelBurst(layer, levelCard);
       return;
     }
 
     if (target?.closest('.cat-manual-card')) {
       const rect = target.closest('.cat-manual-card').getBoundingClientRect();
-      reactCompanion(companion, layer, 'manual', rect);
       makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
       makeBurst(layer, event.clientX, event.clientY, 'manual');
       return;
@@ -71,25 +56,21 @@ export function mountCartoonInteractions() {
 
     if (target?.closest('.cat-result-cardlet, .stars')) {
       const rect = target.closest('.result-card')?.getBoundingClientRect();
-      reactCompanion(companion, layer, 'result', rect);
       makeResultBurst(layer, rect || { left: event.clientX, top: event.clientY, width: 0, height: 0 });
       return;
     }
 
     if (target?.closest(CONTROL_SELECTOR)) {
-      reactCompanion(companion, layer, catRoleForControl(target.closest(CONTROL_SELECTOR)));
       makeBurst(layer, event.clientX, event.clientY, 'control');
       return;
     }
 
     if (target?.closest(STAGE_SELECTOR)) {
-      reactCompanion(companion, layer, 'stage');
       makeRing(layer, event.clientX, event.clientY);
     }
   }, { passive: true });
 
   document.addEventListener('pointermove', (event) => {
-    updateCatParallax(companion, event.clientX, event.clientY);
     tiltCard(event);
   }, { passive: true });
 

@@ -21,6 +21,7 @@
   --cat-look-x: 0px;
   --cat-look-y: 0px;
   --cat-planet-asset: url("/assets/images/cat-planet-clean.svg");
+  --cat-planet-background-asset: url("/assets/images/cat-planet.png");
 }
 
 body,
@@ -1346,5 +1347,127 @@ button.cat-integrated-control {
   .cat-companion * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Cat Planet is now a non-interactive background motif on home and result screens. */
+
+.home-screen,
+.result-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-screen > *,
+.result-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-screen::before,
+.result-card::before {
+  position: absolute;
+  z-index: 0;
+  background: var(--cat-planet-background-asset) center / contain no-repeat;
+  content: "";
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-screen::before {
+  right: max(-9rem, -8vw);
+  bottom: max(-7rem, -9vw);
+  width: clamp(20rem, 46vw, 44rem);
+  aspect-ratio: 1 / 1;
+  opacity: 0.16;
+  filter:
+    drop-shadow(0 28px 42px rgba(52, 56, 74, 0.18))
+    saturate(1.08);
+  transform: rotate(-8deg);
+  animation: catPlanetBackgroundDrift 12s ease-in-out infinite;
+}
+
+.home-screen::after {
+  position: absolute;
+  right: clamp(1rem, 13vw, 15rem);
+  bottom: clamp(3rem, 16vw, 14rem);
+  z-index: 0;
+  width: clamp(9rem, 23vw, 20rem);
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(66, 200, 255, 0.16), transparent 62%),
+    radial-gradient(circle, rgba(255, 111, 159, 0.12), transparent 70%);
+  content: "";
+  pointer-events: none;
+  filter: blur(4px);
+}
+
+.result-card {
+  overflow: hidden;
+}
+
+.result-card::before {
+  left: 50%;
+  top: 50%;
+  width: min(64rem, 118vw);
+  aspect-ratio: 1 / 1;
+  opacity: 0.11;
+  filter:
+    drop-shadow(0 24px 40px rgba(52, 56, 74, 0.18))
+    saturate(1.1);
+  transform: translate(-50%, -50%) rotate(5deg);
+  animation: catPlanetResultGlow 9s ease-in-out infinite;
+}
+
+@keyframes catPlanetBackgroundDrift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: -10px -12px;
+  }
+}
+
+@keyframes catPlanetResultGlow {
+  0%,
+  100% {
+    opacity: 0.1;
+    scale: 1;
+  }
+
+  50% {
+    opacity: 0.16;
+    scale: 1.035;
+  }
+}
+
+@media (max-width: 860px) {
+  .home-screen::before {
+    right: -8.5rem;
+    bottom: 5.5rem;
+    width: clamp(18rem, 88vw, 30rem);
+    opacity: 0.11;
+  }
+
+  .home-screen::after {
+    right: 1.2rem;
+    bottom: 9.2rem;
+    width: 11rem;
+    opacity: 0.8;
+  }
+
+  .result-card::before {
+    width: min(34rem, 132vw);
+    opacity: 0.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-screen::before,
+  .result-card::before {
+    animation: none !important;
   }
 }
