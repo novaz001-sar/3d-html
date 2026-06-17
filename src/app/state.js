@@ -1,11 +1,14 @@
 import { loadData, loadFontScale, loadLanguage, loadMenuMusicEnabled, loadMenuMusicVolume } from '../services/storage.js';
+import { loadAdminConfig } from '../services/adminConfig.js';
 
 export function createInitialState() {
+  const adminConfig = loadAdminConfig();
   return {
-    lang: loadLanguage(),
-    fontScale: loadFontScale(),
-    musicEnabled: loadMenuMusicEnabled(),
-    musicVolume: loadMenuMusicVolume(),
+    lang: loadLanguage(adminConfig.defaults.language),
+    fontScale: loadFontScale(adminConfig.defaults.fontScale),
+    musicEnabled: loadMenuMusicEnabled(adminConfig.audio.menu.enabled),
+    musicVolume: loadMenuMusicVolume(adminConfig.audio.menu.volume),
+    adminConfig,
     screen: 'main',
     editorTab: 'objects',
     paused: false,

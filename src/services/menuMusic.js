@@ -1,12 +1,16 @@
-const MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
+const DEFAULT_MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
 
 let audio;
 let unlockBound = false;
 let shouldPlayWhenUnlocked = false;
 let currentVolume = 0.5;
 let unmuteTimers = [];
+let currentSrc = DEFAULT_MENU_MUSIC_SRC;
+let currentStart = 0;
+let currentLoop = true;
 
-export function primeMenuMusic({ enabled, volume }) {
+export function primeMenuMusic({ enabled, volume, config = {} }) {
+  applyMenuConfig(config);
   currentVolume = normalizeVolume(volume);
   clearUnmuteTimers();
   if (!enabled) {
@@ -20,7 +24,8 @@ export function primeMenuMusic({ enabled, volume }) {
   playMenuMusic({ bootstrap: true });
 }
 
-export function syncMenuMusic({ active, enabled, volume }) {
+export function syncMenuMusic({ active, enabled, volume, config = {} }) {
+  applyMenuConfig(config);
   currentVolume = normalizeVolume(volume);
 
   if (!active || !enabled) {
@@ -58,6 +63,7 @@ export function pauseMenuMusic() {
 function playMenuMusic({ bootstrap = false } = {}) {
   const player = getAudio();
   player.volume = currentVolume;
+  if (!player.dataset.started) seekAudio(player, currentStart);
 
   if (bootstrap) {
     player.muted = false;
@@ -124,8 +130,8 @@ function getAudio() {
   if (audio) return audio;
 
   audio = document.createElement('audio');
-  audio.src = MENU_MUSIC_SRC;
-  audio.loop = true;
+  audio.src = currentSrc;
+  audio.loop = currentLoop;
   audio.preload = 'auto';
   audio.autoplay = true;
   audio.hidden = true;
@@ -133,6 +139,38 @@ function getAudio() {
   audio.setAttribute('playsinline', '');
   document.body?.append(audio);
   return audio;
+}
+
+function applyMenuConfig(config = {}) {
+  const nextSrc = String(config.src || DEFAULT_MENU_MUSIC_SRC);
+  const nextStart = Number(config.start);
+  currentSrc = nextSrc;
+  currentStart = Number.isFinite(nextStart) ? Math.max(0, nextStart) : 0;
+  currentLoop = config.loop !== false;
+
+  if (!audio) return;
+
+  const resolvedCurrent = new URL(audio.getAttribute('src') || audio.src, window.location.href).href;
+  const resolvedNext = new URL(currentSrc, window.location.href).href;
+  if (resolvedCurrent !== resolvedNext) {
+    audio.pause();
+    audio.remove();
+    audio = null;
+    return;
+  }
+
+  audio.loop = currentLoop;
+}
+
+function seekAudio(player, seconds) {
+  if (!seconds) return;
+  try {
+    player.currentTime = seconds;
+  } catch {
+    player.addEventListener('loadedmetadata', () => {
+      player.currentTime = seconds;
+    }, { once: true });
+  }
 }
 
 function bindUnlockEvents() {

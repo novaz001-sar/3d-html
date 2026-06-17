@@ -1,6 +1,13 @@
 let audioContext;
 let unlocked = false;
-const SFX_GAIN_MULTIPLIER = 2;
+let sfxEnabled = true;
+let sfxGainMultiplier = 2;
+
+export function configureSoundEffects(config = {}) {
+  sfxEnabled = config.enabled !== false;
+  const multiplier = Number(config.volumeMultiplier);
+  sfxGainMultiplier = Number.isFinite(multiplier) ? Math.min(4, Math.max(0, multiplier)) : 2;
+}
 
 export function installSoundUnlock() {
   const unlock = () => {
@@ -73,6 +80,7 @@ export function playLevelComplete() {
 }
 
 function playSequence(notes) {
+  if (!sfxEnabled || sfxGainMultiplier <= 0) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -93,7 +101,7 @@ function playNote(ctx, note) {
   const now = ctx.currentTime;
   const start = now + note.start;
   const end = start + note.duration;
-  const peakGain = Math.min(note.gain * SFX_GAIN_MULTIPLIER, 0.24);
+  const peakGain = Math.min(note.gain * sfxGainMultiplier, 0.32);
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
 

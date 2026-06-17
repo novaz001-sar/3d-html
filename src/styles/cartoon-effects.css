@@ -1480,7 +1480,7 @@ button.cat-integrated-control {
   width: clamp(18rem, 33vw, 31rem);
   aspect-ratio: 1 / 1;
   background: var(--cat-planet-background-asset) center / contain no-repeat;
-  opacity: 0.5;
+  opacity: var(--cat-home-opacity, 0.5);
   pointer-events: none;
   user-select: none;
   filter:
@@ -1585,4 +1585,8 @@ button.cat-integrated-control {
   .cat-home-planet {
     animation: none !important;
   }
+}
+
+html[data-home-cat="off"] .cat-home-planet {
+  display: none;
 }

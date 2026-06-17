@@ -2,31 +2,38 @@ import { esc } from '../shared/utils.js';
 import { levelName } from '../domain/levels.js';
 import { downloadJson, readJsonFile } from '../services/dataTransfer.js';
 import { saveData } from '../services/storage.js';
+import { localizedConfigText } from '../services/adminConfig.js';
 
 export function renderHome(ctx) {
   const { state, t } = ctx;
   const levels = state.data.levels || [];
+  const config = state.adminConfig;
+  const title = localizedConfigText(config.content.title, state.lang, t('title'));
+  const edition = localizedConfigText(config.content.edition, state.lang, t('edition'));
+  const showLanguage = config.defaults.allowLanguageSwitch !== false;
+  const showFont = config.defaults.allowFontControl !== false;
+  const showMusic = config.audio.menu.showControls !== false;
   return `
     <main class="screen home-screen">
       <header class="topbar">
         <button class="button ghost" data-home-action="export">${t('export')}</button>
         <label class="button ghost">${t('import')}<input id="import-file" type="file" accept=".json,application/json" hidden /></label>
-        <button class="button ghost" data-action="lang">${t('lang')}</button>
-        <button class="button ghost music-toggle ${state.musicEnabled ? 'is-on' : 'is-off'}" data-action="music">${state.musicEnabled ? t('musicOn') : t('musicOff')}</button>
+        ${showLanguage ? `<button class="button ghost" data-action="lang">${t('lang')}</button>` : ''}
+        ${showMusic ? `<button class="button ghost music-toggle ${state.musicEnabled ? 'is-on' : 'is-off'}" data-action="music">${state.musicEnabled ? t('musicOn') : t('musicOff')}</button>
         <label class="font-scale-control volume-control">
           <span>${t('volume')}</span>
           <input type="range" min="0" max="1" step="0.02" value="${state.musicVolume}" data-action="music-volume" />
-        </label>
-        <label class="font-scale-control">
+        </label>` : ''}
+        ${showFont ? `<label class="font-scale-control">
           <span>${t('fontSize')}</span>
           <input type="range" min="0.88" max="1.28" step="0.04" value="${state.fontScale}" data-action="font-scale" />
-        </label>
+        </label>` : ''}
       </header>
       <section class="hero">
         <div class="cat-home-planet" aria-hidden="true"></div>
         <div>
-          <h1>${t('title')}</h1>
-          <p>${t('edition')}</p>
+          <h1>${esc(title)}</h1>
+          <p>${esc(edition)}</p>
         </div>
         <div class="level-grid">
           ${levels.length ? levels.map((level, idx) => `<button class="level-card" data-start="${esc(level.id)}"><span class="level-number">${idx + 1}</span>${esc(levelName(level, state.lang, t('start')))}</button>`).join('') : `<div class="empty-state">${t('noData')}</div>`}

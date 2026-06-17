@@ -4,7 +4,7 @@ import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMu
 import { translate } from '../services/i18n.js';
 import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic, unlockMenuMusic } from '../services/menuMusic.js';
 import { syncResultMusic } from '../services/resultMusic.js';
-import { installSoundUnlock, unlockSoundEffects } from '../services/sound.js';
+import { configureSoundEffects, installSoundUnlock, unlockSoundEffects } from '../services/sound.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
 import { createInitialState } from './state.js';
@@ -30,8 +30,8 @@ export function createApp(root) {
     if (state.screen === 'main') bindHome(ctx);
     if (state.screen === 'editor') bindEditor(ctx);
     if (state.screen === 'game') bindGame(ctx);
-    syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
-    syncResultMusic({ active: state.screen === 'result', stars: state.result.stars });
+    syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume, config: state.adminConfig.audio.menu });
+    syncResultMusic({ active: state.screen === 'result', stars: state.result.stars, config: state.adminConfig.audio.result });
   }
 
   function bindGlobalActions() {
@@ -59,9 +59,9 @@ export function createApp(root) {
     document.querySelectorAll('[data-action="music-volume"]').forEach(el => {
       const updateMusicVolume = event => {
         state.musicVolume = Number(event.target.value);
-        saveMenuMusicVolume(state.musicVolume);
-        setMenuMusicVolume(state.musicVolume);
-        syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
+      saveMenuMusicVolume(state.musicVolume);
+      setMenuMusicVolume(state.musicVolume);
+      syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume, config: state.adminConfig.audio.menu });
       };
 
       const activateMusicVolume = event => {
@@ -82,6 +82,11 @@ export function createApp(root) {
   function applyUiPreferences() {
     document.documentElement.dataset.lang = state.lang;
     document.documentElement.style.setProperty('--ui-font-scale', String(state.fontScale || 1));
+    document.documentElement.style.setProperty('--font-cute-latin', quoteFont(state.adminConfig.defaults.latinFont || 'Baloo 2'));
+    document.documentElement.style.setProperty('--font-cute-cjk', quoteFont(state.adminConfig.defaults.cjkFont || 'ZCOOL KuaiLe'));
+    document.documentElement.style.setProperty('--cat-home-opacity', String(state.adminConfig.visual.homeCat.opacity));
+    document.documentElement.dataset.homeCat = state.adminConfig.visual.homeCat.enabled === false ? 'off' : 'on';
+    configureSoundEffects(state.adminConfig.audio.sfx);
   }
 
   function installGlobalAudioUnlock() {
@@ -107,7 +112,7 @@ export function createApp(root) {
 
   return {
     start() {
-      primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume });
+      primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume, config: state.adminConfig.audio.menu });
       installSoundUnlock();
       installGlobalAudioUnlock();
       window.addEventListener('resize', () => {
@@ -117,4 +122,8 @@ export function createApp(root) {
       requestAnimationFrame(loop);
     }
   };
+}
+
+function quoteFont(font) {
+  return `"${String(font).replace(/"/g, '')}"`;
 }

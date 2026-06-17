@@ -20,34 +20,38 @@ export function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeData(data)));
 }
 
-export function loadLanguage() {
-  return localStorage.getItem(LANG_KEY) || 'en';
+export function loadLanguage(defaultLanguage = 'en') {
+  return localStorage.getItem(LANG_KEY) || defaultLanguage || 'en';
 }
 
 export function saveLanguage(lang) {
   localStorage.setItem(LANG_KEY, lang);
 }
 
-export function loadFontScale() {
+export function loadFontScale(defaultScale = 1) {
   const saved = Number(localStorage.getItem(FONT_SCALE_KEY));
-  return Number.isFinite(saved) ? Math.min(1.28, Math.max(0.88, saved)) : 1;
+  return Number.isFinite(saved) ? Math.min(1.28, Math.max(0.88, saved)) : Math.min(1.28, Math.max(0.88, Number(defaultScale) || 1));
 }
 
 export function saveFontScale(scale) {
   localStorage.setItem(FONT_SCALE_KEY, String(Math.min(1.28, Math.max(0.88, Number(scale) || 1))));
 }
 
-export function loadMenuMusicEnabled() {
-  return localStorage.getItem(MENU_MUSIC_KEY) !== 'off';
+export function loadMenuMusicEnabled(defaultEnabled = true) {
+  const stored = localStorage.getItem(MENU_MUSIC_KEY);
+  if (stored === 'on') return true;
+  if (stored === 'off') return false;
+  return defaultEnabled !== false;
 }
 
 export function saveMenuMusicEnabled(enabled) {
   localStorage.setItem(MENU_MUSIC_KEY, enabled ? 'on' : 'off');
 }
 
-export function loadMenuMusicVolume() {
+export function loadMenuMusicVolume(defaultVolume = 0.5) {
   const saved = Number(localStorage.getItem(MENU_MUSIC_VOLUME_KEY));
-  if (!Number.isFinite(saved) || saved <= 0) return 0.5;
+  const fallback = Math.min(1, Math.max(0, Number(defaultVolume) || 0.5));
+  if (!Number.isFinite(saved) || saved <= 0) return fallback;
   return Math.min(1, Math.max(0, saved));
 }
 
