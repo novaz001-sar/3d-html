@@ -1,24 +1,4 @@
-export function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
-export function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-export function uid(prefix = 'id') {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
-}
-
-export function esc(value) {
-  return String(value ?? '').replace(/[&<>'"]/g, ch => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
-  })[ch]);
-}
+import { clamp } from '../shared/utils.js';
 
 export function normalizeQuat(q) {
   const len = Math.hypot(q[0], q[1], q[2], q[3]) || 1;
@@ -79,13 +59,8 @@ export function rgba(rgb, a = 1) {
   return `rgba(${rgb.r},${rgb.g},${rgb.b},${a})`;
 }
 
-export function roundRect(ctx, x, y, w, h, r) {
-  const rr = Math.min(r, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + rr, y);
-  ctx.arcTo(x + w, y, x + w, y + h, rr);
-  ctx.arcTo(x + w, y + h, x, y + h, rr);
-  ctx.arcTo(x, y + h, x, y, rr);
-  ctx.arcTo(x, y, x + w, y, rr);
-  ctx.closePath();
+export function stepAutoRotation(q, axisMode, speed, dt) {
+  const angle = Math.PI * 2 / Math.max(0.8, Number(speed || 4)) * dt;
+  const axis = axisMode === 1 ? [0, 1, 0] : [1, 0, 0];
+  return normalizeQuat(quatMultiply(quatFromAxisAngle(axis, angle), q));
 }
