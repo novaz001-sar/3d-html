@@ -1,3 +1,5 @@
+import { setMediaElementVolume, unlockMediaVolumeContext } from './mediaVolume.js';
+
 const DEFAULT_MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
 const UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'click', 'keydown'];
 
@@ -47,7 +49,7 @@ export function syncMenuMusic({ active, enabled, volume, config = {} }) {
 export function setMenuMusicVolume(volume) {
   currentVolume = normalizeVolume(volume);
   if (audio) {
-    audio.volume = currentVolume;
+    setMediaElementVolume(audio, currentVolume);
   }
 }
 
@@ -73,7 +75,7 @@ function getAudio() {
     audio.playsInline = true;
     audio.src = currentSrc;
     audio.loop = currentLoop && currentStart <= 0;
-    audio.volume = currentVolume;
+    setMediaElementVolume(audio, currentVolume);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('canplay', handleCanPlay);
   }
@@ -110,7 +112,8 @@ function attemptAudiblePlay(options = {}) {
   }
 
   player.muted = false;
-  player.volume = currentVolume;
+  setMediaElementVolume(player, currentVolume);
+  unlockMediaVolumeContext();
   seekToStart(player);
 
   try {

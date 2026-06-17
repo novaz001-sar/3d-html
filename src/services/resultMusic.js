@@ -1,3 +1,5 @@
+import { setMediaElementVolume, unlockMediaVolumeContext } from './mediaVolume.js';
+
 const RESULT_TRACKS = {
   1: '/assets/audio/1-star.m4a',
   2: '/assets/audio/2-stars.m4a',
@@ -73,7 +75,8 @@ function playActiveResultAudio(options = {}) {
   if (!resultAudio) return Promise.resolve(false);
   shouldPlayWhenUnlocked = true;
   resultAudio.muted = false;
-  resultAudio.volume = currentConfig.volume;
+  setMediaElementVolume(resultAudio, currentConfig.volume);
+  unlockMediaVolumeContext();
 
   if (!options.keepPosition) {
     seekAudio(resultAudio, currentConfig.start);
@@ -141,7 +144,7 @@ function prepareTrack(track, config) {
     created = true;
   }
 
-  audio.volume = config.volume;
+  setMediaElementVolume(audio, config.volume);
   audio.preload = 'auto';
   if (created || audio.readyState === 0) {
     safeLoad(audio);
@@ -164,8 +167,9 @@ function warmTrack(track) {
   if (warmedTracks.has(track)) return;
   const audio = prepareTrack(track, currentConfig);
   audio.muted = true;
-  audio.volume = 0;
+  setMediaElementVolume(audio, 0);
   seekAudio(audio, currentConfig.start);
+  unlockMediaVolumeContext();
 
   try {
     const playPromise = audio.play();
@@ -178,12 +182,12 @@ function warmTrack(track) {
       () => finishWarmup(track, audio),
       () => {
         audio.muted = false;
-        audio.volume = currentConfig.volume;
+        setMediaElementVolume(audio, currentConfig.volume);
       }
     );
   } catch {
     audio.muted = false;
-    audio.volume = currentConfig.volume;
+    setMediaElementVolume(audio, currentConfig.volume);
   }
 }
 
@@ -192,8 +196,9 @@ function armTrackForResult(track) {
   armedTrack = track;
   armedAudio = audio;
   audio.muted = true;
-  audio.volume = 0;
+  setMediaElementVolume(audio, 0);
   seekAudio(audio, Math.max(0, currentConfig.start - RESULT_ARM_LEAD_SECONDS));
+  unlockMediaVolumeContext();
 
   try {
     const playPromise = audio.play();
@@ -206,19 +211,19 @@ function armTrackForResult(track) {
       () => warmedTracks.add(track),
       () => {
         audio.muted = false;
-        audio.volume = currentConfig.volume;
+        setMediaElementVolume(audio, currentConfig.volume);
       }
     );
   } catch {
     audio.muted = false;
-    audio.volume = currentConfig.volume;
+    setMediaElementVolume(audio, currentConfig.volume);
   }
 }
 
 function finishWarmup(track, audio) {
   audio.pause();
   audio.muted = false;
-  audio.volume = currentConfig.volume;
+  setMediaElementVolume(audio, currentConfig.volume);
   seekAudio(audio, currentConfig.start);
   warmedTracks.add(track);
 }
