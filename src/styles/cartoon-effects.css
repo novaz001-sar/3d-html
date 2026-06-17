@@ -1080,3 +1080,202 @@ button.cat-integrated-control {
     transform: none;
   }
 }
+
+/* Standalone Cat Planet companion. Buttons and options no longer carry cat figures. */
+
+.cat-integrated-control {
+  isolation: auto;
+}
+
+.button.cat-integrated-control,
+button.cat-integrated-control {
+  gap: inherit;
+}
+
+.level-card.cat-integrated-control {
+  padding-right: initial;
+}
+
+.level-card.cat-level-option {
+  padding-right: clamp(1rem, 4vw, 1.35rem);
+}
+
+.cat-mini-planet,
+.cat-level-orbit,
+.cat-level-paws,
+.cat-level-label {
+  display: none !important;
+}
+
+.cat-companion {
+  --cat-float-x: 0px;
+  --cat-float-y: 0px;
+  position: fixed;
+  right: clamp(0.8rem, 3vw, 2rem);
+  top: 48%;
+  z-index: 28;
+  width: clamp(7.8rem, 16vw, 11.5rem);
+  aspect-ratio: 1.22 / 1;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transform: translate(var(--cat-float-x), calc(-50% + var(--cat-float-y)));
+  filter: drop-shadow(0 16px 30px rgba(32, 38, 63, 0.18));
+  animation: catCompanionFloat 4.8s ease-in-out infinite;
+}
+
+.cat-companion-image {
+  position: absolute;
+  inset: -12% -18%;
+  background: var(--cat-planet-asset) center / contain no-repeat;
+  pointer-events: none;
+}
+
+.cat-companion-orbit {
+  position: absolute;
+  inset: 30% -8%;
+  border: 3px solid rgba(66, 200, 255, 0.42);
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-12deg);
+  animation: catOrbitTurn 8s linear infinite;
+}
+
+.cat-companion-badge {
+  position: absolute;
+  right: 4%;
+  bottom: 12%;
+  min-width: 2.2rem;
+  padding: 0.18rem 0.42rem;
+  border: 2px solid rgba(32, 38, 63, 0.82);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 3px 4px 0 rgba(32, 38, 63, 0.14);
+  color: #6d7cff;
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1;
+  transform: rotate(-5deg);
+}
+
+.cat-companion-bubble {
+  position: absolute;
+  right: 62%;
+  top: 2%;
+  min-width: 5.8rem;
+  padding: 0.36rem 0.58rem;
+  border: 2px solid rgba(32, 38, 63, 0.78);
+  border-radius: 999px 999px 0.35rem 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 3px 4px 0 rgba(32, 38, 63, 0.12);
+  color: #ff6f9f;
+  font-size: 0.74rem;
+  font-weight: 950;
+  pointer-events: none;
+  transform: rotate(-5deg);
+}
+
+.cat-companion[data-screen="game"] {
+  top: 54%;
+  right: clamp(0.5rem, 1.6vw, 1.1rem);
+  width: clamp(6.2rem, 12vw, 8.4rem);
+}
+
+.cat-companion[data-screen="editor"] {
+  top: 72%;
+  width: clamp(5.8rem, 11vw, 8rem);
+}
+
+.cat-companion[data-screen="result"] {
+  top: 34%;
+  right: clamp(1rem, 8vw, 7rem);
+  width: clamp(8rem, 18vw, 12rem);
+}
+
+.cat-companion[data-mood="music"] .cat-companion-badge,
+.cat-companion[data-mood="lang"] .cat-companion-badge {
+  background: #daf6ff;
+  color: #2578d8;
+}
+
+.cat-companion[data-mood="editor"] .cat-companion-badge,
+.cat-companion[data-mood="manual"] .cat-companion-badge {
+  background: #fff3bd;
+  color: #9b6810;
+}
+
+.cat-companion[data-mood="diff"] .cat-companion-badge,
+.cat-companion[data-mood="exit"] .cat-companion-badge {
+  background: #ffe2e2;
+  color: #e44f66;
+}
+
+.cat-companion.is-reacting {
+  animation: catCompanionReact 620ms cubic-bezier(0.16, 1.38, 0.32, 1), catCompanionFloat 4.8s ease-in-out 620ms infinite;
+}
+
+@keyframes catCompanionFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@keyframes catCompanionReact {
+  0%,
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+
+  42% {
+    scale: 1.09;
+    rotate: -5deg;
+  }
+
+  72% {
+    scale: 0.97;
+    rotate: 4deg;
+  }
+}
+
+@media (max-width: 860px) {
+  .cat-companion {
+    top: auto;
+    right: 0.7rem;
+    bottom: 4.9rem;
+    width: 5.4rem;
+    transform: translate(var(--cat-float-x), var(--cat-float-y));
+  }
+
+  .cat-companion[data-screen="game"],
+  .cat-companion[data-screen="editor"],
+  .cat-companion[data-screen="result"] {
+    top: auto;
+    right: 0.7rem;
+    bottom: 4.9rem;
+    width: 5.4rem;
+  }
+
+  .cat-companion-bubble {
+    display: none;
+  }
+
+  .cat-companion-badge {
+    min-width: 1.7rem;
+    font-size: 0.56rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-companion,
+  .cat-companion * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

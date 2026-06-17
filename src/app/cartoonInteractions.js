@@ -22,41 +22,45 @@ const TILT_SELECTOR = [
 ].join(',');
 
 export function mountCartoonInteractions() {
-  if (document.documentElement.dataset.cartoonInteractions === 'integrated-cat-planet') {
+  if (document.documentElement.dataset.cartoonInteractions === 'standalone-cat-planet') {
     return;
   }
 
-  document.documentElement.dataset.cartoonInteractions = 'integrated-cat-planet';
+  document.documentElement.dataset.cartoonInteractions = 'standalone-cat-planet';
 
   const layer = document.createElement('div');
   layer.className = 'cartoon-layer';
   document.body.append(layer);
 
-  const decorate = () => decorateCatPlanetUi(layer);
-  decorate();
+  const companion = createCatCompanion(layer);
+  updateCompanionScreen(companion);
 
   const root = document.getElementById('app') || document.body;
   const observer = new MutationObserver(() => {
-    decorate();
+    updateCompanionScreen(companion);
   });
   observer.observe(root, { childList: true, subtree: true });
 
   document.addEventListener('pointerdown', (event) => {
-    if (!event.isPrimary) {
-      return;
-    }
+    if (!event.isPrimary) return;
 
     const target = event.target instanceof Element ? event.target : null;
     const levelCard = target?.closest(LEVEL_SELECTOR);
 
+    if (target?.closest('.cat-companion')) {
+      reactCompanion(companion, layer, 'hello');
+      return;
+    }
+
     if (levelCard) {
-      pulseEmbeddedCat(levelCard);
+      reactCompanion(companion, layer, 'level', levelCard.getBoundingClientRect());
       makeLevelBurst(layer, levelCard);
       return;
     }
 
     if (target?.closest('.cat-manual-card')) {
       const rect = target.closest('.cat-manual-card').getBoundingClientRect();
+      reactCompanion(companion, layer, 'manual', rect);
       makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
       makeBurst(layer, event.clientX, event.clientY, 'manual');
       return;
@@ -64,127 +68,106 @@ export function mountCartoonInteractions() {
 
     if (target?.closest('.cat-result-cardlet, .stars')) {
       const rect = target.closest('.result-card')?.getBoundingClientRect();
+      reactCompanion(companion, layer, 'result', rect);
       makeResultBurst(layer, rect || { left: event.clientX, top: event.clientY, width: 0, height: 0 });
       return;
     }
 
     if (target?.closest(CONTROL_SELECTOR)) {
-      pulseEmbeddedCat(target.closest(CONTROL_SELECTOR));
+      reactCompanion(companion, layer, catRoleForControl(target.closest(CONTROL_SELECTOR)));
       makeBurst(layer, event.clientX, event.clientY, 'control');
       return;
     }
 
     if (target?.closest(STAGE_SELECTOR)) {
+      reactCompanion(companion, layer, 'stage');
       makeRing(layer, event.clientX, event.clientY);
-      return;
     }
   }, { passive: true });
 
   document.addEventListener('pointermove', (event) => {
-    updateCatGaze(event.clientX, event.clientY);
+    updateCatParallax(companion, event.clientX, event.clientY);
     tiltCard(event);
   }, { passive: true });
 
   document.addEventListener('pointerleave', (event) => {
     const target = event.target instanceof Element ? event.target.closest(TILT_SELECTOR) : null;
-
-    if (target) {
-      clearTilt(target);
-    }
+    if (target) clearTilt(target);
   }, true);
 }
 
-function decorateCatPlanetUi(layer) {
-  document.querySelectorAll(CONTROL_SELECTOR).forEach((control) => {
-    if (control.dataset.catIntegrated === 'true') {
-      return;
-    }
-
-    control.dataset.catIntegrated = 'true';
-    control.classList.add('cat-integrated-control');
-    control.insertAdjacentHTML('afterbegin', catMiniPlanetMarkup(catRoleForControl(control)));
-  });
-
-  document.querySelectorAll(LEVEL_SELECTOR).forEach((levelCard, index) => {
-    if (levelCard.dataset.catLevelOption === 'true') {
-      return;
-    }
-
-    levelCard.dataset.catLevelOption = 'true';
-    levelCard.classList.add('cat-level-option');
-    levelCard.style.setProperty('--cat-level-delay', `${index * 70}ms`);
-    levelCard.insertAdjacentHTML('beforeend', catLevelOptionMarkup());
-  });
-
-  const manual = document.querySelector('.manual');
-  if (manual && manual.dataset.catManual !== 'true') {
-    manual.dataset.catManual = 'true';
-    manual.classList.add('cat-manual-panel');
-    manual.querySelector('h2')?.insertAdjacentHTML('afterend', catManualMarkup());
-    manual.querySelector('.cat-manual-card')?.addEventListener('click', (event) => {
-      const rect = event.currentTarget.getBoundingClientRect();
-      makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
-      makeBurst(layer, rect.left + rect.width / 2, rect.top + rect.height / 2, 'manual');
-    });
-  }
-
-  const result = document.querySelector('.result-card');
-  if (result && result.dataset.catResult !== 'true') {
-    result.dataset.catResult = 'true';
-    result.classList.add('cat-result-panel');
-    result.querySelector('h1')?.insertAdjacentHTML('afterend', catResultMarkup());
-    result.querySelector('.cat-result-cardlet')?.addEventListener('click', () => {
-      makeResultBurst(layer, result.getBoundingClientRect());
-    });
-  }
+function createCatCompanion(layer) {
+  const companion = document.createElement('button');
+  companion.className = 'cat-companion';
+  companion.type = 'button';
+  companion.setAttribute('aria-label', 'Cat Planet helper');
+  companion.innerHTML = [
+    '<span class="cat-companion-orbit"></span>',
+    '<span class="cat-companion-image"></span>',
+    '<span class="cat-companion-badge">CAT</span>',
+    '<span class="cat-companion-bubble">Tap me!</span>'
+  ].join('');
+  companion.addEventListener('click', () => reactCompanion(companion, layer, 'hello'));
+  document.body.append(companion);
+  return companion;
 }
 
-function catLevelOptionMarkup() {
-  return [
-    '<span class="cat-level-orbit" aria-hidden="true"></span>',
-    '<span class="cat-level-paws" aria-hidden="true"><i></i><i></i><i></i></span>',
-    '<span class="cat-level-label" aria-hidden="true">CAT STAGE</span>'
-  ].join('');
+function updateCompanionScreen(companion) {
+  const screen = document.querySelector('.screen');
+  const screenName = screen?.className?.match(/([a-z]+)-screen/)?.[1] || 'home';
+  companion.dataset.screen = screenName;
+
+  if (screenName === 'game') setCompanionMood(companion, 'game', 'Ready?');
+  else if (screenName === 'editor') setCompanionMood(companion, 'editor', 'Build!');
+  else if (screenName === 'result') setCompanionMood(companion, 'result', 'Yay!');
+  else setCompanionMood(companion, 'home', 'Pick a stage');
 }
 
-function catMiniPlanetMarkup(role = 'cat') {
-  return [
-    `<span class="cat-mini-planet cat-role-${role}" aria-hidden="true">`,
-    '<span class="cat-planet-image"></span>',
-    `<span class="cat-function-badge">${catBadgeForRole(role)}</span>`,
-    '</span>',
-  ].join('');
+function reactCompanion(companion, layer, role, rect) {
+  const reactions = {
+    cat: ['cat', 'Meow!'],
+    diff: ['diff', 'Different?'],
+    editor: ['editor', 'Build!'],
+    exit: ['exit', 'Bye!'],
+    export: ['export', 'Saved!'],
+    hello: ['hello', 'Meow!'],
+    home: ['home', 'Home!'],
+    import: ['import', 'Load!'],
+    lang: ['lang', 'Hello!'],
+    level: ['level', 'Go!'],
+    manual: ['manual', 'Tips!'],
+    music: ['music', 'La la!'],
+    ok: ['ok', 'OK!'],
+    pause: ['pause', 'Pause'],
+    play: ['play', 'Go!'],
+    reset: ['reset', 'Again!'],
+    result: ['result', 'Stars!'],
+    same: ['same', 'Same?'],
+    skip: ['skip', 'Skip!'],
+    stage: ['stage', 'Spin!']
+  };
+  const [mood, text] = reactions[role] || reactions.cat;
+  setCompanionMood(companion, mood, text);
+  companion.classList.remove('is-reacting');
+  window.requestAnimationFrame(() => companion.classList.add('is-reacting'));
+
+  const ownRect = companion.getBoundingClientRect();
+  const x = rect ? rect.left + rect.width / 2 : ownRect.left + ownRect.width / 2;
+  const y = rect ? rect.top + rect.height / 2 : ownRect.top + ownRect.height / 2;
+  makeBurst(layer, x, y, 'cat');
 }
 
-function catManualMarkup() {
-  return [
-    '<button class="cat-manual-card" type="button" aria-label="Cat manual interaction">',
-    '<span class="cat-inline-planet cat-inline-planet-guide cat-role-manual">',
-    '<span class="cat-planet-image"></span>',
-    '<span class="cat-function-badge">?</span>',
-    '</span>',
-    '<span class="cat-manual-copy">',
-    '<strong>MEOW MANUAL</strong>',
-    '<small>tap for tiny paw stars</small>',
-    '</span>',
-    '</button>'
-  ].join('');
+function setCompanionMood(companion, mood, text) {
+  companion.dataset.mood = mood;
+  companion.querySelector('.cat-companion-badge').textContent = badgeForRole(mood);
+  companion.querySelector('.cat-companion-bubble').textContent = text;
 }
 
-function catResultMarkup() {
-  return [
-    '<button class="cat-result-cardlet" type="button" aria-label="Cat result celebration">',
-    '<span class="cat-inline-planet cat-inline-planet-result cat-role-result">',
-    '<span class="cat-planet-image"></span>',
-    '<span class="cat-function-badge">OK</span>',
-    '<span class="cat-inline-sparkles"><i></i><i></i><i></i></span>',
-    '</span>',
-    '<span class="cat-result-copy">',
-    '<strong>STAR CAT</strong>',
-    '<small>tap to celebrate</small>',
-    '</span>',
-    '</button>'
-  ].join('');
+function updateCatParallax(companion, clientX, clientY) {
+  const x = (clientX / window.innerWidth - 0.5) * 2;
+  const y = (clientY / window.innerHeight - 0.5) * 2;
+  companion.style.setProperty('--cat-float-x', `${(x * 8).toFixed(2)}px`);
+  companion.style.setProperty('--cat-float-y', `${(y * 6).toFixed(2)}px`);
 }
 
 function catRoleForControl(control) {
@@ -213,13 +196,14 @@ function catRoleForControl(control) {
   return 'cat';
 }
 
-function catBadgeForRole(role) {
+function badgeForRole(role) {
   const badges = {
     cat: 'CAT',
     diff: '!=',
     editor: 'ED',
     exit: 'OUT',
     export: 'EX',
+    hello: 'CAT',
     home: 'HM',
     import: 'IN',
     lang: 'EN',
@@ -230,24 +214,12 @@ function catBadgeForRole(role) {
     pause: 'II',
     play: 'GO',
     reset: 'RE',
+    result: 'OK',
     same: '=',
-    skip: 'SK'
+    skip: 'SK',
+    stage: '3D'
   };
-
   return badges[role] || 'CAT';
-}
-
-function pulseEmbeddedCat(control) {
-  const cat = control.querySelector('.cat-mini-planet');
-
-  if (!cat) {
-    return;
-  }
-
-  cat.classList.remove('is-pulsing');
-  window.requestAnimationFrame(() => {
-    cat.classList.add('is-pulsing');
-  });
 }
 
 function makeBurst(layer, x, y, tone) {
@@ -302,16 +274,7 @@ function makeResultBurst(layer, rect) {
 
 function makeLevelBurst(layer, levelCard) {
   const rect = levelCard.getBoundingClientRect();
-  const centerX = rect.left + rect.width * 0.72;
-  const centerY = rect.top + rect.height * 0.36;
-
-  levelCard.classList.remove('cat-level-awake');
-  window.requestAnimationFrame(() => {
-    levelCard.classList.add('cat-level-awake');
-  });
-
-  makeBurst(layer, centerX, centerY, 'level');
-  makePaws(layer, centerX, centerY);
+  makeBurst(layer, rect.left + rect.width * 0.72, rect.top + rect.height * 0.36, 'level');
 }
 
 function makePaws(layer, x, y) {
@@ -340,20 +303,10 @@ function makeRing(layer, x, y) {
   removeAfter(ring, 680);
 }
 
-function updateCatGaze(clientX, clientY) {
-  const x = (clientX / window.innerWidth - 0.5) * 2;
-  const y = (clientY / window.innerHeight - 0.5) * 2;
-
-  document.documentElement.style.setProperty('--cat-look-x', `${(x * 2.4).toFixed(2)}px`);
-  document.documentElement.style.setProperty('--cat-look-y', `${(y * 1.8).toFixed(2)}px`);
-}
-
 function tiltCard(event) {
   const target = event.target instanceof Element ? event.target.closest(TILT_SELECTOR) : null;
 
-  if (!target || window.matchMedia('(max-width: 720px)').matches) {
-    return;
-  }
+  if (!target || window.matchMedia('(max-width: 720px)').matches) return;
 
   const rect = target.getBoundingClientRect();
   const x = (event.clientX - rect.left) / rect.width - 0.5;

@@ -1,4 +1,43 @@
 let audioContext;
+let unlocked = false;
+
+export function installSoundUnlock() {
+  const unlock = () => {
+    unlockSoundEffects();
+    window.removeEventListener('pointerdown', unlock, true);
+    window.removeEventListener('keydown', unlock, true);
+    window.removeEventListener('touchstart', unlock, true);
+  };
+
+  window.addEventListener('pointerdown', unlock, true);
+  window.addEventListener('keydown', unlock, true);
+  window.addEventListener('touchstart', unlock, true);
+}
+
+export function unlockSoundEffects() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const finishUnlock = () => {
+    if (unlocked) return;
+    unlocked = true;
+    const gain = ctx.createGain();
+    const oscillator = ctx.createOscillator();
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.02);
+  };
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(finishUnlock).catch(() => {});
+    return;
+  }
+
+  finishUnlock();
+}
 
 export function playLevelSelect() {
   playSequence([
@@ -36,11 +75,17 @@ function playSequence(notes) {
   const ctx = getAudioContext();
   if (!ctx) return;
 
+  const play = () => {
+    unlocked = true;
+    notes.forEach(note => playNote(ctx, note));
+  };
+
   if (ctx.state === 'suspended') {
-    ctx.resume();
+    ctx.resume().then(play).catch(() => {});
+    return;
   }
 
-  notes.forEach(note => playNote(ctx, note));
+  play();
 }
 
 function playNote(ctx, note) {

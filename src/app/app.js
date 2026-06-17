@@ -3,6 +3,7 @@ import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } fr
 import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMusicVolume } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
 import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic } from '../services/menuMusic.js';
+import { installSoundUnlock } from '../services/sound.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
 import { createInitialState } from './state.js';
@@ -74,6 +75,7 @@ export function createApp(root) {
   return {
     start() {
       primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume });
+      installSoundUnlock();
       window.addEventListener('resize', () => {
         if (state.screen === 'game') bindGame(ctx);
       });

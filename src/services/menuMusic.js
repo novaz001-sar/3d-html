@@ -8,7 +8,9 @@ let currentVolume = 0.34;
 export function primeMenuMusic({ enabled, volume }) {
   currentVolume = normalizeVolume(volume);
   if (!enabled) return;
+
   shouldPlayWhenUnlocked = true;
+  bindUnlockEvents();
   playMenuMusic({ bootstrap: true });
 }
 
@@ -22,6 +24,7 @@ export function syncMenuMusic({ active, enabled, volume }) {
   }
 
   shouldPlayWhenUnlocked = true;
+  bindUnlockEvents();
   playMenuMusic({ bootstrap: true });
 }
 
@@ -29,6 +32,14 @@ export function setMenuMusicVolume(volume) {
   currentVolume = normalizeVolume(volume);
   if (!audio) return;
   audio.volume = currentVolume;
+}
+
+export function unlockMenuMusic() {
+  if (!shouldPlayWhenUnlocked) return;
+  const player = getAudio();
+  player.muted = false;
+  player.volume = currentVolume;
+  playMenuMusic();
 }
 
 export function pauseMenuMusic() {
@@ -50,6 +61,11 @@ function playMenuMusic({ bootstrap = false } = {}) {
     playPromise
       .then(() => {
         player.dataset.started = 'true';
+        if (!bootstrap || !player.muted) {
+          player.volume = currentVolume;
+          return;
+        }
+
         window.setTimeout(() => {
           if (shouldPlayWhenUnlocked) {
             player.volume = currentVolume;
@@ -80,19 +96,16 @@ function bindUnlockEvents() {
   unlockBound = true;
 
   const unlock = () => {
-    if (shouldPlayWhenUnlocked) {
-      playMenuMusic();
-    }
-
-    window.removeEventListener('pointerdown', unlock);
-    window.removeEventListener('keydown', unlock);
-    window.removeEventListener('touchstart', unlock);
+    unlockMenuMusic();
+    window.removeEventListener('pointerdown', unlock, true);
+    window.removeEventListener('keydown', unlock, true);
+    window.removeEventListener('touchstart', unlock, true);
     unlockBound = false;
   };
 
-  window.addEventListener('pointerdown', unlock, { once: true });
-  window.addEventListener('keydown', unlock, { once: true });
-  window.addEventListener('touchstart', unlock, { once: true });
+  window.addEventListener('pointerdown', unlock, true);
+  window.addEventListener('keydown', unlock, true);
+  window.addEventListener('touchstart', unlock, true);
 }
 
 function normalizeVolume(volume) {
