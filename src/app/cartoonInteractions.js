@@ -9,6 +9,7 @@ const CONTROL_SELECTOR = [
   '.level-card'
 ].join(',');
 const STAGE_SELECTOR = 'canvas, .canvas-wrap, .canvas-shell, .game-stage, .editor-stage';
+const LEVEL_SELECTOR = '.level-card';
 const TILT_SELECTOR = [
   '.card',
   '.level-card',
@@ -46,6 +47,13 @@ export function mountCartoonInteractions() {
     }
 
     const target = event.target instanceof Element ? event.target : null;
+    const levelCard = target?.closest(LEVEL_SELECTOR);
+
+    if (levelCard) {
+      pulseEmbeddedCat(levelCard);
+      makeLevelBurst(layer, levelCard);
+      return;
+    }
 
     if (target?.closest('.cat-manual-card')) {
       const rect = target.closest('.cat-manual-card').getBoundingClientRect();
@@ -97,6 +105,17 @@ function decorateCatPlanetUi(layer) {
     control.insertAdjacentHTML('afterbegin', catMiniPlanetMarkup());
   });
 
+  document.querySelectorAll(LEVEL_SELECTOR).forEach((levelCard, index) => {
+    if (levelCard.dataset.catLevelOption === 'true') {
+      return;
+    }
+
+    levelCard.dataset.catLevelOption = 'true';
+    levelCard.classList.add('cat-level-option');
+    levelCard.style.setProperty('--cat-level-delay', `${index * 70}ms`);
+    levelCard.insertAdjacentHTML('beforeend', catLevelOptionMarkup());
+  });
+
   const manual = document.querySelector('.manual');
   if (manual && manual.dataset.catManual !== 'true') {
     manual.dataset.catManual = 'true';
@@ -118,6 +137,14 @@ function decorateCatPlanetUi(layer) {
       makeResultBurst(layer, result.getBoundingClientRect());
     });
   }
+}
+
+function catLevelOptionMarkup() {
+  return [
+    '<span class="cat-level-orbit" aria-hidden="true"></span>',
+    '<span class="cat-level-paws" aria-hidden="true"><i></i><i></i><i></i></span>',
+    '<span class="cat-level-label" aria-hidden="true">MEOW STAGE</span>'
+  ].join('');
 }
 
 function catMiniPlanetMarkup() {
@@ -233,6 +260,20 @@ function makeResultBurst(layer, rect) {
   }
 }
 
+function makeLevelBurst(layer, levelCard) {
+  const rect = levelCard.getBoundingClientRect();
+  const centerX = rect.left + rect.width * 0.72;
+  const centerY = rect.top + rect.height * 0.36;
+
+  levelCard.classList.remove('cat-level-awake');
+  window.requestAnimationFrame(() => {
+    levelCard.classList.add('cat-level-awake');
+  });
+
+  makeBurst(layer, centerX, centerY, 'level');
+  makePaws(layer, centerX, centerY);
+}
+
 function makePaws(layer, x, y) {
   for (let index = 0; index < 5; index += 1) {
     const paw = document.createElement('span');
@@ -298,4 +339,3 @@ function removeAfter(element, delay) {
     element.remove();
   }, delay);
 }
-
