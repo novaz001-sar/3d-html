@@ -1,0 +1,24 @@
+.panel { background: var(--paper); border: 1px solid rgba(255,255,255,.74); border-radius: 8px; box-shadow: var(--shadow); backdrop-filter: blur(16px); }
+.topbar { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+.flow-row { justify-content: space-between; }
+.button, .icon-button, .segment, .level-card, .list-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.86);
+  color: var(--ink);
+  font-weight: 800;
+}
+.button.primary { color: white; background: linear-gradient(180deg, #38bdf8, #2563eb); border-color: transparent; }
+.button.secondary { background: rgba(255,255,255,.82); }
+.button.ghost { background: rgba(255,255,255,.6); }
+.button.success { color: white; background: linear-gradient(180deg, #4ade80, #16a34a); border-color: transparent; }
+.button.danger, .icon-button.danger { color: white; background: linear-gradient(180deg, #fb7185, #dc2626); border-color: transparent; }
+.icon-button { width: 44px; padding: 0; font-size: 24px; line-height: 1; }
+.toolbar { display: flex; gap: 8px; }
+.empty-state { padding: 28px; border: 2px dashed rgba(15, 118, 110, .35); border-radius: 8px; color: var(--teal); font-weight: 900; background: rgba(255,255,255,.7); }
+.modal { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(15,23,42,.38); backdrop-filter: blur(12px); }
+.manual { width: min(560px, 100%); padding: 22px; }
+.manual h2 { margin: 0 0 10px; }
+.manual p { line-height: 1.7; }

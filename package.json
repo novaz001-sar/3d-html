@@ -1,0 +1,10 @@
+{
+  "name": "3d-html",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-syntax.mjs",
+    "serve": "node scripts/serve.mjs"
+  }
+}

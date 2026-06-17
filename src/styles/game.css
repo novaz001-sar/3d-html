@@ -1,0 +1,20 @@
+.game-screen { display: grid; grid-template-rows: auto 1fr auto; gap: 14px; height: 100vh; padding-bottom: calc(20px + var(--safe-bottom)); }
+.game-hud, .answer-bar { padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.game-hud h1 { margin: 0 0 4px; font-size: 26px; }
+.game-hud p { margin: 0; color: var(--muted); font-weight: 800; }
+.game-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
+.viewer { min-height: 0; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.78); }
+.answer-bar { justify-content: center; }
+.answer-bar .button { min-width: 128px; font-size: 20px; }
+.zoom-control { display: flex; align-items: center; gap: 8px; min-width: min(320px, 100%); }
+.zoom-control input { flex: 1; }
+.feedback { position: fixed; inset: 0; display: grid; place-items: center; color: white; font-size: clamp(44px, 9vw, 110px); font-weight: 1000; background: rgba(15,23,42,.32); backdrop-filter: blur(8px); }
+.feedback.good { color: #dcfce7; }
+.feedback.bad { color: #fee2e2; }
+.feedback.skip { color: #fef3c7; }
+.result-screen { display: grid; place-items: center; }
+.result-card { width: min(720px, 100%); padding: 36px; text-align: center; }
+.result-card h1 { margin: 0; font-size: 44px; }
+.result-card strong { display: block; font-size: 90px; color: var(--blue); }
+.stars { font-size: 70px; color: var(--amber); }
+.stars .dim { opacity: .2; filter: grayscale(1); }
