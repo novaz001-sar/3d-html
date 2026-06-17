@@ -18,6 +18,7 @@
 }
 .font-scale-control span { color: var(--muted); font-weight: 900; }
 .font-scale-control input { width: min(150px, 32vw); min-height: auto; padding: 0; box-shadow: none; accent-color: #ff7a9e; }
+.volume-control input { accent-color: #42c8ff; }
 .music-toggle.is-on {
   border-color: rgba(255, 122, 158, .32);
   color: #ff6f9f;

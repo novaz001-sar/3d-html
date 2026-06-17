@@ -1,8 +1,8 @@
 import { bindEditor, renderEditor } from '../features/editor/index.js';
 import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } from '../features/game/index.js';
-import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled } from '../services/storage.js';
+import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMusicVolume } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
-import { syncMenuMusic } from '../services/menuMusic.js';
+import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic } from '../services/menuMusic.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
 import { createInitialState } from './state.js';
@@ -28,7 +28,7 @@ export function createApp(root) {
     if (state.screen === 'main') bindHome(ctx);
     if (state.screen === 'editor') bindEditor(ctx);
     if (state.screen === 'game') bindGame(ctx);
-    syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled });
+    syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
   }
 
   function bindGlobalActions() {
@@ -53,6 +53,12 @@ export function createApp(root) {
       saveMenuMusicEnabled(state.musicEnabled);
       render();
     }));
+    document.querySelectorAll('[data-action="music-volume"]').forEach(el => el.addEventListener('input', event => {
+      state.musicVolume = Number(event.target.value);
+      saveMenuMusicVolume(state.musicVolume);
+      setMenuMusicVolume(state.musicVolume);
+      syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
+    }));
   }
 
   function applyUiPreferences() {
@@ -67,6 +73,7 @@ export function createApp(root) {
 
   return {
     start() {
+      primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume });
       window.addEventListener('resize', () => {
         if (state.screen === 'game') bindGame(ctx);
       });

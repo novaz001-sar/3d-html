@@ -6,6 +6,7 @@ export const STORAGE_KEY = 'MR_GAME_DATA';
 export const LANG_KEY = 'MR_LANG_V3';
 export const FONT_SCALE_KEY = 'MR_FONT_SCALE';
 export const MENU_MUSIC_KEY = 'MR_MENU_MUSIC';
+export const MENU_MUSIC_VOLUME_KEY = 'MR_MENU_MUSIC_VOLUME';
 
 export function loadData() {
   try {
@@ -42,6 +43,15 @@ export function loadMenuMusicEnabled() {
 
 export function saveMenuMusicEnabled(enabled) {
   localStorage.setItem(MENU_MUSIC_KEY, enabled ? 'on' : 'off');
+}
+
+export function loadMenuMusicVolume() {
+  const saved = Number(localStorage.getItem(MENU_MUSIC_VOLUME_KEY));
+  return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 0.34;
+}
+
+export function saveMenuMusicVolume(volume) {
+  localStorage.setItem(MENU_MUSIC_VOLUME_KEY, String(Math.min(1, Math.max(0, Number(volume) || 0))));
 }
 
 export function normalizeData(data) {

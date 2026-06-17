@@ -20,6 +20,7 @@
   --cat-line: 2.5px;
   --cat-look-x: 0px;
   --cat-look-y: 0px;
+  --cat-planet-asset: url("/assets/images/cat-planet.png");
 }
 
 body,
@@ -691,6 +692,126 @@ button.cat-integrated-control {
   content: none;
 }
 
+.cat-mini-planet,
+.cat-inline-planet {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.cat-mini-planet {
+  width: 2.4rem;
+  height: 1.78rem;
+  border-radius: 0;
+}
+
+.level-card .cat-mini-planet {
+  top: 0.4rem;
+  right: 0.42rem;
+  width: 3.8rem;
+  height: 2.75rem;
+}
+
+.cat-inline-planet {
+  width: 5.8rem;
+  height: 4.35rem;
+}
+
+.cat-planet-image {
+  position: absolute;
+  inset: -0.28rem -0.44rem;
+  background: var(--cat-planet-asset) center / contain no-repeat;
+  filter:
+    drop-shadow(0 6px 10px rgba(32, 38, 63, 0.16))
+    drop-shadow(0 0 10px rgba(66, 200, 255, 0.16));
+  pointer-events: none;
+}
+
+.cat-inline-planet .cat-planet-image {
+  inset: -0.8rem -1.05rem;
+}
+
+.cat-function-badge {
+  position: absolute;
+  right: -0.34rem;
+  bottom: -0.18rem;
+  z-index: 1;
+  min-width: 1.42rem;
+  padding: 0.1rem 0.28rem;
+  border: 2px solid rgba(32, 38, 63, 0.82);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 2px 3px 0 rgba(32, 38, 63, 0.14);
+  color: #5f73ff;
+  font-size: 0.52rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-align: center;
+  transform: rotate(-5deg);
+}
+
+.cat-role-music .cat-function-badge,
+.cat-role-lang .cat-function-badge {
+  background: #daf6ff;
+  color: #2578d8;
+}
+
+.cat-role-editor .cat-function-badge,
+.cat-role-manual .cat-function-badge {
+  background: #fff3bd;
+  color: #9b6810;
+}
+
+.cat-role-export .cat-function-badge,
+.cat-role-import .cat-function-badge {
+  background: #ffe4ef;
+  color: #df4f87;
+}
+
+.cat-role-level .cat-function-badge,
+.cat-role-play .cat-function-badge,
+.cat-role-same .cat-function-badge {
+  background: #ecedff;
+  color: #6d7cff;
+}
+
+.cat-role-diff .cat-function-badge,
+.cat-role-exit .cat-function-badge {
+  background: #ffe2e2;
+  color: #e44f66;
+}
+
+.cat-role-pause .cat-function-badge,
+.cat-role-skip .cat-function-badge,
+.cat-role-reset .cat-function-badge {
+  background: #f4ecff;
+  color: #845ce8;
+}
+
+.cat-mini-orbit,
+.cat-mini-ear,
+.cat-mini-face,
+.cat-inline-orbit,
+.cat-inline-ear,
+.cat-inline-face {
+  display: none;
+}
+
+.cat-level-orbit {
+  display: none;
+}
+
+.cat-level-label {
+  right: 0.62rem;
+  bottom: 0.92rem;
+  border-color: rgba(66, 200, 255, 0.34);
+  color: #2578d8;
+  -webkit-text-fill-color: #2578d8;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 @keyframes catMiniPulse {
   0%,
   100% {
@@ -828,8 +949,8 @@ button.cat-integrated-control {
   }
 
   .cat-mini-planet {
-    width: 1.34rem;
-    height: 1.34rem;
+    width: 2rem;
+    height: 1.45rem;
     margin-right: 0;
   }
 
@@ -854,6 +975,8 @@ button.cat-integrated-control {
   .level-card .cat-mini-planet {
     top: 0.45rem;
     right: 0.45rem;
+    width: 2.9rem;
+    height: 2.1rem;
   }
 
   .cat-level-orbit {
@@ -887,8 +1010,8 @@ button.cat-integrated-control {
   }
 
   .cat-inline-planet {
-    width: 3.15rem;
-    height: 3.15rem;
+    width: 4.2rem;
+    height: 3.18rem;
     border-width: 2px;
   }
 

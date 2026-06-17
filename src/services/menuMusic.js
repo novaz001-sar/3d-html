@@ -3,8 +3,18 @@ const MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
 let audio;
 let unlockBound = false;
 let shouldPlayWhenUnlocked = false;
+let currentVolume = 0.34;
 
-export function syncMenuMusic({ active, enabled }) {
+export function primeMenuMusic({ enabled, volume }) {
+  currentVolume = normalizeVolume(volume);
+  if (!enabled) return;
+  shouldPlayWhenUnlocked = true;
+  playMenuMusic({ bootstrap: true });
+}
+
+export function syncMenuMusic({ active, enabled, volume }) {
+  currentVolume = normalizeVolume(volume);
+
   if (!active || !enabled) {
     shouldPlayWhenUnlocked = false;
     pauseMenuMusic();
@@ -12,7 +22,13 @@ export function syncMenuMusic({ active, enabled }) {
   }
 
   shouldPlayWhenUnlocked = true;
-  playMenuMusic();
+  playMenuMusic({ bootstrap: true });
+}
+
+export function setMenuMusicVolume(volume) {
+  currentVolume = normalizeVolume(volume);
+  if (!audio) return;
+  audio.volume = currentVolume;
 }
 
 export function pauseMenuMusic() {
@@ -20,14 +36,31 @@ export function pauseMenuMusic() {
   audio.pause();
 }
 
-function playMenuMusic() {
+function playMenuMusic({ bootstrap = false } = {}) {
   const player = getAudio();
+  player.volume = currentVolume;
+
+  if (bootstrap && !player.dataset.started) {
+    player.muted = true;
+  }
+
   const playPromise = player.play();
 
-  if (playPromise?.catch) {
-    playPromise.catch(() => {
-      bindUnlockEvents();
-    });
+  if (playPromise?.then) {
+    playPromise
+      .then(() => {
+        player.dataset.started = 'true';
+        window.setTimeout(() => {
+          if (shouldPlayWhenUnlocked) {
+            player.volume = currentVolume;
+            player.muted = false;
+          }
+        }, 120);
+      })
+      .catch(() => {
+        player.muted = false;
+        bindUnlockEvents();
+      });
   }
 }
 
@@ -37,7 +70,8 @@ function getAudio() {
   audio = new Audio(MENU_MUSIC_SRC);
   audio.loop = true;
   audio.preload = 'auto';
-  audio.volume = 0.34;
+  audio.volume = currentVolume;
+  audio.setAttribute('playsinline', '');
   return audio;
 }
 
@@ -59,4 +93,10 @@ function bindUnlockEvents() {
   window.addEventListener('pointerdown', unlock, { once: true });
   window.addEventListener('keydown', unlock, { once: true });
   window.addEventListener('touchstart', unlock, { once: true });
+}
+
+function normalizeVolume(volume) {
+  const value = Number(volume);
+  if (!Number.isFinite(value)) return 0.34;
+  return Math.min(1, Math.max(0, value));
 }

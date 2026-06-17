@@ -102,7 +102,7 @@ function decorateCatPlanetUi(layer) {
 
     control.dataset.catIntegrated = 'true';
     control.classList.add('cat-integrated-control');
-    control.insertAdjacentHTML('afterbegin', catMiniPlanetMarkup());
+    control.insertAdjacentHTML('afterbegin', catMiniPlanetMarkup(catRoleForControl(control)));
   });
 
   document.querySelectorAll(LEVEL_SELECTOR).forEach((levelCard, index) => {
@@ -143,33 +143,25 @@ function catLevelOptionMarkup() {
   return [
     '<span class="cat-level-orbit" aria-hidden="true"></span>',
     '<span class="cat-level-paws" aria-hidden="true"><i></i><i></i><i></i></span>',
-    '<span class="cat-level-label" aria-hidden="true">MEOW STAGE</span>'
+    '<span class="cat-level-label" aria-hidden="true">CAT STAGE</span>'
   ].join('');
 }
 
-function catMiniPlanetMarkup() {
+function catMiniPlanetMarkup(role = 'cat') {
   return [
-    '<span class="cat-mini-planet" aria-hidden="true">',
-    '<span class="cat-mini-orbit"></span>',
-    '<span class="cat-mini-ear cat-mini-ear-left"></span>',
-    '<span class="cat-mini-ear cat-mini-ear-right"></span>',
-    '<span class="cat-mini-face">',
-    '<span class="cat-mini-eye cat-mini-eye-left"></span>',
-    '<span class="cat-mini-eye cat-mini-eye-right"></span>',
-    '<span class="cat-mini-mouth"></span>',
+    `<span class="cat-mini-planet cat-role-${role}" aria-hidden="true">`,
+    '<span class="cat-planet-image"></span>',
+    `<span class="cat-function-badge">${catBadgeForRole(role)}</span>`,
     '</span>',
-    '</span>'
   ].join('');
 }
 
 function catManualMarkup() {
   return [
     '<button class="cat-manual-card" type="button" aria-label="Cat manual interaction">',
-    '<span class="cat-inline-planet cat-inline-planet-guide">',
-    '<span class="cat-inline-orbit"></span>',
-    '<span class="cat-inline-ear cat-inline-ear-left"></span>',
-    '<span class="cat-inline-ear cat-inline-ear-right"></span>',
-    '<span class="cat-inline-face"><span></span></span>',
+    '<span class="cat-inline-planet cat-inline-planet-guide cat-role-manual">',
+    '<span class="cat-planet-image"></span>',
+    '<span class="cat-function-badge">?</span>',
     '</span>',
     '<span class="cat-manual-copy">',
     '<strong>MEOW MANUAL</strong>',
@@ -182,11 +174,9 @@ function catManualMarkup() {
 function catResultMarkup() {
   return [
     '<button class="cat-result-cardlet" type="button" aria-label="Cat result celebration">',
-    '<span class="cat-inline-planet cat-inline-planet-result">',
-    '<span class="cat-inline-orbit"></span>',
-    '<span class="cat-inline-ear cat-inline-ear-left"></span>',
-    '<span class="cat-inline-ear cat-inline-ear-right"></span>',
-    '<span class="cat-inline-face"><span></span></span>',
+    '<span class="cat-inline-planet cat-inline-planet-result cat-role-result">',
+    '<span class="cat-planet-image"></span>',
+    '<span class="cat-function-badge">OK</span>',
     '<span class="cat-inline-sparkles"><i></i><i></i><i></i></span>',
     '</span>',
     '<span class="cat-result-copy">',
@@ -195,6 +185,56 @@ function catResultMarkup() {
     '</span>',
     '</button>'
   ].join('');
+}
+
+function catRoleForControl(control) {
+  if (control.classList.contains('level-card')) return 'level';
+  if (control.querySelector?.('#import-file')) return 'import';
+
+  const homeAction = control.dataset.homeAction;
+  const action = control.dataset.action;
+  const gameAction = control.dataset.gameAction;
+  const answer = control.dataset.answer;
+
+  if (homeAction === 'export') return 'export';
+  if (homeAction === 'editor') return 'editor';
+  if (homeAction === 'manual') return 'manual';
+  if (homeAction === 'close-manual') return 'ok';
+  if (action === 'lang') return 'lang';
+  if (action === 'music') return 'music';
+  if (action === 'home') return 'home';
+  if (gameAction === 'pause') return 'pause';
+  if (gameAction === 'resume') return 'play';
+  if (gameAction === 'reset') return 'reset';
+  if (gameAction === 'exit') return 'exit';
+  if (gameAction === 'skip') return 'skip';
+  if (answer === 'same') return 'same';
+  if (answer === 'different') return 'diff';
+  return 'cat';
+}
+
+function catBadgeForRole(role) {
+  const badges = {
+    cat: 'CAT',
+    diff: '!=',
+    editor: 'ED',
+    exit: 'OUT',
+    export: 'EX',
+    home: 'HM',
+    import: 'IN',
+    lang: 'EN',
+    level: 'LV',
+    manual: '?',
+    music: 'M',
+    ok: 'OK',
+    pause: 'II',
+    play: 'GO',
+    reset: 'RE',
+    same: '=',
+    skip: 'SK'
+  };
+
+  return badges[role] || 'CAT';
 }
 
 function pulseEmbeddedCat(control) {
