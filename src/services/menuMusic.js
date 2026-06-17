@@ -154,6 +154,6 @@ function bindUnlockEvents() {
 
 function normalizeVolume(volume) {
   const value = Number(volume);
-  if (!Number.isFinite(value)) return 0.5;
+  if (!Number.isFinite(value) || value <= 0) return 0.5;
   return Math.min(1, Math.max(0, value));
 }

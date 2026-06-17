@@ -1476,18 +1476,18 @@ button.cat-integrated-control {
   position: absolute;
   right: clamp(-5.5rem, -5vw, -2rem);
   bottom: clamp(1.8rem, 7vw, 7rem);
-  z-index: 0;
+  z-index: 2;
   width: clamp(19rem, 39vw, 36rem);
   aspect-ratio: 1 / 1;
   background: var(--cat-planet-background-asset) center / contain no-repeat;
-  opacity: 0.28;
+  opacity: 0.4;
   pointer-events: none;
   user-select: none;
   filter:
     drop-shadow(0 30px 45px rgba(52, 56, 74, 0.22))
     saturate(1.12);
-  transform: rotate(-7deg);
-  animation: catPlanetBackgroundDrift 12s ease-in-out infinite;
+  rotate: -7deg;
+  animation: catHomePlanetFloat 8s ease-in-out infinite;
 }
 
 .cat-home-planet::before,
@@ -1523,7 +1523,7 @@ button.cat-integrated-control {
     right: -7.5rem;
     bottom: 8.5rem;
     width: clamp(18rem, 88vw, 30rem);
-    opacity: 0.22;
+    opacity: 0.34;
   }
 }
 
@@ -1532,7 +1532,43 @@ button.cat-integrated-control {
     right: -9.5rem;
     bottom: 11.5rem;
     width: 27rem;
-    opacity: 0.2;
+    opacity: 0.32;
+  }
+}
+
+.home-screen .topbar,
+.home-screen .hero,
+.home-screen .modal {
+  position: relative;
+  z-index: 3;
+}
+
+.home-screen .modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  overflow: auto;
+}
+
+.home-screen .manual {
+  width: min(560px, calc(100vw - 2rem));
+  max-height: min(76vh, 680px);
+  overflow: auto;
+}
+
+@keyframes catHomePlanetFloat {
+  0%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+
+  50% {
+    translate: -12px -18px;
+    scale: 1.025;
   }
 }
 
