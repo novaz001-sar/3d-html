@@ -53,7 +53,6 @@ export function bindObjectEditor(ctx) {
   document.getElementById('obj-mat')?.addEventListener('change', event => v.mat = event.target.value);
   document.getElementById('obj-shape')?.addEventListener('change', event => {
     v.shape = event.target.value;
-    v.voxels = v.voxels.map(voxel => ({ ...voxel, shape: v.shape }));
     redraw();
   });
   document.getElementById('obj-layer')?.addEventListener('input', event => {
@@ -100,14 +99,14 @@ function loadObject(ctx, idx) {
 function getShapeText(lang) {
   if (lang === 'zh') {
     return {
-      blockStyle: '方块外观',
+      blockStyle: '下一个方块',
       normalCube: '普通方块',
       catMagicCube: '猫猫魔法方块'
     };
   }
 
   return {
-    blockStyle: 'Block Style',
+    blockStyle: 'Next Cube',
     normalCube: 'Normal Cube',
     catMagicCube: 'Cat Magic Cube'
   };

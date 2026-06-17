@@ -103,49 +103,227 @@ function drawCatMagicFace(ctx, pts, scale, faceName) {
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
-  drawSoftFacePanel(ctx, pts, 'rgba(255, 250, 240, .18)');
-  ctx.strokeStyle = faceName === 'top' ? 'rgba(255, 216, 79, .6)' : 'rgba(123, 220, 255, .58)';
-  ctx.lineWidth = Math.max(1, scale * 0.016);
+  drawSoftFacePanel(ctx, pts, 'rgba(255, 250, 240, .2)');
+
+  if (faceName === 'front') {
+    drawCatMagicFront(ctx, pts, scale);
+  } else if (faceName === 'right' || faceName === 'left') {
+    drawCatMagicSideWindow(ctx, pts, scale);
+  } else if (faceName === 'top') {
+    drawCatMagicTop(ctx, pts, scale);
+  } else if (faceName === 'back') {
+    drawCatMagicBack(ctx, pts, scale);
+  } else {
+    drawMagicSpark(ctx, pointOnFace(pts, 0.78, 0.75), scale * 0.07);
+  }
+
+  ctx.strokeStyle = 'rgba(86, 98, 124, .34)';
+  ctx.lineWidth = Math.max(1, scale * 0.014);
   ctx.beginPath();
   pts.forEach((p, index) => index ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
   ctx.closePath();
   ctx.stroke();
+  ctx.restore();
+}
 
-  drawMagicSpark(ctx, pointOnFace(pts, 0.8, 0.76), scale * 0.074);
+function drawCatMagicFront(ctx, pts, scale) {
+  drawCatMagicCloudBase(ctx, pts, scale);
+  drawFaceText(ctx, pts, 'CAT PLANET', 0.5, 0.72, scale * 0.13, -0.07);
+  drawCatPlanetIcon(ctx, pts, 0.5, 0.43, scale * 0.38);
+  drawTinyPlanetOnFace(ctx, pts, 0.18, 0.46, scale * 0.075);
+  drawMagicSpark(ctx, pointOnFace(pts, 0.82, 0.42), scale * 0.07);
+  drawMagicSpark(ctx, pointOnFace(pts, 0.76, 0.18), scale * 0.085);
+}
 
-  if (faceName !== 'front') {
-    ctx.restore();
-    return;
+function drawCatMagicSideWindow(ctx, pts, scale) {
+  const center = pointOnFace(pts, 0.52, 0.54);
+  ctx.save();
+  ctx.fillStyle = '#fff2dc';
+  ctx.strokeStyle = 'rgba(86, 98, 124, .24)';
+  ctx.lineWidth = Math.max(1.2, scale * 0.025);
+  ctx.beginPath();
+  ctx.ellipse(center[0], center[1], scale * 0.28, scale * 0.34, 0.04, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#333d78';
+  ctx.beginPath();
+  ctx.ellipse(center[0], center[1], scale * 0.21, scale * 0.27, 0.04, 0, Math.PI * 2);
+  ctx.fill();
+  drawTinyPlanetOnScreen(ctx, center[0] - scale * 0.02, center[1] + scale * 0.02, scale * 0.07);
+  drawScreenStar(ctx, center[0] + scale * 0.11, center[1] - scale * 0.08, scale * 0.055, '#ffe07a');
+  drawScreenStar(ctx, center[0] - scale * 0.12, center[1] + scale * 0.11, scale * 0.026, '#ffffff');
+  drawCatMagicCloudBase(ctx, pts, scale);
+  drawMagicSpark(ctx, pointOnFace(pts, 0.18, 0.34), scale * 0.055);
+  ctx.restore();
+}
+
+function drawCatMagicTop(ctx, pts, scale) {
+  const panel = [
+    pointOnFace(pts, 0.12, 0.16),
+    pointOnFace(pts, 0.88, 0.16),
+    pointOnFace(pts, 0.88, 0.84),
+    pointOnFace(pts, 0.12, 0.84)
+  ];
+  drawSoftFacePanel(ctx, panel, 'rgba(150, 154, 223, .72)');
+  const center = pointOnFace(pts, 0.5, 0.5);
+  ctx.save();
+  ctx.strokeStyle = '#aee8ff';
+  ctx.lineWidth = Math.max(1.4, scale * 0.04);
+  ctx.beginPath();
+  ctx.ellipse(center[0], center[1], scale * 0.24, scale * 0.14, -0.12, 0, Math.PI * 2);
+  ctx.stroke();
+  drawScreenStar(ctx, center[0], center[1], scale * 0.085, '#ffe07a');
+  drawScreenStar(ctx, pointOnFace(pts, 0.18, 0.25)[0], pointOnFace(pts, 0.18, 0.25)[1], scale * 0.035, '#ffc0d2');
+  drawScreenStar(ctx, pointOnFace(pts, 0.82, 0.72)[0], pointOnFace(pts, 0.82, 0.72)[1], scale * 0.035, '#fff8cc');
+  ctx.restore();
+}
+
+function drawCatMagicBack(ctx, pts, scale) {
+  drawCatMagicCloudBase(ctx, pts, scale);
+  const center = pointOnFace(pts, 0.5, 0.56);
+  ctx.save();
+  ctx.fillStyle = '#fff6e7';
+  ctx.strokeStyle = 'rgba(86, 98, 124, .22)';
+  ctx.lineWidth = Math.max(1, scale * 0.02);
+  ctx.beginPath();
+  ctx.ellipse(center[0], center[1], scale * 0.24, scale * 0.22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#ff9fba';
+  drawFaceDot(ctx, [center[0], center[1] + scale * 0.02], scale * 0.07, '#ff9fba');
+  [-0.13, -0.045, 0.045, 0.13].forEach((dx, index) => {
+    drawFaceDot(ctx, [center[0] + scale * dx, center[1] - scale * (0.12 + (index % 2) * 0.025)], scale * 0.045, '#ff9fba');
+  });
+  drawScreenStar(ctx, center[0], center[1] + scale * 0.03, scale * 0.032, '#ffe07a');
+  ctx.restore();
+}
+
+function drawCatMagicCloudBase(ctx, pts, scale) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(142, 197, 236, .88)';
+  ctx.beginPath();
+  ctx.moveTo(...pointOnFace(pts, 0, 0));
+  for (let i = 0; i <= 7; i += 1) {
+    const u = i / 7;
+    const p = pointOnFace(pts, u, 0.2 + (i % 2) * 0.04);
+    ctx.quadraticCurveTo(p[0], p[1] - scale * 0.045, pointOnFace(pts, Math.min(1, u + 0.07), 0.16)[0], pointOnFace(pts, Math.min(1, u + 0.07), 0.16)[1]);
   }
+  ctx.lineTo(...pointOnFace(pts, 1, 0));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
 
-  drawSoftFacePanel(ctx, [
-    pointOnFace(pts, 0.14, 0.16),
-    pointOnFace(pts, 0.86, 0.16),
-    pointOnFace(pts, 0.82, 0.84),
-    pointOnFace(pts, 0.18, 0.84)
-  ], 'rgba(255, 255, 245, .3)');
+function drawFaceText(ctx, pts, text, u, v, size, angleOffset = 0) {
+  const center = pointOnFace(pts, u, v);
+  const left = pointOnFace(pts, 0.24, v);
+  const right = pointOnFace(pts, 0.76, v);
+  const angle = Math.atan2(right[1] - left[1], right[0] - left[0]) + angleOffset;
+  ctx.save();
+  ctx.translate(center[0], center[1]);
+  ctx.rotate(angle);
+  ctx.fillStyle = '#56627c';
+  ctx.strokeStyle = 'rgba(255, 255, 255, .5)';
+  ctx.lineWidth = Math.max(1, size * 0.12);
+  ctx.font = `900 ${Math.max(7, size)}px "Baloo 2", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeText(text, 0, 0);
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
 
-  const leftEar = [pointOnFace(pts, 0.14, 0.84), pointOnFace(pts, 0.3, 1.14), pointOnFace(pts, 0.43, 0.83)];
-  const rightEar = [pointOnFace(pts, 0.57, 0.83), pointOnFace(pts, 0.72, 1.14), pointOnFace(pts, 0.86, 0.84)];
-  drawFaceTriangle(ctx, leftEar, '#fff6d8', '#34384a', scale);
-  drawFaceTriangle(ctx, rightEar, '#fff6d8', '#34384a', scale);
-  drawFaceTriangle(ctx, [
-    pointOnFace(pts, 0.23, 0.9),
-    pointOnFace(pts, 0.3, 1.04),
-    pointOnFace(pts, 0.37, 0.9)
-  ], '#ff9fba', 'rgba(52, 56, 74, .18)', scale * 0.48);
-  drawFaceTriangle(ctx, [
-    pointOnFace(pts, 0.63, 0.9),
-    pointOnFace(pts, 0.72, 1.04),
-    pointOnFace(pts, 0.78, 0.9)
-  ], '#ff9fba', 'rgba(52, 56, 74, .18)', scale * 0.48);
+function drawCatPlanetIcon(ctx, pts, u, v, radius) {
+  const center = pointOnFace(pts, u, v);
+  ctx.save();
+  drawLogoEarOnScreen(ctx, center[0] - radius * 0.38, center[1] - radius * 0.48, radius * 0.22, -1);
+  drawLogoEarOnScreen(ctx, center[0] + radius * 0.38, center[1] - radius * 0.48, radius * 0.22, 1);
+  ctx.fillStyle = '#fff8e9';
+  ctx.strokeStyle = '#56627c';
+  ctx.lineWidth = Math.max(1.5, radius * 0.08);
+  ctx.beginPath();
+  ctx.arc(center[0], center[1] - radius * 0.06, radius * 0.58, Math.PI, 0);
+  ctx.lineTo(center[0] + radius * 0.58, center[1] + radius * 0.24);
+  ctx.lineTo(center[0] - radius * 0.58, center[1] + radius * 0.24);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = '#8fd2ff';
+  ctx.lineWidth = Math.max(2, radius * 0.16);
+  ctx.beginPath();
+  ctx.ellipse(center[0], center[1] + radius * 0.05, radius * 0.88, radius * 0.24, -0.09, 0, Math.PI * 2);
+  ctx.stroke();
+  drawFaceDot(ctx, [center[0] - radius * 0.24, center[1] - radius * 0.08], radius * 0.065, '#34384a');
+  drawFaceDot(ctx, [center[0] + radius * 0.24, center[1] - radius * 0.08], radius * 0.065, '#34384a');
+  drawFaceDot(ctx, [center[0] - radius * 0.38, center[1] + radius * 0.11], radius * 0.085, '#ff9fba');
+  drawFaceDot(ctx, [center[0] + radius * 0.38, center[1] + radius * 0.11], radius * 0.085, '#ff9fba');
+  ctx.strokeStyle = '#34384a';
+  ctx.lineWidth = Math.max(1.2, radius * 0.045);
+  ctx.beginPath();
+  ctx.arc(center[0] - radius * 0.05, center[1] + radius * 0.06, radius * 0.055, 0, Math.PI);
+  ctx.arc(center[0] + radius * 0.05, center[1] + radius * 0.06, radius * 0.055, 0, Math.PI);
+  ctx.stroke();
+  ctx.restore();
+}
 
-  drawFaceDot(ctx, pointOnFace(pts, 0.38, 0.56), scale * 0.054, '#34384a');
-  drawFaceDot(ctx, pointOnFace(pts, 0.62, 0.56), scale * 0.054, '#34384a');
-  drawFaceDot(ctx, pointOnFace(pts, 0.27, 0.4), scale * 0.074, '#ff8aad');
-  drawFaceDot(ctx, pointOnFace(pts, 0.73, 0.4), scale * 0.074, '#ff8aad');
-  drawCatMouth(ctx, pts, scale);
-  drawMagicOrbit(ctx, pts, scale);
+function drawLogoEarOnScreen(ctx, x, y, size, direction) {
+  ctx.beginPath();
+  ctx.moveTo(x, y - size);
+  ctx.lineTo(x + size * direction, y + size * 0.62);
+  ctx.lineTo(x - size * direction, y + size * 0.62);
+  ctx.closePath();
+  ctx.fillStyle = '#fff8e9';
+  ctx.fill();
+  ctx.strokeStyle = '#56627c';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y - size * 0.35);
+  ctx.lineTo(x + size * 0.45 * direction, y + size * 0.42);
+  ctx.lineTo(x - size * 0.45 * direction, y + size * 0.42);
+  ctx.closePath();
+  ctx.fillStyle = '#ff9fba';
+  ctx.fill();
+}
+
+function drawTinyPlanetOnFace(ctx, pts, u, v, radius) {
+  const center = pointOnFace(pts, u, v);
+  drawTinyPlanetOnScreen(ctx, center[0], center[1], radius);
+}
+
+function drawTinyPlanetOnScreen(ctx, cx, cy, radius) {
+  ctx.save();
+  ctx.fillStyle = '#ffb8ca';
+  ctx.strokeStyle = '#e79dac';
+  ctx.lineWidth = Math.max(1, radius * 0.12);
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = '#ffe0a8';
+  ctx.lineWidth = Math.max(1.3, radius * 0.22);
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + radius * 0.08, radius * 1.45, radius * 0.36, -0.18, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawScreenStar(ctx, cx, cy, size, fill) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = 'rgba(86, 98, 124, .32)';
+  ctx.lineWidth = Math.max(1, size * 0.16);
+  ctx.beginPath();
+  for (let i = 0; i < 10; i += 1) {
+    const r = i % 2 ? size * 0.52 : size;
+    const a = -Math.PI / 2 + i * Math.PI / 5;
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r;
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
   ctx.restore();
 }
 
