@@ -1474,19 +1474,19 @@ button.cat-integrated-control {
 
 .cat-home-planet {
   position: absolute;
-  right: clamp(-5.5rem, -5vw, -2rem);
-  bottom: clamp(1.8rem, 7vw, 7rem);
-  z-index: 2;
-  width: clamp(19rem, 39vw, 36rem);
+  right: clamp(1rem, 4vw, 6rem);
+  top: clamp(3.5rem, 8vw, 8rem);
+  z-index: 1;
+  width: clamp(18rem, 33vw, 31rem);
   aspect-ratio: 1 / 1;
   background: var(--cat-planet-background-asset) center / contain no-repeat;
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
   user-select: none;
   filter:
-    drop-shadow(0 30px 45px rgba(52, 56, 74, 0.22))
-    saturate(1.12);
-  rotate: -7deg;
+    drop-shadow(0 26px 38px rgba(52, 56, 74, 0.24))
+    saturate(1.16);
+  rotate: -8deg;
   animation: catHomePlanetFloat 8s ease-in-out infinite;
 }
 
@@ -1520,27 +1520,36 @@ button.cat-integrated-control {
 
 @media (max-width: 860px) {
   .cat-home-planet {
-    right: -7.5rem;
-    bottom: 8.5rem;
-    width: clamp(18rem, 88vw, 30rem);
-    opacity: 0.34;
+    right: -3rem;
+    top: 6.2rem;
+    width: clamp(15rem, 58vw, 24rem);
+    opacity: 0.38;
   }
 }
 
 @media (max-width: 560px) {
   .cat-home-planet {
-    right: -9.5rem;
-    bottom: 11.5rem;
-    width: 27rem;
-    opacity: 0.32;
+    right: -5.2rem;
+    top: 7.4rem;
+    width: 20rem;
+    opacity: 0.34;
   }
 }
 
 .home-screen .topbar,
-.home-screen .hero,
 .home-screen .modal {
   position: relative;
   z-index: 3;
+}
+
+.home-screen .hero {
+  position: relative;
+  z-index: 3;
+}
+
+.home-screen .hero > :not(.cat-home-planet) {
+  position: relative;
+  z-index: 2;
 }
 
 .home-screen .modal {
