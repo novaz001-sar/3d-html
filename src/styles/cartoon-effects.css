@@ -13,6 +13,62 @@
   --cat-look-y: 0px;
 }
 
+h1,
+.title,
+.hero-title,
+.brand-title,
+.result-card h1,
+.game-hud h1 {
+  color: var(--cartoon-ink);
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: var(--cartoon-ink);
+  text-shadow:
+    2px 2px 0 #ffffff,
+    4px 4px 0 rgba(255, 216, 79, 0.78),
+    6px 6px 0 rgba(32, 38, 63, 0.10);
+  font-weight: 950;
+  letter-spacing: -0.045em;
+}
+
+h2,
+h3,
+.section-title,
+.card-title {
+  color: var(--cartoon-ink);
+  text-shadow:
+    1px 1px 0 #ffffff,
+    2px 2px 0 rgba(57, 200, 255, 0.22);
+  font-weight: 900;
+}
+
+.level-card {
+  color: var(--cartoon-ink);
+  font-weight: 950;
+  letter-spacing: -0.025em;
+  text-shadow:
+    1px 1px 0 #ffffff,
+    2px 2px 0 rgba(255, 216, 79, 0.52);
+}
+
+.level-card > span:first-child {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  margin-right: 0.55rem;
+  border: 2px solid var(--cartoon-ink);
+  border-radius: 999px 999px 999px 0.42rem;
+  background: linear-gradient(135deg, #ffffff, var(--cartoon-yellow));
+  box-shadow: 3px 4px 0 rgba(32, 38, 63, 0.13);
+  color: var(--cartoon-ink);
+  font-size: 0.9rem;
+  font-weight: 950;
+  text-shadow: none;
+  transform: rotate(-5deg);
+}
+
 button:active,
 .button:active,
 .btn:active,
