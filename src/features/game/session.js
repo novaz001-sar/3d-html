@@ -14,6 +14,7 @@ export function startGame(ctx, levelId) {
     score: 0,
     timeLeft: Number(level.timeLimit || 60),
     zoom: 1,
+    spinSpeed: 1,
     leftAuto: 0,
     feedback: '',
     feedbackKind: 'good',
@@ -38,6 +39,7 @@ export function bindGame(ctx) {
   document.querySelector('[data-game-action="skip"]')?.addEventListener('click', () => skipQuestion(ctx));
   document.querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => answer(ctx, btn.dataset.answer === 'same')));
   document.getElementById('game-zoom')?.addEventListener('input', event => ctx.state.game.zoom = Number(event.target.value));
+  document.getElementById('game-spin-speed')?.addEventListener('input', event => ctx.state.game.spinSpeed = Number(event.target.value));
   document.getElementById('game-left')?.addEventListener('pointerdown', () => ctx.state.game.leftAuto = (ctx.state.game.leftAuto + 1) % 3);
   makeDragRotator(document.getElementById('game-right'), () => ctx.state.game.rightQ, q => ctx.state.game.rightQ = q);
   stage?.addEventListener('wheel', event => {
@@ -89,7 +91,8 @@ export function tickGame(ctx, ts) {
   const dt = Math.min(0.05, (ts - (game.lastT || ts)) / 1000);
   game.lastT = ts;
   if (!ctx.state.paused && !game.feedback && game.leftAuto) {
-    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, game.level?.speed, dt);
+    const spinSpeed = clamp(Number(game.spinSpeed) || 1, 0.18, 1);
+    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, Number(game.level?.speed || 1) * spinSpeed, dt);
   }
   drawGame(ctx);
 }

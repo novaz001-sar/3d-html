@@ -34,6 +34,7 @@ export function createInitialState() {
       timeLeft: 0,
       timer: null,
       zoom: 1,
+      spinSpeed: 1,
       leftQ: [0, 0, 0, 1],
       rightQ: [0, 0, 0, 1],
       leftAuto: 0,

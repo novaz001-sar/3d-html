@@ -8,6 +8,7 @@ export function renderHome(ctx) {
   const levels = state.data.levels || [];
   return `
     <main class="screen home-screen">
+      <div class="cat-home-planet" aria-hidden="true"></div>
       <header class="topbar">
         <button class="button ghost" data-home-action="export">${t('export')}</button>
         <label class="button ghost">${t('import')}<input id="import-file" type="file" accept=".json,application/json" hidden /></label>

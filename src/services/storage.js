@@ -47,7 +47,7 @@ export function saveMenuMusicEnabled(enabled) {
 
 export function loadMenuMusicVolume() {
   const saved = Number(localStorage.getItem(MENU_MUSIC_VOLUME_KEY));
-  return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 0.34;
+  return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 0.5;
 }
 
 export function saveMenuMusicVolume(volume) {

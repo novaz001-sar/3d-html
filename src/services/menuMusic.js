@@ -3,7 +3,7 @@ const MENU_MUSIC_SRC = '/assets/audio/menu-theme.m4a';
 let audio;
 let unlockBound = false;
 let shouldPlayWhenUnlocked = false;
-let currentVolume = 0.34;
+let currentVolume = 0.5;
 let unmuteTimers = [];
 
 export function primeMenuMusic({ enabled, volume }) {
@@ -110,6 +110,7 @@ function scheduleUnmuteAttempts(player) {
       if (!shouldPlayWhenUnlocked || player.paused) return;
       player.volume = currentVolume;
       player.muted = currentVolume <= 0;
+      player.play().catch(bindUnlockEvents);
     }, delay));
   });
 }
@@ -153,6 +154,6 @@ function bindUnlockEvents() {
 
 function normalizeVolume(volume) {
   const value = Number(volume);
-  if (!Number.isFinite(value)) return 0.34;
+  if (!Number.isFinite(value)) return 0.5;
   return Math.min(1, Math.max(0, value));
 }

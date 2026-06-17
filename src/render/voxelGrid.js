@@ -50,42 +50,92 @@ export function drawVoxelGrid(canvas, voxels, layer, color) {
 
 function drawCatMagicGridCell(ctx, x, y, size, color) {
   const radius = Math.max(8, size * 0.18);
-  roundRect(ctx, x, y + size * 0.08, size, size * 0.92, radius);
-  ctx.fillStyle = color;
+  const bodyTop = y + size * 0.12;
+  const bodyHeight = size * 0.84;
+  const grad = ctx.createLinearGradient(x, bodyTop, x + size, bodyTop + bodyHeight);
+  grad.addColorStop(0, '#fffaf0');
+  grad.addColorStop(0.48, color);
+  grad.addColorStop(1, '#ffddea');
+  roundRect(ctx, x, bodyTop, size, bodyHeight, radius);
+  ctx.fillStyle = grad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(32, 38, 63, .55)';
-  ctx.lineWidth = Math.max(1.5, size * 0.06);
+  ctx.strokeStyle = 'rgba(52, 56, 74, .62)';
+  ctx.lineWidth = Math.max(1.6, size * 0.052);
   ctx.stroke();
 
-  ctx.fillStyle = color;
-  drawEar(ctx, x + size * 0.2, y + size * 0.16, size * 0.24, -1);
-  drawEar(ctx, x + size * 0.8, y + size * 0.16, size * 0.24, 1);
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = '#7bdcff';
+  ctx.lineWidth = Math.max(1.2, size * 0.042);
+  ctx.beginPath();
+  ctx.ellipse(x + size * 0.5, y + size * 0.62, size * 0.46, size * 0.16, -0.16, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  drawEar(ctx, x + size * 0.25, y + size * 0.19, size * 0.22, -1, color);
+  drawEar(ctx, x + size * 0.75, y + size * 0.19, size * 0.22, 1, color);
+  drawSpark(ctx, x + size * 0.82, y + size * 0.3, size * 0.08);
+
   ctx.fillStyle = '#ff8aad';
   ctx.beginPath();
-  ctx.arc(x + size * 0.27, y + size * 0.58, size * 0.09, 0, Math.PI * 2);
-  ctx.arc(x + size * 0.73, y + size * 0.58, size * 0.09, 0, Math.PI * 2);
+  ctx.ellipse(x + size * 0.28, y + size * 0.62, size * 0.095, size * 0.065, -0.08, 0, Math.PI * 2);
+  ctx.ellipse(x + size * 0.72, y + size * 0.62, size * 0.095, size * 0.065, 0.08, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = '#34384a';
   ctx.beginPath();
-  ctx.arc(x + size * 0.38, y + size * 0.43, size * 0.065, 0, Math.PI * 2);
-  ctx.arc(x + size * 0.62, y + size * 0.43, size * 0.065, 0, Math.PI * 2);
+  ctx.arc(x + size * 0.39, y + size * 0.47, size * 0.058, 0, Math.PI * 2);
+  ctx.arc(x + size * 0.61, y + size * 0.47, size * 0.058, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = '#34384a';
-  ctx.lineWidth = Math.max(1.4, size * 0.055);
+  ctx.lineWidth = Math.max(1.4, size * 0.048);
   ctx.beginPath();
-  ctx.arc(x + size * 0.47, y + size * 0.56, size * 0.07, 0, Math.PI);
-  ctx.arc(x + size * 0.53, y + size * 0.56, size * 0.07, 0, Math.PI);
+  ctx.arc(x + size * 0.47, y + size * 0.57, size * 0.055, 0, Math.PI);
+  ctx.arc(x + size * 0.53, y + size * 0.57, size * 0.055, 0, Math.PI);
   ctx.stroke();
 }
 
-function drawEar(ctx, x, y, size, direction) {
+function drawEar(ctx, x, y, size, direction, color) {
+  const earGrad = ctx.createLinearGradient(x, y - size, x, y + size);
+  earGrad.addColorStop(0, '#fffaf0');
+  earGrad.addColorStop(1, color);
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x + size * direction, y + size * 0.72);
   ctx.lineTo(x - size * direction, y + size * 0.72);
   ctx.closePath();
+  ctx.fillStyle = earGrad;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(52, 56, 74, .62)';
+  ctx.lineWidth = Math.max(1.3, size * 0.18);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(x, y + size * 0.2);
+  ctx.lineTo(x + size * 0.42 * direction, y + size * 0.58);
+  ctx.lineTo(x - size * 0.42 * direction, y + size * 0.58);
+  ctx.closePath();
+  ctx.fillStyle = '#ff9fba';
+  ctx.fill();
+}
+
+function drawSpark(ctx, x, y, size) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = '#ffd84f';
+  ctx.strokeStyle = 'rgba(52, 56, 74, .38)';
+  ctx.lineWidth = Math.max(1, size * 0.2);
+  ctx.beginPath();
+  for (let i = 0; i < 8; i += 1) {
+    const r = i % 2 ? size * 0.42 : size;
+    const a = -Math.PI / 2 + i * Math.PI / 4;
+    const px = Math.cos(a) * r;
+    const py = Math.sin(a) * r;
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.closePath();
   ctx.fill();
   ctx.stroke();
+  ctx.restore();
 }
 
 export function gridPointFromEvent(canvas, event) {

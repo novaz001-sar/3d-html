@@ -23,6 +23,7 @@ export function renderGame(ctx) {
         <button class="button danger" data-answer="different">${t('different')}</button>
         <button class="button secondary" data-game-action="skip">${t('skip')}</button>
         <label class="zoom-control">Zoom<input id="game-zoom" type="range" min="0.55" max="2.8" step="0.05" value="${game.zoom}" /></label>
+        <label class="zoom-control">${t('speed')}<input id="game-spin-speed" type="range" min="0.18" max="1" step="0.02" value="${game.spinSpeed || 1}" /></label>
       </footer>
       ${game.feedback ? `<div class="feedback ${game.feedbackKind}">${esc(game.feedback)}</div>` : ''}
       ${state.paused ? `
