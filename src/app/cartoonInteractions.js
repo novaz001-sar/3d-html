@@ -1,13 +1,12 @@
-const BURST_WORDS = ['MEOW!', 'PAW!', 'STAR!', 'WOW!', 'NICE!'];
-const CLICKABLE_SELECTOR = [
-  'button',
-  '.button',
-  '.btn',
-  '[role="button"]',
-  '.answer-card',
-  '.option-card',
-  '.choice',
-  '.answer-option'
+const BURST_WORDS = ['MEOW', 'PAW', 'STAR', 'YAY', 'NICE'];
+const CONTROL_SELECTOR = [
+  '.topbar .button',
+  '.hero-actions .button',
+  '.game-hud .button',
+  '.answer-bar .button',
+  '.manual .button',
+  '.result-card .button',
+  '.level-card'
 ].join(',');
 const STAGE_SELECTOR = 'canvas, .canvas-wrap, .canvas-shell, .game-stage, .editor-stage';
 const TILT_SELECTOR = [
@@ -17,22 +16,29 @@ const TILT_SELECTOR = [
   '.question-card',
   '.answer-card',
   '.option-card',
-  '.stat-card'
+  '.stat-card',
+  '.result-card'
 ].join(',');
 
 export function mountCartoonInteractions() {
-  if (document.documentElement.dataset.cartoonInteractions === 'cat-planet') {
+  if (document.documentElement.dataset.cartoonInteractions === 'integrated-cat-planet') {
     return;
   }
 
-  document.documentElement.dataset.cartoonInteractions = 'cat-planet';
+  document.documentElement.dataset.cartoonInteractions = 'integrated-cat-planet';
 
   const layer = document.createElement('div');
   layer.className = 'cartoon-layer';
   document.body.append(layer);
 
-  const figure = createCatPlanetFigure(layer);
-  const logo = createCatPlanetLogo(layer, figure);
+  const decorate = () => decorateCatPlanetUi(layer);
+  decorate();
+
+  const root = document.getElementById('app') || document.body;
+  const observer = new MutationObserver(() => {
+    decorate();
+  });
+  observer.observe(root, { childList: true, subtree: true });
 
   document.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary) {
@@ -41,22 +47,29 @@ export function mountCartoonInteractions() {
 
     const target = event.target instanceof Element ? event.target : null;
 
-    if (target?.closest('.cat-planet-figure, .cat-planet-logo')) {
+    if (target?.closest('.cat-manual-card')) {
+      const rect = target.closest('.cat-manual-card').getBoundingClientRect();
+      makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      makeBurst(layer, event.clientX, event.clientY, 'manual');
       return;
     }
 
-    if (target?.closest(CLICKABLE_SELECTOR)) {
-      makeBurst(layer, event.clientX, event.clientY, 'button');
+    if (target?.closest('.cat-result-cardlet, .stars')) {
+      const rect = target.closest('.result-card')?.getBoundingClientRect();
+      makeResultBurst(layer, rect || { left: event.clientX, top: event.clientY, width: 0, height: 0 });
+      return;
+    }
+
+    if (target?.closest(CONTROL_SELECTOR)) {
+      pulseEmbeddedCat(target.closest(CONTROL_SELECTOR));
+      makeBurst(layer, event.clientX, event.clientY, 'control');
       return;
     }
 
     if (target?.closest(STAGE_SELECTOR)) {
       makeRing(layer, event.clientX, event.clientY);
-      makeBurst(layer, event.clientX, event.clientY, 'stage');
       return;
     }
-
-    makeBurst(layer, event.clientX, event.clientY, 'soft');
   }, { passive: true });
 
   document.addEventListener('pointermove', (event) => {
@@ -71,107 +84,113 @@ export function mountCartoonInteractions() {
       clearTilt(target);
     }
   }, true);
+}
 
-  window.addEventListener('keydown', (event) => {
-    if (isTypingTarget(event.target)) {
+function decorateCatPlanetUi(layer) {
+  document.querySelectorAll(CONTROL_SELECTOR).forEach((control) => {
+    if (control.dataset.catIntegrated === 'true') {
       return;
     }
 
-    if (event.key.toLowerCase() === 'c' && !event.metaKey && !event.ctrlKey && !event.altKey) {
-      figure.click();
-    }
+    control.dataset.catIntegrated = 'true';
+    control.classList.add('cat-integrated-control');
+    control.insertAdjacentHTML('afterbegin', catMiniPlanetMarkup());
   });
 
-  window.setTimeout(() => {
-    logo.classList.add('is-awake');
-    figure.classList.add('is-awake');
-  }, 250);
+  const manual = document.querySelector('.manual');
+  if (manual && manual.dataset.catManual !== 'true') {
+    manual.dataset.catManual = 'true';
+    manual.classList.add('cat-manual-panel');
+    manual.querySelector('h2')?.insertAdjacentHTML('afterend', catManualMarkup());
+    manual.querySelector('.cat-manual-card')?.addEventListener('click', (event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      makeBurst(layer, rect.left + rect.width / 2, rect.top + rect.height / 2, 'manual');
+    });
+  }
+
+  const result = document.querySelector('.result-card');
+  if (result && result.dataset.catResult !== 'true') {
+    result.dataset.catResult = 'true';
+    result.classList.add('cat-result-panel');
+    result.querySelector('h1')?.insertAdjacentHTML('afterend', catResultMarkup());
+    result.querySelector('.cat-result-cardlet')?.addEventListener('click', () => {
+      makeResultBurst(layer, result.getBoundingClientRect());
+    });
+  }
 }
 
-function createCatPlanetLogo(layer, figure) {
-  const logo = document.createElement('button');
-  logo.className = 'cat-planet-logo';
-  logo.type = 'button';
-  logo.setAttribute('aria-label', 'Cat Planet logo');
-  logo.innerHTML = [
-    '<span class="cat-logo-mark">',
-    '<span class="cat-logo-orbit"></span>',
-    '<span class="cat-logo-face"><span></span></span>',
+function catMiniPlanetMarkup() {
+  return [
+    '<span class="cat-mini-planet" aria-hidden="true">',
+    '<span class="cat-mini-orbit"></span>',
+    '<span class="cat-mini-ear cat-mini-ear-left"></span>',
+    '<span class="cat-mini-ear cat-mini-ear-right"></span>',
+    '<span class="cat-mini-face">',
+    '<span class="cat-mini-eye cat-mini-eye-left"></span>',
+    '<span class="cat-mini-eye cat-mini-eye-right"></span>',
+    '<span class="cat-mini-mouth"></span>',
     '</span>',
-    '<span class="cat-logo-copy">',
-    '<strong>Cat Planet</strong>',
-    '<small>3D play lab</small>',
     '</span>'
   ].join('');
-
-  logo.addEventListener('click', (event) => {
-    event.stopPropagation();
-    logo.classList.add('is-twinkling');
-    figure.click();
-    removeClassAfter(logo, 'is-twinkling', 720);
-
-    const rect = logo.getBoundingClientRect();
-    makeBurst(layer, rect.left + rect.width / 2, rect.top + rect.height / 2, 'logo');
-  });
-
-  document.body.append(logo);
-  return logo;
 }
 
-function createCatPlanetFigure(layer) {
-  const figure = document.createElement('button');
-  figure.className = 'cat-planet-figure';
-  figure.type = 'button';
-  figure.setAttribute('aria-label', 'Interactive Cat Planet figure');
-  figure.innerHTML = [
-    '<span class="cat-planet-halo cat-planet-halo-one"></span>',
-    '<span class="cat-planet-halo cat-planet-halo-two"></span>',
-    '<span class="cat-planet-stars"><i></i><i></i><i></i></span>',
-    '<span class="cat-planet-tail"></span>',
-    '<span class="cat-planet-body">',
-    '<span class="cat-ear cat-ear-left"></span>',
-    '<span class="cat-ear cat-ear-right"></span>',
-    '<span class="cat-face">',
-    '<span class="cat-eye cat-eye-left"></span>',
-    '<span class="cat-eye cat-eye-right"></span>',
-    '<span class="cat-nose"></span>',
-    '<span class="cat-mouth"></span>',
-    '<span class="cat-whiskers cat-whiskers-left"></span>',
-    '<span class="cat-whiskers cat-whiskers-right"></span>',
+function catManualMarkup() {
+  return [
+    '<button class="cat-manual-card" type="button" aria-label="Cat manual interaction">',
+    '<span class="cat-inline-planet cat-inline-planet-guide">',
+    '<span class="cat-inline-orbit"></span>',
+    '<span class="cat-inline-ear cat-inline-ear-left"></span>',
+    '<span class="cat-inline-ear cat-inline-ear-right"></span>',
+    '<span class="cat-inline-face"><span></span></span>',
     '</span>',
+    '<span class="cat-manual-copy">',
+    '<strong>MEOW MANUAL</strong>',
+    '<small>tap for tiny paw stars</small>',
     '</span>',
-    '<span class="cat-planet-shadow"></span>',
-    '<span class="cat-planet-bubble">MEOW!</span>'
+    '</button>'
   ].join('');
+}
 
-  let mood = 0;
+function catResultMarkup() {
+  return [
+    '<button class="cat-result-cardlet" type="button" aria-label="Cat result celebration">',
+    '<span class="cat-inline-planet cat-inline-planet-result">',
+    '<span class="cat-inline-orbit"></span>',
+    '<span class="cat-inline-ear cat-inline-ear-left"></span>',
+    '<span class="cat-inline-ear cat-inline-ear-right"></span>',
+    '<span class="cat-inline-face"><span></span></span>',
+    '<span class="cat-inline-sparkles"><i></i><i></i><i></i></span>',
+    '</span>',
+    '<span class="cat-result-copy">',
+    '<strong>STAR CAT</strong>',
+    '<small>tap to celebrate</small>',
+    '</span>',
+    '</button>'
+  ].join('');
+}
 
-  figure.addEventListener('click', (event) => {
-    event.stopPropagation();
-    mood = (mood + 1) % BURST_WORDS.length;
-    figure.dataset.mood = String(mood);
-    figure.querySelector('.cat-planet-bubble').textContent = BURST_WORDS[mood];
-    figure.classList.add('is-reacting');
-    removeClassAfter(figure, 'is-reacting', 820);
+function pulseEmbeddedCat(control) {
+  const cat = control.querySelector('.cat-mini-planet');
 
-    const rect = figure.getBoundingClientRect();
-    makeBurst(layer, rect.left + rect.width / 2, rect.top + rect.height / 2, 'cat');
-    makePaws(layer, rect.left + rect.width / 2, rect.top + rect.height / 2);
+  if (!cat) {
+    return;
+  }
+
+  cat.classList.remove('is-pulsing');
+  window.requestAnimationFrame(() => {
+    cat.classList.add('is-pulsing');
   });
-
-  document.body.append(figure);
-  return figure;
 }
 
 function makeBurst(layer, x, y, tone) {
   const isSmallScreen = window.matchMedia('(max-width: 720px)').matches;
-  const count = tone === 'soft' ? 5 : isSmallScreen ? 7 : 11;
-  const word = BURST_WORDS[Math.floor(Math.random() * BURST_WORDS.length)];
+  const count = tone === 'manual' ? 9 : isSmallScreen ? 5 : 8;
 
-  if (tone !== 'soft' && !isSmallScreen) {
+  if (!isSmallScreen && tone !== 'control') {
     const label = document.createElement('span');
     label.className = 'cartoon-word-pop';
-    label.textContent = word;
+    label.textContent = BURST_WORDS[Math.floor(Math.random() * BURST_WORDS.length)];
     label.style.left = `${x}px`;
     label.style.top = `${y}px`;
     layer.append(label);
@@ -181,8 +200,8 @@ function makeBurst(layer, x, y, tone) {
   for (let index = 0; index < count; index += 1) {
     const spark = document.createElement('span');
     const angle = (Math.PI * 2 * index) / count;
-    const distance = (isSmallScreen ? 22 : 34) + Math.random() * (isSmallScreen ? 28 : 54);
-    const hue = 22 + Math.random() * 220;
+    const distance = (isSmallScreen ? 20 : 30) + Math.random() * (isSmallScreen ? 22 : 42);
+    const hue = 28 + Math.random() * 210;
 
     spark.className = `cartoon-spark cartoon-spark-${index % 4}`;
     spark.style.left = `${x}px`;
@@ -190,26 +209,44 @@ function makeBurst(layer, x, y, tone) {
     spark.style.setProperty('--spark-x', `${Math.cos(angle) * distance}px`);
     spark.style.setProperty('--spark-y', `${Math.sin(angle) * distance}px`);
     spark.style.setProperty('--spark-hue', `${hue.toFixed(0)}deg`);
-    spark.style.setProperty('--spark-scale', `${(0.62 + Math.random() * 0.82).toFixed(2)}`);
+    spark.style.setProperty('--spark-scale', `${(0.58 + Math.random() * 0.72).toFixed(2)}`);
     layer.append(spark);
-    removeAfter(spark, 860);
+    removeAfter(spark, 820);
+  }
+}
+
+function makeResultBurst(layer, rect) {
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height * 0.38;
+  makeBurst(layer, centerX, centerY, 'result');
+  makePaws(layer, centerX, centerY);
+
+  for (let index = 0; index < 3; index += 1) {
+    window.setTimeout(() => {
+      makeBurst(
+        layer,
+        rect.left + rect.width * (0.24 + index * 0.26),
+        rect.top + rect.height * (0.22 + Math.random() * 0.2),
+        'result'
+      );
+    }, index * 110);
   }
 }
 
 function makePaws(layer, x, y) {
   for (let index = 0; index < 5; index += 1) {
     const paw = document.createElement('span');
-    const angle = -Math.PI / 1.15 + index * 0.46;
-    const distance = 30 + index * 8;
+    const angle = -Math.PI / 1.1 + index * 0.48;
+    const distance = 24 + index * 8;
 
     paw.className = 'cat-paw-pop';
     paw.style.left = `${x}px`;
     paw.style.top = `${y}px`;
     paw.style.setProperty('--paw-x', `${Math.cos(angle) * distance}px`);
     paw.style.setProperty('--paw-y', `${Math.sin(angle) * distance}px`);
-    paw.style.setProperty('--paw-delay', `${index * 45}ms`);
+    paw.style.setProperty('--paw-delay', `${index * 42}ms`);
     layer.append(paw);
-    removeAfter(paw, 920);
+    removeAfter(paw, 880);
   }
 }
 
@@ -219,17 +256,15 @@ function makeRing(layer, x, y) {
   ring.style.left = `${x}px`;
   ring.style.top = `${y}px`;
   layer.append(ring);
-  removeAfter(ring, 700);
+  removeAfter(ring, 680);
 }
 
 function updateCatGaze(clientX, clientY) {
   const x = (clientX / window.innerWidth - 0.5) * 2;
   const y = (clientY / window.innerHeight - 0.5) * 2;
 
-  document.documentElement.style.setProperty('--cat-look-x', `${(x * 4).toFixed(2)}px`);
-  document.documentElement.style.setProperty('--cat-look-y', `${(y * 3).toFixed(2)}px`);
-  document.documentElement.style.setProperty('--cat-parallax-x', `${(x * 7).toFixed(2)}px`);
-  document.documentElement.style.setProperty('--cat-parallax-y', `${(y * 5).toFixed(2)}px`);
+  document.documentElement.style.setProperty('--cat-look-x', `${(x * 2.4).toFixed(2)}px`);
+  document.documentElement.style.setProperty('--cat-look-y', `${(y * 1.8).toFixed(2)}px`);
 }
 
 function tiltCard(event) {
@@ -244,8 +279,8 @@ function tiltCard(event) {
   const y = (event.clientY - rect.top) / rect.height - 0.5;
 
   target.classList.add('cartoon-tilt');
-  target.style.setProperty('--cartoon-tilt-x', `${(-y * 4).toFixed(2)}deg`);
-  target.style.setProperty('--cartoon-tilt-y', `${(x * 5).toFixed(2)}deg`);
+  target.style.setProperty('--cartoon-tilt-x', `${(-y * 3).toFixed(2)}deg`);
+  target.style.setProperty('--cartoon-tilt-y', `${(x * 4).toFixed(2)}deg`);
   target.style.setProperty('--cartoon-shine-x', `${((x + 0.5) * 100).toFixed(1)}%`);
   target.style.setProperty('--cartoon-shine-y', `${((y + 0.5) * 100).toFixed(1)}%`);
 }
@@ -264,16 +299,3 @@ function removeAfter(element, delay) {
   }, delay);
 }
 
-function removeClassAfter(element, className, delay) {
-  window.setTimeout(() => {
-    element.classList.remove(className);
-  }, delay);
-}
-
-function isTypingTarget(target) {
-  if (!(target instanceof Element)) {
-    return false;
-  }
-
-  return Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
-}
