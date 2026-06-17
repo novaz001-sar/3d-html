@@ -28,20 +28,28 @@ export function unlockSoundEffects(options = {}) {
   if (!ctx) return Promise.resolve(false);
   if (unlocked && ctx.state === 'running') return Promise.resolve(true);
 
+  const shouldScheduleSilent = !unlocked;
+  const shouldScheduleTone = options.audible && !unlockTonePlayed && sfxEnabled && sfxGainMultiplier > 0;
+
   if (!unlocked) {
     unlocked = true;
-    scheduleSilentUnlock(ctx);
   }
 
-  if (options.audible && !unlockTonePlayed && sfxEnabled && sfxGainMultiplier > 0) {
+  if (shouldScheduleTone) {
     unlockTonePlayed = true;
-    scheduleUnlockTone(ctx);
   }
+
+  const scheduleUnlockFeedback = () => {
+    if (shouldScheduleSilent) scheduleSilentUnlock(ctx);
+    if (shouldScheduleTone) scheduleUnlockTone(ctx);
+    return true;
+  };
 
   if (ctx.state === 'suspended') {
-    return ctx.resume().then(() => true).catch(() => false);
+    return ctx.resume().then(scheduleUnlockFeedback).catch(() => false);
   }
 
+  scheduleUnlockFeedback();
   return Promise.resolve(true);
 }
 
@@ -82,14 +90,16 @@ function playSequence(notes) {
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  const leadTime = ctx.state === 'suspended' ? 0.035 : 0;
   unlocked = true;
-  notes.forEach(note => playNote(ctx, note, leadTime));
 
   if (ctx.state === 'suspended') {
-    ctx.resume().catch(() => {});
+    ctx.resume()
+      .then(() => notes.forEach(note => playNote(ctx, note, 0.012)))
+      .catch(() => {});
     return;
   }
+
+  notes.forEach(note => playNote(ctx, note, 0));
 }
 
 function playNote(ctx, note, leadTime = 0) {

@@ -26,11 +26,7 @@ export function primeMenuMusic({ enabled, volume, config = {} }) {
   }
 
   shouldPlayWhenUnlocked = true;
-  attemptAudiblePlay().then((played) => {
-    if (!played && shouldPlayWhenUnlocked) {
-      warmMutedPlayback();
-    }
-  });
+  attemptAudiblePlay();
 }
 
 export function syncMenuMusic({ active, enabled, volume, config = {} }) {
@@ -45,11 +41,7 @@ export function syncMenuMusic({ active, enabled, volume, config = {} }) {
   }
 
   shouldPlayWhenUnlocked = true;
-  attemptAudiblePlay().then((played) => {
-    if (!played && shouldPlayWhenUnlocked) {
-      warmMutedPlayback();
-    }
-  });
+  attemptAudiblePlay();
 }
 
 export function setMenuMusicVolume(volume) {
@@ -63,8 +55,7 @@ export function unlockMenuMusic() {
   if (!shouldPlayWhenUnlocked) return Promise.resolve(true);
   const player = getAudio();
   player.preload = 'auto';
-  safeLoad(player);
-  return attemptAudiblePlay();
+  return attemptAudiblePlay({ userGesture: true });
 }
 
 export function pauseMenuMusic() {
@@ -111,8 +102,13 @@ function applyMenuConfig(config = {}) {
   audio.loop = currentLoop && currentStart <= 0;
 }
 
-function attemptAudiblePlay() {
+function attemptAudiblePlay(options = {}) {
   const player = getAudio();
+
+  if (options.userGesture && player.muted) {
+    player.pause();
+  }
+
   player.muted = false;
   player.volume = currentVolume;
   seekToStart(player);
@@ -140,33 +136,6 @@ function attemptAudiblePlay() {
   }
 }
 
-function warmMutedPlayback() {
-  if (!shouldPlayWhenUnlocked) return Promise.resolve(false);
-
-  const player = getAudio();
-  player.muted = true;
-  player.volume = 0;
-  seekToStart(player);
-
-  try {
-    const playResult = player.play();
-    if (!playResult || typeof playResult.then !== 'function') {
-      player.volume = currentVolume;
-      return Promise.resolve(true);
-    }
-
-    return playResult.then(
-      () => {
-        player.volume = currentVolume;
-        return true;
-      },
-      () => false
-    );
-  } catch {
-    return Promise.resolve(false);
-  }
-}
-
 function handleCanPlay() {
   if (!shouldPlayWhenUnlocked || audio?.muted || document.hidden) return;
   attemptAudiblePlay();
@@ -176,7 +145,6 @@ function handleEnded() {
   if (!currentLoop || !audio) return;
   seekToStart(audio, true);
   if (shouldPlayWhenUnlocked) {
-    warmMutedPlayback();
     return;
   }
   attemptAudiblePlay();
@@ -230,6 +198,7 @@ function bindUnlockEvents() {
   unlockEventsBound = true;
   UNLOCK_EVENTS.forEach((eventName) => {
     document.addEventListener(eventName, unlockMenuMusic, { passive: true, capture: true });
+    window.addEventListener(eventName, unlockMenuMusic, { passive: true, capture: true });
   });
 }
 
