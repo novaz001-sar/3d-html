@@ -20,7 +20,7 @@
   --cat-line: 2.5px;
   --cat-look-x: 0px;
   --cat-look-y: 0px;
-  --cat-planet-asset: url("/assets/images/cat-planet.png");
+  --cat-planet-asset: url("/assets/images/cat-planet-clean.svg");
 }
 
 body,
@@ -1115,7 +1115,7 @@ button.cat-integrated-control {
   top: 48%;
   z-index: 28;
   width: clamp(9rem, 18vw, 13.5rem);
-  aspect-ratio: 1.38 / 1;
+  aspect-ratio: 1 / 1;
   border: 0;
   background: transparent;
   cursor: pointer;

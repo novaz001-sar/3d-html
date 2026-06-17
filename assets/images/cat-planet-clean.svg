@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 236" role="img" aria-label="Cat planet without ring">
+  <defs>
+    <radialGradient id="bodyGlow" cx="42%" cy="32%" r="72%">
+      <stop offset="0" stop-color="#fffef3"/>
+      <stop offset="0.62" stop-color="#fff7dc"/>
+      <stop offset="1" stop-color="#f7e9c7"/>
+    </radialGradient>
+    <linearGradient id="earPink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9db7"/>
+      <stop offset="1" stop-color="#ff6f9f"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="7" flood-color="#20263f" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#softShadow)">
+    <path d="M48 93 C38 48 52 18 80 18 C101 18 116 35 126 57 C138 35 156 18 178 18 C206 18 220 50 207 96 C222 112 230 135 226 160 C219 204 178 224 128 224 C77 224 36 202 30 160 C26 134 33 111 48 93 Z" fill="#34384a"/>
+    <path d="M61 94 C51 55 61 34 81 34 C99 34 113 53 120 72 L136 72 C144 53 158 34 177 34 C197 34 207 57 196 96 C207 110 213 130 210 153 C204 189 171 207 128 207 C84 207 51 188 46 153 C43 129 50 109 61 94 Z" fill="url(#bodyGlow)"/>
+    <path d="M72 82 C69 58 74 47 85 46 C96 45 106 59 112 78 Z" fill="#fffef3"/>
+    <path d="M80 81 C78 62 82 55 88 55 C95 55 102 65 106 78 Z" fill="url(#earPink)"/>
+    <path d="M144 78 C151 59 162 45 174 46 C185 47 190 59 184 82 Z" fill="#fffef3"/>
+    <path d="M150 78 C155 65 163 55 170 55 C177 55 181 63 178 81 Z" fill="url(#earPink)"/>
+    <ellipse cx="81" cy="137" rx="19" ry="14" fill="#ff7fa4" opacity="0.92"/>
+    <ellipse cx="175" cy="137" rx="19" ry="14" fill="#ff7fa4" opacity="0.92"/>
+    <ellipse cx="104" cy="119" rx="13" ry="17" fill="#34384a"/>
+    <ellipse cx="152" cy="119" rx="13" ry="17" fill="#34384a"/>
+    <circle cx="109" cy="112" r="4.3" fill="#ffffff"/>
+    <circle cx="157" cy="112" r="4.3" fill="#ffffff"/>
+    <path d="M112 142 C117 153 125 153 128 143 C132 153 140 153 145 142" fill="none" stroke="#34384a" stroke-width="8" stroke-linecap="round"/>
+    <path d="M122 137 C125 141 131 141 134 137" fill="none" stroke="#34384a" stroke-width="6" stroke-linecap="round"/>
+    <path d="M69 171 C91 189 164 190 187 171" fill="none" stroke="#eadbbd" stroke-width="9" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="56" cy="112" r="5" fill="#ffffff" opacity="0.62"/>
+    <path d="M205 118 l6 13 14 2 -10 9 3 14 -13 -7 -12 7 2 -14 -10 -9 14 -2 Z" fill="#ffd84f" stroke="#34384a" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

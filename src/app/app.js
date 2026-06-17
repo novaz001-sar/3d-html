@@ -58,14 +58,24 @@ export function createApp(root) {
     }));
     document.querySelectorAll('[data-action="music-volume"]').forEach(el => {
       const updateMusicVolume = event => {
-      state.musicVolume = Number(event.target.value);
-      saveMenuMusicVolume(state.musicVolume);
-      setMenuMusicVolume(state.musicVolume);
-      syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
+        state.musicVolume = Number(event.target.value);
+        saveMenuMusicVolume(state.musicVolume);
+        setMenuMusicVolume(state.musicVolume);
+        syncMenuMusic({ active: state.screen === 'main', enabled: state.musicEnabled, volume: state.musicVolume });
+      };
+
+      const activateMusicVolume = event => {
+        event.stopPropagation();
+        if (state.musicEnabled) {
+          unlockMenuMusic();
+        }
+        updateMusicVolume(event);
       };
 
       el.addEventListener('input', updateMusicVolume);
       el.addEventListener('change', updateMusicVolume);
+      el.addEventListener('pointerdown', activateMusicVolume);
+      el.addEventListener('touchstart', activateMusicVolume, { passive: true });
     });
   }
 

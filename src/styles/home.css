@@ -21,12 +21,12 @@
   position: relative;
   z-index: 34;
   width: min(150px, 32vw);
-  min-height: 32px;
-  height: 32px;
+  min-height: 40px;
+  height: 40px;
   padding: 0;
   box-shadow: none;
   accent-color: #ff7a9e;
-  touch-action: pan-x;
+  touch-action: none;
 }
 .volume-control input { accent-color: #42c8ff; }
 .music-toggle.is-on {
@@ -51,6 +51,6 @@
 
   .volume-control {
     position: relative;
-    z-index: 35;
+    z-index: 60;
   }
 }

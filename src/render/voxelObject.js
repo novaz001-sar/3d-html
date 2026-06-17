@@ -53,7 +53,15 @@ function drawVoxelObject(ctx, width, height, voxels, q, opts = {}) {
       if (rn[2] <= 0.02) continue;
       const pts3 = face.idx.map(i => corners[i]);
       const avgZ = pts3.reduce((sum, p) => sum + p[2], 0) / pts3.length;
-      faces.push({ pts3, n: rn, avgZ, color: opts.overrideColor || voxel.color || '#60a5fa', mat: opts.overrideMat || voxel.mat || 'wood', face: face.name });
+      faces.push({
+        pts3,
+        n: rn,
+        avgZ,
+        color: opts.overrideColor || voxel.color || '#60a5fa',
+        mat: opts.overrideMat || voxel.mat || 'wood',
+        shape: voxel.shape || 'cube',
+        face: face.name
+      });
     }
   }
 
@@ -81,10 +89,121 @@ function drawVoxelObject(ctx, width, height, voxels, q, opts = {}) {
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
+    if (face.shape === 'catMagicCube') {
+      drawCatMagicFace(ctx, pts, scale, face.face);
+    }
     ctx.strokeStyle = face.mat === 'glass' ? 'rgba(255, 255, 255, .78)' : 'rgba(15, 23, 42, .45)';
     ctx.lineWidth = Math.max(1.2, scale * 0.034);
     ctx.stroke();
   }
+  ctx.restore();
+}
+
+function drawCatMagicFace(ctx, pts, scale, faceName) {
+  ctx.save();
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgba(255, 111, 159, .64)';
+  ctx.lineWidth = Math.max(1, scale * 0.018);
+  ctx.beginPath();
+  pts.forEach((p, index) => index ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+  ctx.closePath();
+  ctx.stroke();
+
+  drawMagicSpark(ctx, pointOnFace(pts, 0.78, 0.78), scale * 0.085);
+
+  if (faceName !== 'front') {
+    ctx.restore();
+    return;
+  }
+
+  const leftEar = [pointOnFace(pts, 0.16, 0.92), pointOnFace(pts, 0.3, 1.22), pointOnFace(pts, 0.42, 0.9)];
+  const rightEar = [pointOnFace(pts, 0.58, 0.9), pointOnFace(pts, 0.72, 1.22), pointOnFace(pts, 0.84, 0.92)];
+  drawFaceTriangle(ctx, leftEar, '#fff6d8', '#34384a', scale);
+  drawFaceTriangle(ctx, rightEar, '#fff6d8', '#34384a', scale);
+  drawFaceTriangle(ctx, [
+    pointOnFace(pts, 0.22, 0.94),
+    pointOnFace(pts, 0.3, 1.1),
+    pointOnFace(pts, 0.37, 0.94)
+  ], '#ff8aad', 'rgba(52, 56, 74, .28)', scale * 0.58);
+  drawFaceTriangle(ctx, [
+    pointOnFace(pts, 0.63, 0.94),
+    pointOnFace(pts, 0.72, 1.1),
+    pointOnFace(pts, 0.78, 0.94)
+  ], '#ff8aad', 'rgba(52, 56, 74, .28)', scale * 0.58);
+
+  drawFaceDot(ctx, pointOnFace(pts, 0.37, 0.56), scale * 0.065, '#34384a');
+  drawFaceDot(ctx, pointOnFace(pts, 0.63, 0.56), scale * 0.065, '#34384a');
+  drawFaceDot(ctx, pointOnFace(pts, 0.25, 0.39), scale * 0.085, '#ff8aad');
+  drawFaceDot(ctx, pointOnFace(pts, 0.75, 0.39), scale * 0.085, '#ff8aad');
+  drawCatMouth(ctx, pts, scale);
+  ctx.restore();
+}
+
+function pointOnFace(pts, u, v) {
+  const [p0, p1, p2, p3] = pts;
+  const a = (1 - u) * (1 - v);
+  const b = u * (1 - v);
+  const c = u * v;
+  const d = (1 - u) * v;
+  return [
+    p0[0] * a + p1[0] * b + p2[0] * c + p3[0] * d,
+    p0[1] * a + p1[1] * b + p2[1] * c + p3[1] * d
+  ];
+}
+
+function drawFaceTriangle(ctx, points, fill, stroke, scale) {
+  ctx.beginPath();
+  points.forEach((point, index) => index ? ctx.lineTo(point[0], point[1]) : ctx.moveTo(point[0], point[1]));
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = Math.max(1, scale * 0.025);
+  ctx.stroke();
+}
+
+function drawFaceDot(ctx, point, radius, fill) {
+  ctx.beginPath();
+  ctx.fillStyle = fill;
+  ctx.arc(point[0], point[1], radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawCatMouth(ctx, pts, scale) {
+  const left = pointOnFace(pts, 0.44, 0.34);
+  const mid = pointOnFace(pts, 0.5, 0.31);
+  const right = pointOnFace(pts, 0.56, 0.34);
+  ctx.strokeStyle = '#34384a';
+  ctx.lineWidth = Math.max(1.4, scale * 0.035);
+  ctx.beginPath();
+  ctx.arc(left[0], left[1], scale * 0.055, 0, Math.PI);
+  ctx.arc(right[0], right[1], scale * 0.055, 0, Math.PI);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(mid[0], mid[1], scale * 0.024, 0, Math.PI * 2);
+  ctx.fillStyle = '#34384a';
+  ctx.fill();
+}
+
+function drawMagicSpark(ctx, point, size) {
+  ctx.save();
+  ctx.translate(point[0], point[1]);
+  ctx.rotate(-0.22);
+  ctx.fillStyle = '#ffd84f';
+  ctx.strokeStyle = 'rgba(52, 56, 74, .45)';
+  ctx.lineWidth = Math.max(1, size * 0.18);
+  ctx.beginPath();
+  for (let index = 0; index < 8; index += 1) {
+    const radius = index % 2 === 0 ? size : size * 0.42;
+    const angle = -Math.PI / 2 + index * Math.PI / 4;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    index ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
   ctx.restore();
 }
 

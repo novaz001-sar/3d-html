@@ -15,6 +15,7 @@ export function createInitialState() {
       name: '',
       color: '#d97706',
       mat: 'wood',
+      shape: 'cube',
       layer: 0,
       voxels: [],
       editingId: null,

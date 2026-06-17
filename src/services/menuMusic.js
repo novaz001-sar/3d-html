@@ -4,10 +4,16 @@ let audio;
 let unlockBound = false;
 let shouldPlayWhenUnlocked = false;
 let currentVolume = 0.34;
+let unmuteTimers = [];
 
 export function primeMenuMusic({ enabled, volume }) {
   currentVolume = normalizeVolume(volume);
-  if (!enabled) return;
+  clearUnmuteTimers();
+  if (!enabled) {
+    shouldPlayWhenUnlocked = false;
+    pauseMenuMusic();
+    return;
+  }
 
   shouldPlayWhenUnlocked = true;
   bindUnlockEvents();
@@ -19,6 +25,7 @@ export function syncMenuMusic({ active, enabled, volume }) {
 
   if (!active || !enabled) {
     shouldPlayWhenUnlocked = false;
+    clearUnmuteTimers();
     pauseMenuMusic();
     return;
   }
@@ -32,6 +39,7 @@ export function setMenuMusicVolume(volume) {
   currentVolume = normalizeVolume(volume);
   if (!audio) return;
   audio.volume = currentVolume;
+  audio.muted = currentVolume <= 0;
 }
 
 export function unlockMenuMusic() {
@@ -51,43 +59,78 @@ function playMenuMusic({ bootstrap = false } = {}) {
   const player = getAudio();
   player.volume = currentVolume;
 
-  if (bootstrap && !player.dataset.started) {
-    player.muted = true;
+  if (bootstrap) {
+    player.muted = false;
+    attemptPlay(player, () => {
+      player.dataset.started = 'true';
+      player.volume = currentVolume;
+      player.muted = currentVolume <= 0;
+    }, () => {
+      startMutedBootstrap(player);
+    });
+    return;
   }
 
-  const playPromise = player.play();
+  player.muted = currentVolume <= 0;
+  attemptPlay(player, () => {
+    player.dataset.started = 'true';
+  }, bindUnlockEvents);
+}
 
+function attemptPlay(player, onSuccess, onFailure) {
+  const playPromise = player.play();
   if (playPromise?.then) {
     playPromise
       .then(() => {
-        player.dataset.started = 'true';
-        if (!bootstrap || !player.muted) {
-          player.volume = currentVolume;
-          return;
-        }
-
-        window.setTimeout(() => {
-          if (shouldPlayWhenUnlocked) {
-            player.volume = currentVolume;
-            player.muted = false;
-          }
-        }, 120);
+        onSuccess?.();
       })
       .catch(() => {
-        player.muted = false;
-        bindUnlockEvents();
+        onFailure?.();
       });
+    return;
   }
+
+  onSuccess?.();
+}
+
+function startMutedBootstrap(player) {
+  player.muted = true;
+  player.volume = 0;
+
+  attemptPlay(player, () => {
+    player.dataset.started = 'true';
+    scheduleUnmuteAttempts(player);
+  }, bindUnlockEvents);
+}
+
+function scheduleUnmuteAttempts(player) {
+  clearUnmuteTimers();
+  [120, 420, 1100, 2200].forEach(delay => {
+    unmuteTimers.push(window.setTimeout(() => {
+      if (!shouldPlayWhenUnlocked || player.paused) return;
+      player.volume = currentVolume;
+      player.muted = currentVolume <= 0;
+    }, delay));
+  });
+}
+
+function clearUnmuteTimers() {
+  unmuteTimers.forEach(timer => window.clearTimeout(timer));
+  unmuteTimers = [];
 }
 
 function getAudio() {
   if (audio) return audio;
 
-  audio = new Audio(MENU_MUSIC_SRC);
+  audio = document.createElement('audio');
+  audio.src = MENU_MUSIC_SRC;
   audio.loop = true;
   audio.preload = 'auto';
+  audio.autoplay = true;
+  audio.hidden = true;
   audio.volume = currentVolume;
   audio.setAttribute('playsinline', '');
+  document.body?.append(audio);
   return audio;
 }
 
