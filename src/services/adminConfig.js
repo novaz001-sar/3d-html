@@ -10,6 +10,10 @@ export const DEFAULT_ADMIN_CONFIG = {
     edition: {
       en: '3D Mental Rotation',
       zh: '3D 心理旋转训练'
+    },
+    manualText: {
+      en: 'Compare the left and right 3D block models and decide whether they are the same object shown from different angles. The editor can create voxel objects, levels, and questions; data can be imported and exported.',
+      zh: '\u901a\u8fc7\u6bd4\u5bf9\u5de6\u53f3\u4e24\u4fa7\u7684\u4e09\u7ef4\u79ef\u6728\uff0c\u5224\u65ad\u5b83\u4eec\u662f\u5426\u662f\u540c\u4e00\u4e2a\u7269\u4f53\u5728\u4e0d\u540c\u89d2\u5ea6\u4e0b\u7684\u5f62\u6001\u3002\u7f16\u8f91\u5668\u53ef\u4ee5\u521b\u5efa\u4f53\u7d20\u7269\u4f53\u3001\u5173\u5361\u548c\u9898\u76ee\uff0c\u6570\u636e\u53ef\u5bfc\u5165\u5bfc\u51fa\u3002'
     }
   },
   defaults: {

@@ -5,6 +5,7 @@ import {
   resetAdminConfig,
   saveAdminConfig
 } from '../services/adminConfig.js';
+import { saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMusicVolume } from '../services/storage.js';
 
 const app = document.getElementById('admin-app');
 let config = loadAdminConfig();
@@ -54,6 +55,8 @@ function renderContentCard() {
         ${textInput('Chinese title', 'content.title.zh', config.content.title.zh)}
         ${textInput('English subtitle', 'content.edition.en', config.content.edition.en)}
         ${textInput('Chinese subtitle', 'content.edition.zh', config.content.edition.zh)}
+        ${textAreaInput('English manual text', 'content.manualText.en', config.content.manualText.en)}
+        ${textAreaInput('Chinese manual text', 'content.manualText.zh', config.content.manualText.zh)}
       </div>
     </article>
   `;
@@ -164,7 +167,8 @@ function bind() {
 
   document.querySelector('[data-action="publish"]')?.addEventListener('click', () => {
     config = saveAdminConfig(readForm());
-    render('Published. Open or refresh the game on this same origin to apply the settings.');
+    publishGamePreferences(config);
+    render('Published. The game will update on refresh, focus, or immediately in another open tab.');
   });
 
   document.querySelector('[data-action="export"]')?.addEventListener('click', () => {
@@ -175,6 +179,7 @@ function bind() {
 
   document.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
     config = resetAdminConfig();
+    publishGamePreferences(config);
     render('Defaults restored.');
   });
 
@@ -233,6 +238,10 @@ function textInput(label, field, value, wide = false) {
   return `<label class="${wide ? 'wide-label' : ''}">${label}<input data-field="${field}" value="${escapeAttr(value)}" /></label>`;
 }
 
+function textAreaInput(label, field, value) {
+  return `<label class="wide-label">${label}<textarea data-field="${field}" rows="4">${escapeHtml(value)}</textarea></label>`;
+}
+
 function numberInput(label, field, value, min, max, step) {
   return `<label>${label}<input type="number" min="${min}" max="${max}" step="${step}" data-field="${field}" value="${escapeAttr(value)}" /></label>`;
 }
@@ -262,6 +271,13 @@ function downloadJson(value) {
   link.download = `toy-planet-config-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+function publishGamePreferences(nextConfig) {
+  saveLanguage(nextConfig.defaults.language);
+  saveFontScale(nextConfig.defaults.fontScale);
+  saveMenuMusicEnabled(nextConfig.audio.menu.enabled);
+  saveMenuMusicVolume(nextConfig.audio.menu.volume);
 }
 
 function escapeHtml(value) {

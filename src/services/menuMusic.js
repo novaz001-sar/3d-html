@@ -179,15 +179,11 @@ function bindUnlockEvents() {
 
   const unlock = () => {
     unlockMenuMusic();
-    window.removeEventListener('pointerdown', unlock, true);
-    window.removeEventListener('keydown', unlock, true);
-    window.removeEventListener('touchstart', unlock, true);
-    unlockBound = false;
   };
 
-  window.addEventListener('pointerdown', unlock, true);
-  window.addEventListener('keydown', unlock, true);
-  window.addEventListener('touchstart', unlock, true);
+  ['pointerdown', 'mousedown', 'click', 'keydown', 'touchstart', 'touchend'].forEach(eventName => {
+    window.addEventListener(eventName, unlock, true);
+  });
 }
 
 function normalizeVolume(volume) {

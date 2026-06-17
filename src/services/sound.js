@@ -2,6 +2,7 @@ let audioContext;
 let unlocked = false;
 let sfxEnabled = true;
 let sfxGainMultiplier = 2;
+let unlockInstalled = false;
 
 export function configureSoundEffects(config = {}) {
   sfxEnabled = config.enabled !== false;
@@ -10,24 +11,24 @@ export function configureSoundEffects(config = {}) {
 }
 
 export function installSoundUnlock() {
+  if (unlockInstalled) return;
+  unlockInstalled = true;
   const unlock = () => {
     unlockSoundEffects();
-    window.removeEventListener('pointerdown', unlock, true);
-    window.removeEventListener('keydown', unlock, true);
-    window.removeEventListener('touchstart', unlock, true);
   };
 
-  window.addEventListener('pointerdown', unlock, true);
-  window.addEventListener('keydown', unlock, true);
-  window.addEventListener('touchstart', unlock, true);
+  ['pointerdown', 'mousedown', 'click', 'keydown', 'touchstart', 'touchend'].forEach(eventName => {
+    window.addEventListener(eventName, unlock, true);
+  });
 }
 
 export function unlockSoundEffects() {
   const ctx = getAudioContext();
-  if (!ctx) return;
+  if (!ctx) return Promise.resolve(false);
+  if (unlocked && ctx.state === 'running') return Promise.resolve(true);
 
   const finishUnlock = () => {
-    if (unlocked) return;
+    if (unlocked && ctx.state === 'running') return true;
     unlocked = true;
     const gain = ctx.createGain();
     const oscillator = ctx.createOscillator();
@@ -37,14 +38,14 @@ export function unlockSoundEffects() {
     gain.connect(ctx.destination);
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.02);
+    return true;
   };
 
   if (ctx.state === 'suspended') {
-    ctx.resume().then(finishUnlock).catch(() => {});
-    return;
+    return ctx.resume().then(finishUnlock).catch(() => false);
   }
 
-  finishUnlock();
+  return Promise.resolve(finishUnlock());
 }
 
 export function playLevelSelect() {

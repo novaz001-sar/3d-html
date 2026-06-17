@@ -2,6 +2,7 @@ import { bindEditor, renderEditor } from '../features/editor/index.js';
 import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } from '../features/game/index.js';
 import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMusicVolume } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
+import { ADMIN_CONFIG_KEY, loadAdminConfig } from '../services/adminConfig.js';
 import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic, unlockMenuMusic } from '../services/menuMusic.js';
 import { syncResultMusic } from '../services/resultMusic.js';
 import { configureSoundEffects, installSoundUnlock, unlockSoundEffects } from '../services/sound.js';
@@ -11,6 +12,7 @@ import { createInitialState } from './state.js';
 
 export function createApp(root) {
   const state = createInitialState();
+  let adminConfigSignature = JSON.stringify(state.adminConfig);
   const ctx = {
     state,
     t: key => translate(state.lang, key),
@@ -89,20 +91,39 @@ export function createApp(root) {
     configureSoundEffects(state.adminConfig.audio.sfx);
   }
 
+  function installAdminConfigSync() {
+    const sync = () => {
+      const nextConfig = loadAdminConfig();
+      const nextSignature = JSON.stringify(nextConfig);
+      if (nextSignature === adminConfigSignature) return;
+
+      adminConfigSignature = nextSignature;
+      state.adminConfig = nextConfig;
+      state.lang = nextConfig.defaults.language;
+      state.fontScale = nextConfig.defaults.fontScale;
+      state.musicEnabled = nextConfig.audio.menu.enabled;
+      state.musicVolume = nextConfig.audio.menu.volume;
+      setMenuMusicVolume(state.musicVolume);
+      render();
+    };
+
+    window.addEventListener('storage', event => {
+      if (event.key === ADMIN_CONFIG_KEY) sync();
+    });
+    window.addEventListener('focus', sync);
+  }
+
   function installGlobalAudioUnlock() {
     const unlock = () => {
       unlockSoundEffects();
       if (state.musicEnabled) {
         unlockMenuMusic();
       }
-      window.removeEventListener('pointerdown', unlock, true);
-      window.removeEventListener('keydown', unlock, true);
-      window.removeEventListener('touchstart', unlock, true);
     };
 
-    window.addEventListener('pointerdown', unlock, true);
-    window.addEventListener('keydown', unlock, true);
-    window.addEventListener('touchstart', unlock, true);
+    ['pointerdown', 'mousedown', 'click', 'keydown', 'touchstart', 'touchend'].forEach(eventName => {
+      window.addEventListener(eventName, unlock, true);
+    });
   }
 
   function loop(ts) {
@@ -115,6 +136,7 @@ export function createApp(root) {
       primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume, config: state.adminConfig.audio.menu });
       installSoundUnlock();
       installGlobalAudioUnlock();
+      installAdminConfigSync();
       window.addEventListener('resize', () => {
         if (state.screen === 'game') bindGame(ctx);
       });

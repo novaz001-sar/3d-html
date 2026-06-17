@@ -10,6 +10,7 @@ export function renderHome(ctx) {
   const config = state.adminConfig;
   const title = localizedConfigText(config.content.title, state.lang, t('title'));
   const edition = localizedConfigText(config.content.edition, state.lang, t('edition'));
+  const manualText = localizedConfigText(config.content.manualText, state.lang, t('manualText'));
   const showLanguage = config.defaults.allowLanguageSwitch !== false;
   const showFont = config.defaults.allowFontControl !== false;
   const showMusic = config.audio.menu.showControls !== false;
@@ -43,7 +44,7 @@ export function renderHome(ctx) {
           <button class="button secondary" data-home-action="manual">${t('manual')}</button>
         </div>
       </section>
-      ${state.showManual ? `<div class="modal"><section class="panel manual"><h2>${t('manual')}</h2><p>${t('manualText')}</p><button class="button primary" data-home-action="close-manual">OK</button></section></div>` : ''}
+      ${state.showManual ? `<div class="modal"><section class="panel manual"><h2>${t('manual')}</h2><p>${esc(manualText)}</p><button class="button primary" data-home-action="close-manual">OK</button></section></div>` : ''}
     </main>
   `;
 }
