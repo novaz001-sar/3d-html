@@ -2,9 +2,9 @@ import { bindEditor, renderEditor } from '../features/editor/index.js';
 import { bindGame, renderGame, renderResult, startGame, stopTimer, tickGame } from '../features/game/index.js';
 import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMusicVolume } from '../services/storage.js';
 import { translate } from '../services/i18n.js';
-import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic } from '../services/menuMusic.js';
+import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic, unlockMenuMusic } from '../services/menuMusic.js';
 import { syncResultMusic } from '../services/resultMusic.js';
-import { installSoundUnlock } from '../services/sound.js';
+import { installSoundUnlock, unlockSoundEffects } from '../services/sound.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
 import { createInitialState } from './state.js';
@@ -69,6 +69,22 @@ export function createApp(root) {
     document.documentElement.style.setProperty('--ui-font-scale', String(state.fontScale || 1));
   }
 
+  function installGlobalAudioUnlock() {
+    const unlock = () => {
+      unlockSoundEffects();
+      if (state.musicEnabled) {
+        unlockMenuMusic();
+      }
+      window.removeEventListener('pointerdown', unlock, true);
+      window.removeEventListener('keydown', unlock, true);
+      window.removeEventListener('touchstart', unlock, true);
+    };
+
+    window.addEventListener('pointerdown', unlock, true);
+    window.addEventListener('keydown', unlock, true);
+    window.addEventListener('touchstart', unlock, true);
+  }
+
   function loop(ts) {
     tickGame(ctx, ts);
     requestAnimationFrame(loop);
@@ -78,6 +94,7 @@ export function createApp(root) {
     start() {
       primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume });
       installSoundUnlock();
+      installGlobalAudioUnlock();
       window.addEventListener('resize', () => {
         if (state.screen === 'game') bindGame(ctx);
       });

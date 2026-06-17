@@ -1,3 +1,5 @@
+import { playCatMeow } from '../services/catSound.js';
+
 const BURST_WORDS = ['MEOW', 'PAW', 'STAR', 'YAY', 'NICE'];
 const CONTROL_SELECTOR = [
   '.topbar .button',
@@ -48,6 +50,7 @@ export function mountCartoonInteractions() {
     const levelCard = target?.closest(LEVEL_SELECTOR);
 
     if (target?.closest('.cat-companion')) {
+      playCatMeow();
       reactCompanion(companion, layer, 'hello');
       return;
     }
@@ -107,7 +110,11 @@ function createCatCompanion(layer) {
     '<span class="cat-companion-badge">CAT</span>',
     '<span class="cat-companion-bubble">Tap me!</span>'
   ].join('');
-  companion.addEventListener('click', () => reactCompanion(companion, layer, 'hello'));
+  companion.addEventListener('click', (event) => {
+    if (event.detail !== 0) return;
+    playCatMeow();
+    reactCompanion(companion, layer, 'hello');
+  });
   document.body.append(companion);
   return companion;
 }
