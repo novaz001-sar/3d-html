@@ -17,12 +17,14 @@ export function renderGame(ctx) {
       <section class="game-stage">
         <div class="viewer viewer-left">
           <canvas id="game-left"></canvas>
-          <div class="viewer-hint"><strong>${esc(t('leftObj'))}</strong><span>${esc(t('leftInteractionHint'))}</span></div>
         </div>
         <div class="viewer viewer-right">
           <canvas id="game-right"></canvas>
-          <div class="viewer-hint"><strong>${esc(t('rightObj'))}</strong><span>${esc(t('rightInteractionHint'))}</span></div>
         </div>
+      </section>
+      <section class="stage-hints panel" aria-label="${esc(t('rotateHint'))}">
+        <div class="stage-hint"><strong>${esc(t('leftObj'))}</strong><span>${esc(t('leftInteractionHint'))}</span></div>
+        <div class="stage-hint"><strong>${esc(t('rightObj'))}</strong><span>${esc(t('rightInteractionHint'))}</span></div>
       </section>
       <footer class="answer-bar panel">
         <button class="button success" data-answer="same">${t('same')}</button>

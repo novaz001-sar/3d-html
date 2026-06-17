@@ -4,6 +4,7 @@ const RESULT_TRACKS = {
   3: '/assets/audio/3-stars.m4a'
 };
 const RESULT_MUSIC_START_SECONDS = 2;
+const RESULT_ARM_LEAD_SECONDS = 0.75;
 const UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'click', 'keydown'];
 
 let resultAudio;
@@ -12,6 +13,8 @@ let currentTrack = '';
 let currentConfig = normalizeResultConfig({});
 let shouldPlayWhenUnlocked = false;
 let unlockBound = false;
+let armedTrack = '';
+let armedAudio = null;
 const preparedTracks = new Map();
 const preloadedLinks = new Set();
 const warmedTracks = new Set();
@@ -26,16 +29,18 @@ export function warmResultMusicForStars(stars, config = {}) {
   primeResultMusic(config);
   const normalizedStars = Math.min(3, Math.max(1, Number(stars) || 1));
   const track = currentConfig.tracks[normalizedStars] || RESULT_TRACKS[normalizedStars];
-  warmTrack(track);
+  armTrackForResult(track);
 }
 
 export function syncResultMusic({ active, stars, config = {} }) {
-  primeResultMusic(config);
+  currentConfig = normalizeResultConfig(config);
 
   if (!active || !currentConfig.enabled) {
     stopResultMusic();
     return;
   }
+
+  bindResultUnlock();
 
   const normalizedStars = Math.min(3, Math.max(1, Number(stars) || 1));
   const track = currentConfig.tracks[normalizedStars] || RESULT_TRACKS[normalizedStars];
@@ -44,11 +49,17 @@ export function syncResultMusic({ active, stars, config = {} }) {
     return;
   }
 
-  stopActiveResultAudio();
+  const useArmedAudio = armedAudio && armedTrack === track;
+  if (!useArmedAudio) {
+    stopActiveResultAudio();
+  }
+
   currentStars = normalizedStars;
   currentTrack = track;
-  resultAudio = prepareTrack(track, currentConfig);
-  playActiveResultAudio();
+  resultAudio = useArmedAudio ? armedAudio : prepareTrack(track, currentConfig);
+  playActiveResultAudio({ keepPosition: Boolean(useArmedAudio) });
+  armedTrack = '';
+  armedAudio = null;
 }
 
 export function stopResultMusic() {
@@ -58,12 +69,21 @@ export function stopResultMusic() {
   currentTrack = '';
 }
 
-function playActiveResultAudio() {
+function playActiveResultAudio(options = {}) {
   if (!resultAudio) return Promise.resolve(false);
   shouldPlayWhenUnlocked = true;
   resultAudio.muted = false;
   resultAudio.volume = currentConfig.volume;
-  seekAudio(resultAudio, currentConfig.start);
+
+  if (!options.keepPosition) {
+    seekAudio(resultAudio, currentConfig.start);
+  }
+
+  if (!resultAudio.paused) {
+    shouldPlayWhenUnlocked = false;
+    warmedTracks.add(currentTrack);
+    return Promise.resolve(true);
+  }
 
   try {
     const playPromise = resultAudio.play();
@@ -91,10 +111,15 @@ function playActiveResultAudio() {
 
 function stopActiveResultAudio() {
   if (!resultAudio) return;
+  const stoppedAudio = resultAudio;
   resultAudio.pause();
   seekAudio(resultAudio, currentConfig.start);
   resultAudio.muted = false;
   resultAudio = null;
+  if (armedAudio && armedAudio === stoppedAudio) {
+    armedTrack = '';
+    armedAudio = null;
+  }
 }
 
 function preloadResultTracks(config) {
@@ -151,6 +176,34 @@ function warmTrack(track) {
 
     playPromise.then(
       () => finishWarmup(track, audio),
+      () => {
+        audio.muted = false;
+        audio.volume = currentConfig.volume;
+      }
+    );
+  } catch {
+    audio.muted = false;
+    audio.volume = currentConfig.volume;
+  }
+}
+
+function armTrackForResult(track) {
+  const audio = prepareTrack(track, currentConfig);
+  armedTrack = track;
+  armedAudio = audio;
+  audio.muted = true;
+  audio.volume = 0;
+  seekAudio(audio, Math.max(0, currentConfig.start - RESULT_ARM_LEAD_SECONDS));
+
+  try {
+    const playPromise = audio.play();
+    if (!playPromise || typeof playPromise.then !== 'function') {
+      warmedTracks.add(track);
+      return;
+    }
+
+    playPromise.then(
+      () => warmedTracks.add(track),
       () => {
         audio.muted = false;
         audio.volume = currentConfig.volume;

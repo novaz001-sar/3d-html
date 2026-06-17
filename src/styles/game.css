@@ -1,31 +1,22 @@
-.game-screen { display: grid; grid-template-rows: auto 1fr auto; gap: 14px; height: 100vh; padding-bottom: calc(20px + var(--safe-bottom)); }
+.game-screen { display: grid; grid-template-rows: auto 1fr auto auto; gap: 12px; height: 100vh; padding-bottom: calc(20px + var(--safe-bottom)); }
 .game-hud, .answer-bar { padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .game-hud h1 { margin: 0 0 4px; font-size: 26px; }
 .game-hud p { margin: 0; color: var(--muted); font-weight: 800; }
 .game-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
 .viewer { position: relative; min-height: 0; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.78); }
-.viewer-hint {
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 12px;
+.stage-hints {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 9px 12px;
-  border: 1px solid rgba(255,255,255,.78);
-  border-radius: 999px;
-  background: rgba(255,255,255,.76);
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 14px;
   color: #516074;
   font-size: 13px;
   font-weight: 800;
-  pointer-events: none;
-  box-shadow: 0 12px 28px rgba(83,104,139,.16);
-  backdrop-filter: blur(10px);
 }
-.viewer-hint strong { color: #ff6fa6; white-space: nowrap; }
-.viewer-hint span { text-align: right; }
+.stage-hint { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+.stage-hint strong { color: #ff6fa6; white-space: nowrap; }
+.stage-hint span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .answer-bar { justify-content: center; }
 .answer-bar .button { min-width: 128px; font-size: 20px; }
 .zoom-control { display: flex; align-items: center; gap: 8px; min-width: min(270px, 100%); color: #50607a; font-weight: 900; }
