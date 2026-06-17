@@ -1,5 +1,6 @@
 let audioContext;
 let unlocked = false;
+const SFX_GAIN_MULTIPLIER = 2;
 
 export function installSoundUnlock() {
   const unlock = () => {
@@ -92,6 +93,7 @@ function playNote(ctx, note) {
   const now = ctx.currentTime;
   const start = now + note.start;
   const end = start + note.duration;
+  const peakGain = Math.min(note.gain * SFX_GAIN_MULTIPLIER, 0.24);
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
 
@@ -100,7 +102,7 @@ function playNote(ctx, note) {
   oscillator.frequency.exponentialRampToValueAtTime(note.frequency * 1.015, end);
 
   gain.gain.setValueAtTime(0.001, start);
-  gain.gain.exponentialRampToValueAtTime(note.gain, start + 0.018);
+  gain.gain.exponentialRampToValueAtTime(peakGain, start + 0.018);
   gain.gain.exponentialRampToValueAtTime(0.001, end);
 
   oscillator.connect(gain);

@@ -1,6 +1,8 @@
 import { playCatMeow } from '../services/catSound.js';
 
 const BURST_WORDS = ['MEOW', 'PAW', 'STAR', 'YAY', 'NICE'];
+const COMPANION_POSITION_KEY = 'catCompanionPositionV1';
+const DRAG_THRESHOLD = 6;
 const CONTROL_SELECTOR = [
   '.topbar .button',
   '.hero-actions .button',
@@ -50,8 +52,6 @@ export function mountCartoonInteractions() {
     const levelCard = target?.closest(LEVEL_SELECTOR);
 
     if (target?.closest('.cat-companion')) {
-      playCatMeow();
-      reactCompanion(companion, layer, 'hello');
       return;
     }
 
@@ -110,6 +110,8 @@ function createCatCompanion(layer) {
     '<span class="cat-companion-badge">CAT</span>',
     '<span class="cat-companion-bubble">Tap me!</span>'
   ].join('');
+  restoreCompanionPosition(companion);
+  attachCompanionDrag(companion, layer);
   companion.addEventListener('click', (event) => {
     if (event.detail !== 0) return;
     playCatMeow();
@@ -117,6 +119,121 @@ function createCatCompanion(layer) {
   });
   document.body.append(companion);
   return companion;
+}
+
+function attachCompanionDrag(companion, layer) {
+  let drag = null;
+
+  companion.addEventListener('pointerdown', (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+
+    const rect = companion.getBoundingClientRect();
+    drag = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      left: rect.left,
+      top: rect.top,
+      moved: false
+    };
+
+    companion.classList.add('is-dragging');
+    companion.setPointerCapture?.(event.pointerId);
+  });
+
+  companion.addEventListener('pointermove', (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+
+    drag.moved = true;
+    moveCompanionTo(companion, drag.left + dx, drag.top + dy);
+  });
+
+  companion.addEventListener('pointerup', (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+
+    const wasMoved = drag.moved;
+    drag = null;
+    companion.classList.remove('is-dragging');
+    companion.releasePointerCapture?.(event.pointerId);
+
+    if (wasMoved) {
+      saveCompanionPosition(companion);
+      return;
+    }
+
+    playCatMeow();
+    reactCompanion(companion, layer, 'hello');
+  });
+
+  companion.addEventListener('pointercancel', (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+    drag = null;
+    companion.classList.remove('is-dragging');
+    companion.releasePointerCapture?.(event.pointerId);
+  });
+
+  window.addEventListener('resize', () => {
+    if (companion.classList.contains('is-positioned')) {
+      clampCompanionIntoViewport(companion);
+      saveCompanionPosition(companion);
+    }
+  });
+}
+
+function restoreCompanionPosition(companion) {
+  let position;
+  try {
+    position = JSON.parse(localStorage.getItem(COMPANION_POSITION_KEY) || 'null');
+  } catch {
+    position = null;
+  }
+
+  if (!position || typeof position.x !== 'number' || typeof position.y !== 'number') return;
+
+  companion.classList.add('is-positioned');
+  window.requestAnimationFrame(() => {
+    const rect = companion.getBoundingClientRect();
+    moveCompanionTo(
+      companion,
+      position.x * window.innerWidth - rect.width / 2,
+      position.y * window.innerHeight - rect.height / 2
+    );
+  });
+}
+
+function moveCompanionTo(companion, left, top) {
+  const rect = companion.getBoundingClientRect();
+  const margin = 8;
+  const maxLeft = Math.max(margin, window.innerWidth - rect.width - margin);
+  const maxTop = Math.max(margin, window.innerHeight - rect.height - margin);
+  const nextLeft = Math.min(Math.max(margin, left), maxLeft);
+  const nextTop = Math.min(Math.max(margin, top), maxTop);
+
+  companion.classList.add('is-positioned');
+  companion.style.left = `${nextLeft}px`;
+  companion.style.top = `${nextTop}px`;
+  companion.style.right = 'auto';
+  companion.style.bottom = 'auto';
+}
+
+function clampCompanionIntoViewport(companion) {
+  const rect = companion.getBoundingClientRect();
+  moveCompanionTo(companion, rect.left, rect.top);
+}
+
+function saveCompanionPosition(companion) {
+  const rect = companion.getBoundingClientRect();
+  const position = {
+    x: (rect.left + rect.width / 2) / window.innerWidth,
+    y: (rect.top + rect.height / 2) / window.innerHeight
+  };
+  try {
+    localStorage.setItem(COMPANION_POSITION_KEY, JSON.stringify(position));
+  } catch {}
 }
 
 function updateCompanionScreen(companion) {
@@ -128,6 +245,10 @@ function updateCompanionScreen(companion) {
   else if (screenName === 'editor') setCompanionMood(companion, 'editor', 'Build!');
   else if (screenName === 'result') setCompanionMood(companion, 'result', 'Yay!');
   else setCompanionMood(companion, 'home', 'Pick a stage');
+
+  if (companion.classList.contains('is-positioned')) {
+    window.requestAnimationFrame(() => clampCompanionIntoViewport(companion));
+  }
 }
 
 function reactCompanion(companion, layer, role, rect) {
