@@ -1,4 +1,5 @@
 import { DEFAULT_DATA } from '../data/defaultData.js';
+import { ensureLevelNames } from '../domain/levels.js';
 import { clone } from '../shared/utils.js';
 
 export const STORAGE_KEY = 'MR_GAME_DATA';
@@ -50,11 +51,13 @@ function withDefaultContent(data) {
     else normalized.objects.push(clone(defaultObject));
   });
 
-  DEFAULT_DATA.levels.forEach(defaultLevel => {
+  DEFAULT_DATA.levels.map(level => ensureLevelNames(level, 'en')).forEach(defaultLevel => {
     const existingIndex = normalized.levels.findIndex(level => level.id === defaultLevel.id);
     if (existingIndex >= 0) normalized.levels[existingIndex] = clone(defaultLevel);
     else normalized.levels.push(clone(defaultLevel));
   });
+
+  normalized.levels = normalized.levels.map(level => ensureLevelNames(level));
 
   return normalized;
 }

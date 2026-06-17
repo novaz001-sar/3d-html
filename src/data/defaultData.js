@@ -97,6 +97,8 @@ export const DEFAULT_DATA = {
     {
       id: 'lvl1',
       name: 'Tiny Orbit',
+      nameEn: 'Tiny Orbit',
+      nameZh: '小小轨道',
       timeLimit: 70,
       speed: 4,
       scoreWin: 10,
@@ -114,6 +116,8 @@ export const DEFAULT_DATA = {
     {
       id: 'lvl2',
       name: 'Mirror Paws',
+      nameEn: 'Mirror Paws',
+      nameZh: '镜像猫爪',
       timeLimit: 85,
       speed: 5,
       scoreWin: 12,
@@ -133,6 +137,8 @@ export const DEFAULT_DATA = {
     {
       id: 'lvl3',
       name: 'Twin Star Trial',
+      nameEn: 'Twin Star Trial',
+      nameZh: '双星挑战',
       timeLimit: 105,
       speed: 6,
       scoreWin: 15,

@@ -1,4 +1,5 @@
 import { esc } from '../shared/utils.js';
+import { levelName } from '../domain/levels.js';
 import { downloadJson, readJsonFile } from '../services/dataTransfer.js';
 import { saveData } from '../services/storage.js';
 
@@ -22,7 +23,7 @@ export function renderHome(ctx) {
           <p>${t('edition')}</p>
         </div>
         <div class="level-grid">
-          ${levels.length ? levels.map((level, idx) => `<button class="level-card" data-start="${esc(level.id)}"><span class="level-number">${idx + 1}</span>${esc(level.name || t('start'))}</button>`).join('') : `<div class="empty-state">${t('noData')}</div>`}
+          ${levels.length ? levels.map((level, idx) => `<button class="level-card" data-start="${esc(level.id)}"><span class="level-number">${idx + 1}</span>${esc(levelName(level, state.lang, t('start')))}</button>`).join('') : `<div class="empty-state">${t('noData')}</div>`}
         </div>
         <div class="hero-actions">
           <button class="button primary" data-home-action="editor">${t('editor')}</button>

@@ -2,10 +2,12 @@ import { clone, clamp } from '../../shared/utils.js';
 import { currentQuestion, getQuestionObjects } from '../../domain/questions.js';
 import { applyAnswerScore, applySkipScore, isCorrectAnswer, starsForScore } from '../../domain/scoring.js';
 import { drawObject, makeDragRotator, normalizeQuat, stepAutoRotation, syncVoxels } from '../../render/index.js';
+import { playCorrect, playLevelComplete, playLevelSelect, playWrong } from '../../services/sound.js';
 
 export function startGame(ctx, levelId) {
   const level = ctx.state.data.levels.find(item => item.id === levelId);
   if (!level || !level.questions?.length) return alert(ctx.t('emptyQuestions'));
+  playLevelSelect();
   Object.assign(ctx.state.game, {
     level: clone(level),
     qIndex: 0,
@@ -133,6 +135,8 @@ function answer(ctx, isSame) {
   if (ctx.state.paused || game.feedback) return;
   const correct = isCorrectAnswer(currentQuestion(game), isSame);
   applyAnswerScore(game, correct);
+  if (correct) playCorrect();
+  else playWrong();
   showFeedback(ctx, correct ? 'Correct' : 'Wrong', correct ? 'good' : 'bad', 800);
 }
 
@@ -160,6 +164,7 @@ function showFeedback(ctx, text, kind, delay) {
 
 function endGame(ctx) {
   stopTimer(ctx);
+  playLevelComplete();
   const game = ctx.state.game;
   ctx.state.result.score = game.score;
   ctx.state.result.stars = starsForScore(game.level, game.score);

@@ -1,4 +1,5 @@
 import { clone, esc, uid } from '../../shared/utils.js';
+import { ensureLevelNames, levelName } from '../../domain/levels.js';
 import { addQuestion, bindQuestionEditor, editQuestion, renderQuestionEditor, saveQuestion } from './questionEditor.js';
 
 export function renderLevelEditor(ctx) {
@@ -9,7 +10,7 @@ export function renderLevelEditor(ctx) {
       <aside class="panel side-panel">
         <button class="button primary" data-level-action="new-pack">${t('newPack')}</button>
         <div class="list">${state.data.levels.map((level, idx) => `
-          <button class="list-item ${idx === state.logic.currentPackIndex ? 'active' : ''}" data-edit-pack="${idx}">${esc(level.name)}</button>
+          <button class="list-item ${idx === state.logic.currentPackIndex ? 'active' : ''}" data-edit-pack="${idx}">${esc(levelName(level, state.lang))}</button>
         `).join('')}</div>
       </aside>
       <section class="workspace">
@@ -35,9 +36,11 @@ export function bindLevelEditor(ctx) {
 
 function renderPackEditor(ctx, pack) {
   const { t } = ctx;
+  const namedPack = ensureLevelNames(pack);
   return `
     <div class="panel form-grid compact-form">
-      <label>${t('name')}<input id="pack-name" value="${esc(pack.name)}" /></label>
+      <label>${t('nameEn')}<input id="pack-name-en" value="${esc(namedPack.nameEn)}" /></label>
+      <label>${t('nameZh')}<input id="pack-name-zh" value="${esc(namedPack.nameZh)}" /></label>
       ${numField('pack-time', t('time'), pack.timeLimit)}
       ${numField('pack-speed', t('speed'), pack.speed, '0.5')}
       ${numField('pack-win', t('win'), pack.scoreWin)}
@@ -64,7 +67,11 @@ function numField(id, label, value, step = '1') {
 
 function bindPackFields(pack) {
   const setNum = (id, key) => document.getElementById(id)?.addEventListener('input', event => pack[key] = Number(event.target.value || 0));
-  document.getElementById('pack-name')?.addEventListener('input', event => pack.name = event.target.value);
+  document.getElementById('pack-name-en')?.addEventListener('input', event => {
+    pack.nameEn = event.target.value;
+    pack.name = event.target.value;
+  });
+  document.getElementById('pack-name-zh')?.addEventListener('input', event => pack.nameZh = event.target.value);
   setNum('pack-time', 'timeLimit');
   setNum('pack-speed', 'speed');
   setNum('pack-win', 'scoreWin');
@@ -82,7 +89,9 @@ function newPack(ctx) {
     editingQIndex: -1,
     editingPack: {
       id: uid('lvl'),
-      name: ctx.state.lang === 'zh' ? '新练习包' : 'New Level Pack',
+      name: 'New Level Pack',
+      nameEn: 'New Level Pack',
+      nameZh: '新关卡',
       timeLimit: 60,
       speed: 4,
       scoreWin: 10,
@@ -108,7 +117,7 @@ function editPack(ctx, idx) {
 function savePack(ctx) {
   const pack = ctx.state.logic.editingPack;
   if (!pack) return;
-  pack.name = (pack.name || '').trim() || 'Untitled';
+  Object.assign(pack, ensureLevelNames(pack));
   if (ctx.state.logic.currentPackIndex >= 0) ctx.state.data.levels.splice(ctx.state.logic.currentPackIndex, 1, clone(pack));
   else {
     ctx.state.data.levels.push(clone(pack));

@@ -1,4 +1,5 @@
 import { esc } from '../../shared/utils.js';
+import { levelName } from '../../domain/levels.js';
 
 export function renderGame(ctx) {
   const { state, t } = ctx;
@@ -8,7 +9,7 @@ export function renderGame(ctx) {
     <main class="screen game-screen">
       <header class="game-hud panel">
         <div>
-          <h1>${esc(game.level?.name || '')}</h1>
+          <h1>${esc(levelName(game.level, state.lang, ''))}</h1>
           <p>${t('score')}: <strong id="hud-score">${game.score}</strong> · ${t('timeLeft')}: <strong id="hud-time">${Math.max(0, game.timeLeft)}</strong>s · ${game.qIndex + 1}/${total}</p>
         </div>
         <button class="button secondary" data-game-action="pause" aria-haspopup="dialog">${t('pause')}</button>
