@@ -2,6 +2,7 @@ import { clone, clamp } from '../../shared/utils.js';
 import { currentQuestion, getQuestionObjects } from '../../domain/questions.js';
 import { applyAnswerScore, applySkipScore, isCorrectAnswer, starsForScore } from '../../domain/scoring.js';
 import { drawObject, makeDragRotator, normalizeQuat, stepAutoRotation, syncVoxels } from '../../render/index.js';
+import { warmResultMusicForStars } from '../../services/resultMusic.js';
 import { playCorrect, playLevelSelect, playWrong } from '../../services/sound.js';
 
 export function startGame(ctx, levelId) {
@@ -15,6 +16,7 @@ export function startGame(ctx, levelId) {
     timeLeft: Number(level.timeLimit || 60),
     zoom: 1,
     spinSpeed: 1,
+    rightDragSpeed: 1,
     leftAuto: 0,
     feedback: '',
     feedbackKind: 'good',
@@ -40,8 +42,9 @@ export function bindGame(ctx) {
   document.querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => answer(ctx, btn.dataset.answer === 'same')));
   document.getElementById('game-zoom')?.addEventListener('input', event => ctx.state.game.zoom = Number(event.target.value));
   document.getElementById('game-spin-speed')?.addEventListener('input', event => ctx.state.game.spinSpeed = Number(event.target.value));
+  document.getElementById('game-drag-speed')?.addEventListener('input', event => ctx.state.game.rightDragSpeed = Number(event.target.value));
   document.getElementById('game-left')?.addEventListener('pointerdown', () => ctx.state.game.leftAuto = (ctx.state.game.leftAuto + 1) % 3);
-  makeDragRotator(document.getElementById('game-right'), () => ctx.state.game.rightQ, q => ctx.state.game.rightQ = q);
+  makeDragRotator(document.getElementById('game-right'), () => ctx.state.game.rightQ, q => ctx.state.game.rightQ = q, () => {}, () => ctx.state.game.rightDragSpeed || 1);
   stage?.addEventListener('wheel', event => {
     event.preventDefault();
     ctx.state.game.zoom = clamp(ctx.state.game.zoom + (event.deltaY < 0 ? 0.08 : -0.08), 0.55, 2.8);
@@ -92,7 +95,7 @@ export function tickGame(ctx, ts) {
   game.lastT = ts;
   if (!ctx.state.paused && !game.feedback && game.leftAuto) {
     const spinSpeed = clamp(Number(game.spinSpeed) || 1, 0.18, 1);
-    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, Number(game.level?.speed || 1) / spinSpeed, dt);
+    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, Number(game.level?.speed || 1) * spinSpeed, dt);
   }
   drawGame(ctx);
 }
@@ -138,6 +141,7 @@ function answer(ctx, isSame) {
   if (ctx.state.paused || game.feedback) return;
   const correct = isCorrectAnswer(currentQuestion(game), isSame);
   applyAnswerScore(game, correct);
+  warmEndingMusicIfNeeded(ctx);
   if (correct) playCorrect();
   else playWrong();
   showFeedback(ctx, correct ? 'Correct' : 'Wrong', correct ? 'good' : 'bad', 800);
@@ -147,7 +151,14 @@ function skipQuestion(ctx) {
   const game = ctx.state.game;
   if (ctx.state.paused || game.feedback) return;
   applySkipScore(game);
+  warmEndingMusicIfNeeded(ctx);
   showFeedback(ctx, ctx.t('skip'), 'skip', 600);
+}
+
+function warmEndingMusicIfNeeded(ctx) {
+  const game = ctx.state.game;
+  if (game.qIndex + 1 < (game.level.questions?.length || 0)) return;
+  warmResultMusicForStars(starsForScore(game.level, game.score), ctx.state.adminConfig.audio.result);
 }
 
 function showFeedback(ctx, text, kind, delay) {

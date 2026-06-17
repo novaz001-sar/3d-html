@@ -4,14 +4,34 @@ const RESULT_TRACKS = {
   3: '/assets/audio/3-stars.m4a'
 };
 const RESULT_MUSIC_START_SECONDS = 2;
+const UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'click', 'keydown'];
 
 let resultAudio;
 let currentStars = 0;
 let currentTrack = '';
-let currentConfig = {};
+let currentConfig = normalizeResultConfig({});
+let shouldPlayWhenUnlocked = false;
+let unlockBound = false;
+const preparedTracks = new Map();
+const preloadedLinks = new Set();
+const warmedTracks = new Set();
+
+export function primeResultMusic(config = {}) {
+  currentConfig = normalizeResultConfig(config);
+  bindResultUnlock();
+  preloadResultTracks(currentConfig);
+}
+
+export function warmResultMusicForStars(stars, config = {}) {
+  primeResultMusic(config);
+  const normalizedStars = Math.min(3, Math.max(1, Number(stars) || 1));
+  const track = currentConfig.tracks[normalizedStars] || RESULT_TRACKS[normalizedStars];
+  warmTrack(track);
+}
 
 export function syncResultMusic({ active, stars, config = {} }) {
-  currentConfig = normalizeResultConfig(config);
+  primeResultMusic(config);
+
   if (!active || !currentConfig.enabled) {
     stopResultMusic();
     return;
@@ -24,46 +44,155 @@ export function syncResultMusic({ active, stars, config = {} }) {
     return;
   }
 
-  stopResultMusic();
+  stopActiveResultAudio();
   currentStars = normalizedStars;
   currentTrack = track;
-  resultAudio = new Audio(track);
-  resultAudio.preload = 'auto';
-  resultAudio.volume = currentConfig.volume;
-  seekAudio(resultAudio, currentConfig.start);
-
-  const playPromise = resultAudio.play();
-  if (playPromise?.catch) {
-    playPromise.catch(() => {
-      bindResultUnlock();
-    });
-  }
+  resultAudio = prepareTrack(track, currentConfig);
+  playActiveResultAudio();
 }
 
 export function stopResultMusic() {
-  if (!resultAudio) return;
-  resultAudio.pause();
-  resultAudio.currentTime = 0;
-  resultAudio = null;
+  shouldPlayWhenUnlocked = false;
+  stopActiveResultAudio();
   currentStars = 0;
   currentTrack = '';
 }
 
-function bindResultUnlock() {
-  const unlock = () => {
-    if (resultAudio) {
-      seekAudio(resultAudio, currentConfig.start);
-      resultAudio.play().catch(() => {});
+function playActiveResultAudio() {
+  if (!resultAudio) return Promise.resolve(false);
+  shouldPlayWhenUnlocked = true;
+  resultAudio.muted = false;
+  resultAudio.volume = currentConfig.volume;
+  seekAudio(resultAudio, currentConfig.start);
+
+  try {
+    const playPromise = resultAudio.play();
+    if (!playPromise || typeof playPromise.then !== 'function') {
+      shouldPlayWhenUnlocked = false;
+      return Promise.resolve(true);
     }
 
-    window.removeEventListener('pointerdown', unlock, true);
-    window.removeEventListener('keydown', unlock, true);
-    window.removeEventListener('touchstart', unlock, true);
-  };
+    return playPromise.then(
+      () => {
+        shouldPlayWhenUnlocked = false;
+        warmedTracks.add(currentTrack);
+        return true;
+      },
+      () => {
+        shouldPlayWhenUnlocked = true;
+        return false;
+      }
+    );
+  } catch {
+    shouldPlayWhenUnlocked = true;
+    return Promise.resolve(false);
+  }
+}
 
-  window.addEventListener('pointerdown', unlock, true);
-  window.addEventListener('keydown', unlock, true);
-  window.addEventListener('touchstart', unlock, true);
+function stopActiveResultAudio() {
+  if (!resultAudio) return;
+  resultAudio.pause();
+  seekAudio(resultAudio, currentConfig.start);
+  resultAudio.muted = false;
+  resultAudio = null;
+}
+
+function preloadResultTracks(config) {
+  Object.values(config.tracks).forEach(track => prepareTrack(track, config));
+}
+
+function prepareTrack(track, config) {
+  addAudioPreloadLink(track);
+
+  let audio = preparedTracks.get(track);
+  let created = false;
+  if (!audio) {
+    audio = new Audio(track);
+    audio.preload = 'auto';
+    audio.playsInline = true;
+    audio.loop = false;
+    audio.addEventListener('loadedmetadata', () => seekAudio(audio, config.start));
+    preparedTracks.set(track, audio);
+    created = true;
+  }
+
+  audio.volume = config.volume;
+  audio.preload = 'auto';
+  if (created || audio.readyState === 0) {
+    safeLoad(audio);
+  }
+  return audio;
+}
+
+function warmPreparedTracks() {
+  if (shouldPlayWhenUnlocked && resultAudio) {
+    playActiveResultAudio();
+    return;
+  }
+
+  Object.values(currentConfig.tracks).forEach(track => {
+    warmTrack(track);
+  });
+}
+
+function warmTrack(track) {
+  if (warmedTracks.has(track)) return;
+  const audio = prepareTrack(track, currentConfig);
+  audio.muted = true;
+  audio.volume = 0;
+  seekAudio(audio, currentConfig.start);
+
+  try {
+    const playPromise = audio.play();
+    if (!playPromise || typeof playPromise.then !== 'function') {
+      finishWarmup(track, audio);
+      return;
+    }
+
+    playPromise.then(
+      () => finishWarmup(track, audio),
+      () => {
+        audio.muted = false;
+        audio.volume = currentConfig.volume;
+      }
+    );
+  } catch {
+    audio.muted = false;
+    audio.volume = currentConfig.volume;
+  }
+}
+
+function finishWarmup(track, audio) {
+  audio.pause();
+  audio.muted = false;
+  audio.volume = currentConfig.volume;
+  seekAudio(audio, currentConfig.start);
+  warmedTracks.add(track);
+}
+
+function bindResultUnlock() {
+  if (unlockBound || typeof window === 'undefined') return;
+  unlockBound = true;
+  UNLOCK_EVENTS.forEach(eventName => {
+    window.addEventListener(eventName, warmPreparedTracks, { passive: true, capture: true });
+    document.addEventListener(eventName, warmPreparedTracks, { passive: true, capture: true });
+  });
+}
+
+function addAudioPreloadLink(track) {
+  if (typeof document === 'undefined' || !track || track.startsWith('data:') || track.startsWith('blob:') || preloadedLinks.has(track)) {
+    return;
+  }
+
+  preloadedLinks.add(track);
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'audio';
+  link.href = track;
+  if (/\.m4a($|\?)/i.test(track) || /\.mp4($|\?)/i.test(track)) {
+    link.type = 'audio/mp4';
+  }
+  document.head.appendChild(link);
 }
 
 function normalizeResultConfig(config) {
@@ -82,11 +211,25 @@ function normalizeResultConfig(config) {
 }
 
 function seekAudio(audio, seconds) {
+  const target = Number(seconds) || 0;
+  const seek = () => {
+    try {
+      if (Math.abs(audio.currentTime - target) > 0.25) {
+        audio.currentTime = target;
+      }
+    } catch {
+      // Some mobile browsers reject currentTime until media metadata is available.
+    }
+  };
+
+  if (audio.readyState >= 1) seek();
+  else audio.addEventListener('loadedmetadata', seek, { once: true });
+}
+
+function safeLoad(audio) {
   try {
-    audio.currentTime = seconds;
+    audio.load();
   } catch {
-    audio.addEventListener('loadedmetadata', () => {
-      audio.currentTime = seconds;
-    }, { once: true });
+    // Custom admin audio URLs may temporarily fail; playback will retry on result render.
   }
 }

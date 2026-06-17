@@ -12,6 +12,8 @@
   .form-grid { grid-template-columns: 1fr; }
   .game-screen { height: auto; min-height: 100vh; }
   .viewer { aspect-ratio: 1 / 1.2; }
+  .viewer-hint { left: 8px; right: 8px; bottom: 8px; border-radius: 18px; align-items: flex-start; flex-direction: column; gap: 2px; font-size: 11px; }
+  .viewer-hint span { text-align: left; }
   .answer-bar .button { flex: 1; min-width: 110px; }
 }
 

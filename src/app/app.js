@@ -4,7 +4,7 @@ import { saveData, saveFontScale, saveLanguage, saveMenuMusicEnabled, saveMenuMu
 import { translate } from '../services/i18n.js';
 import { ADMIN_CONFIG_KEY, loadAdminConfig } from '../services/adminConfig.js';
 import { primeMenuMusic, setMenuMusicVolume, syncMenuMusic, unlockMenuMusic } from '../services/menuMusic.js';
-import { syncResultMusic } from '../services/resultMusic.js';
+import { primeResultMusic, syncResultMusic } from '../services/resultMusic.js';
 import { configureSoundEffects, installSoundUnlock, unlockSoundEffects } from '../services/sound.js';
 import { bindHome, renderHome } from './homeView.js';
 import { renderShell } from './shell.js';
@@ -134,6 +134,7 @@ export function createApp(root) {
   return {
     start() {
       primeMenuMusic({ enabled: state.musicEnabled, volume: state.musicVolume, config: state.adminConfig.audio.menu });
+      primeResultMusic(state.adminConfig.audio.result);
       installSoundUnlock();
       installGlobalAudioUnlock();
       installAdminConfigSync();

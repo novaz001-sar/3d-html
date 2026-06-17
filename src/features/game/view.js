@@ -15,15 +15,22 @@ export function renderGame(ctx) {
         <button class="button secondary" data-game-action="pause" aria-haspopup="dialog">${t('pause')}</button>
       </header>
       <section class="game-stage">
-        <div class="viewer"><canvas id="game-left"></canvas></div>
-        <div class="viewer"><canvas id="game-right"></canvas></div>
+        <div class="viewer viewer-left">
+          <canvas id="game-left"></canvas>
+          <div class="viewer-hint"><strong>${esc(t('leftObj'))}</strong><span>${esc(t('leftInteractionHint'))}</span></div>
+        </div>
+        <div class="viewer viewer-right">
+          <canvas id="game-right"></canvas>
+          <div class="viewer-hint"><strong>${esc(t('rightObj'))}</strong><span>${esc(t('rightInteractionHint'))}</span></div>
+        </div>
       </section>
       <footer class="answer-bar panel">
         <button class="button success" data-answer="same">${t('same')}</button>
         <button class="button danger" data-answer="different">${t('different')}</button>
         <button class="button secondary" data-game-action="skip">${t('skip')}</button>
         <label class="zoom-control">Zoom<input id="game-zoom" type="range" min="0.55" max="2.8" step="0.05" value="${game.zoom}" /></label>
-        <label class="zoom-control">${t('speed')}<input id="game-spin-speed" type="range" min="0.18" max="1" step="0.02" value="${game.spinSpeed || 1}" /></label>
+        <label class="zoom-control">${t('leftAutoSpeed')}<input id="game-spin-speed" type="range" min="0.18" max="1" step="0.02" value="${game.spinSpeed || 1}" /></label>
+        <label class="zoom-control">${t('rightDragSpeed')}<input id="game-drag-speed" type="range" min="0.18" max="1" step="0.02" value="${game.rightDragSpeed || 1}" /></label>
       </footer>
       ${game.feedback ? `<div class="feedback ${game.feedbackKind}">${esc(game.feedback)}</div>` : ''}
       ${state.paused ? `

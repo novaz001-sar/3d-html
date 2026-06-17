@@ -3,10 +3,32 @@
 .game-hud h1 { margin: 0 0 4px; font-size: 26px; }
 .game-hud p { margin: 0; color: var(--muted); font-weight: 800; }
 .game-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
-.viewer { min-height: 0; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.78); }
+.viewer { position: relative; min-height: 0; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.78); }
+.viewer-hint {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 999px;
+  background: rgba(255,255,255,.76);
+  color: #516074;
+  font-size: 13px;
+  font-weight: 800;
+  pointer-events: none;
+  box-shadow: 0 12px 28px rgba(83,104,139,.16);
+  backdrop-filter: blur(10px);
+}
+.viewer-hint strong { color: #ff6fa6; white-space: nowrap; }
+.viewer-hint span { text-align: right; }
 .answer-bar { justify-content: center; }
 .answer-bar .button { min-width: 128px; font-size: 20px; }
-.zoom-control { display: flex; align-items: center; gap: 8px; min-width: min(320px, 100%); }
+.zoom-control { display: flex; align-items: center; gap: 8px; min-width: min(270px, 100%); color: #50607a; font-weight: 900; }
 .zoom-control input { flex: 1; }
 .feedback { position: fixed; inset: 0; display: grid; place-items: center; color: white; font-size: clamp(44px, 9vw, 110px); font-weight: 1000; background: rgba(15,23,42,.32); backdrop-filter: blur(8px); }
 .feedback.good { color: #dcfce7; }
