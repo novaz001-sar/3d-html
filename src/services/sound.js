@@ -3,6 +3,7 @@ let unlocked = false;
 let sfxEnabled = true;
 let sfxGainMultiplier = 2;
 let unlockInstalled = false;
+let unlockTonePlayed = false;
 
 export function configureSoundEffects(config = {}) {
   sfxEnabled = config.enabled !== false;
@@ -13,8 +14,8 @@ export function configureSoundEffects(config = {}) {
 export function installSoundUnlock() {
   if (unlockInstalled) return;
   unlockInstalled = true;
-  const unlock = () => {
-    unlockSoundEffects();
+  const unlock = event => {
+    unlockSoundEffects({ audible: isInteractiveAudioGesture(event) });
   };
 
   ['pointerdown', 'mousedown', 'click', 'keydown', 'touchstart', 'touchend'].forEach(eventName => {
@@ -22,30 +23,26 @@ export function installSoundUnlock() {
   });
 }
 
-export function unlockSoundEffects() {
+export function unlockSoundEffects(options = {}) {
   const ctx = getAudioContext();
   if (!ctx) return Promise.resolve(false);
   if (unlocked && ctx.state === 'running') return Promise.resolve(true);
 
-  const finishUnlock = () => {
-    if (unlocked && ctx.state === 'running') return true;
+  if (!unlocked) {
     unlocked = true;
-    const gain = ctx.createGain();
-    const oscillator = ctx.createOscillator();
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.02);
-    return true;
-  };
-
-  if (ctx.state === 'suspended') {
-    return ctx.resume().then(finishUnlock).catch(() => false);
+    scheduleSilentUnlock(ctx);
   }
 
-  return Promise.resolve(finishUnlock());
+  if (options.audible && !unlockTonePlayed && sfxEnabled && sfxGainMultiplier > 0) {
+    unlockTonePlayed = true;
+    scheduleUnlockTone(ctx);
+  }
+
+  if (ctx.state === 'suspended') {
+    return ctx.resume().then(() => true).catch(() => false);
+  }
+
+  return Promise.resolve(true);
 }
 
 export function playLevelSelect() {
@@ -85,22 +82,19 @@ function playSequence(notes) {
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  const play = () => {
-    unlocked = true;
-    notes.forEach(note => playNote(ctx, note));
-  };
+  const leadTime = ctx.state === 'suspended' ? 0.035 : 0;
+  unlocked = true;
+  notes.forEach(note => playNote(ctx, note, leadTime));
 
   if (ctx.state === 'suspended') {
-    ctx.resume().then(play).catch(() => {});
+    ctx.resume().catch(() => {});
     return;
   }
-
-  play();
 }
 
-function playNote(ctx, note) {
+function playNote(ctx, note, leadTime = 0) {
   const now = ctx.currentTime;
-  const start = now + note.start;
+  const start = now + leadTime + note.start;
   const end = start + note.duration;
   const peakGain = Math.min(note.gain * sfxGainMultiplier, 0.32);
   const oscillator = ctx.createOscillator();
@@ -118,6 +112,29 @@ function playNote(ctx, note) {
   gain.connect(ctx.destination);
   oscillator.start(start);
   oscillator.stop(end + 0.03);
+}
+
+function scheduleSilentUnlock(ctx) {
+  const start = ctx.currentTime + 0.005;
+  const gain = ctx.createGain();
+  const oscillator = ctx.createOscillator();
+  gain.gain.setValueAtTime(0.0001, start);
+  oscillator.frequency.setValueAtTime(440, start);
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+  oscillator.start(start);
+  oscillator.stop(start + 0.02);
+}
+
+function scheduleUnlockTone(ctx) {
+  playNote(ctx, { frequency: 740, start: 0, duration: 0.055, type: 'triangle', gain: 0.045 }, 0.018);
+  playNote(ctx, { frequency: 980, start: 0.055, duration: 0.06, type: 'sine', gain: 0.035 }, 0.018);
+}
+
+function isInteractiveAudioGesture(event) {
+  const target = event?.target instanceof Element ? event.target : null;
+  if (!target) return event?.type === 'keydown';
+  return Boolean(target.closest('button, .button, [role="button"], [data-start], [data-answer], [data-game-action], [data-home-action], input, label'));
 }
 
 function getAudioContext() {
