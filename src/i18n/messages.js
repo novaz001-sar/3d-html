@@ -78,7 +78,6 @@ export const I18N = {
     musicOn: 'Music On',
     musicOff: 'Music Off',
     volume: 'Volume',
-    volume: '\u97f3\u91cf',
     export: 'Export',
     import: 'Import',
     start: 'Start',
