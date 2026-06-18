@@ -3,7 +3,7 @@ import { currentQuestion, getQuestionObjects } from '../../domain/questions.js';
 import { applyAnswerScore, applySkipScore, isCorrectAnswer, starsForScore } from '../../domain/scoring.js';
 import { drawObject, makeDragRotator, normalizeQuat, stepAutoRotation, syncVoxels } from '../../render/index.js';
 import { primeResultMusic, warmResultMusicForStars } from '../../services/resultMusic.js';
-import { playCorrect, playLevelSelect, playWrong } from '../../services/sound.js';
+import { playCorrect, playLevelSelect, playWrong, unlockSoundEffects } from '../../services/sound.js';
 
 export function startGame(ctx, levelId) {
   const level = ctx.state.data.levels.find(item => item.id === levelId);
@@ -40,6 +40,7 @@ export function bindGame(ctx) {
   document.querySelector('[data-game-action="reset"]')?.addEventListener('click', () => resetGame(ctx));
   document.querySelector('[data-game-action="exit"]')?.addEventListener('click', () => exitGame(ctx));
   document.querySelector('[data-game-action="skip"]')?.addEventListener('click', () => skipQuestion(ctx));
+  document.querySelectorAll('[data-answer], [data-game-action="skip"]').forEach(bindGameButtonAudioWarmup);
   document.querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => answer(ctx, btn.dataset.answer === 'same')));
   document.getElementById('game-zoom')?.addEventListener('input', event => ctx.state.game.zoom = Number(event.target.value));
   document.getElementById('game-spin-speed')?.addEventListener('input', event => ctx.state.game.spinSpeed = Number(event.target.value));
@@ -53,6 +54,12 @@ export function bindGame(ctx) {
     if (slider) slider.value = ctx.state.game.zoom;
   }, { passive: false });
   drawGame(ctx);
+}
+
+function bindGameButtonAudioWarmup(button) {
+  const warmup = () => unlockSoundEffects();
+  button.addEventListener('pointerdown', warmup);
+  button.addEventListener('touchstart', warmup, { passive: true });
 }
 
 function bindPauseShortcuts(ctx) {

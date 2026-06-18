@@ -45,7 +45,7 @@ export function unlockSoundEffects(options = {}) {
     return true;
   };
 
-  if (ctx.state === 'suspended') {
+  if (ctx.state !== 'running') {
     return ctx.resume().then(scheduleUnlockFeedback).catch(() => false);
   }
 
@@ -92,7 +92,7 @@ function playSequence(notes) {
 
   unlocked = true;
 
-  if (ctx.state === 'suspended') {
+  if (ctx.state !== 'running') {
     ctx.resume()
       .then(() => notes.forEach(note => playNote(ctx, note, 0.012)))
       .catch(() => {});

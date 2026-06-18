@@ -1,6 +1,7 @@
 import { createApp } from './app/app.js';
 import { mountCartoonInteractions } from './app/cartoonInteractions.js';
 import { preloadGameAudioAssets } from './services/preloadAssets.js';
+import { unlockSoundEffects } from './services/sound.js';
 
 const root = document.getElementById('app');
 let started = false;
@@ -13,6 +14,7 @@ async function boot() {
 
   if (requiresTouchStart()) {
     renderLoader({ percent: 1, label: 'Ready', ready: true });
+    root.querySelector('[data-loader-start]')?.addEventListener('pointerdown', startApp, { once: true });
     root.querySelector('[data-loader-start]')?.addEventListener('click', startApp, { once: true });
     root.querySelector('[data-loader-start]')?.addEventListener('touchend', startApp, { once: true, passive: true });
     return;
@@ -24,6 +26,7 @@ async function boot() {
 function startApp() {
   if (started) return;
   started = true;
+  unlockSoundEffects();
   createApp(root).start();
   mountCartoonInteractions();
 }
