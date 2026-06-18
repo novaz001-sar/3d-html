@@ -103,7 +103,7 @@ export function tickGame(ctx, ts) {
   game.lastT = ts;
   if (!ctx.state.paused && !game.feedback && game.leftAuto) {
     const spinSpeed = clamp(Number(game.spinSpeed) || 1, 0.18, 1);
-    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, Number(game.level?.speed || 1) * spinSpeed, dt);
+    game.leftQ = stepAutoRotation(game.leftQ, game.leftAuto, Number(game.level?.speed || 1) / spinSpeed, dt);
   }
   drawGame(ctx);
 }
