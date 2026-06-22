@@ -19,6 +19,7 @@ export function startGame(ctx, levelId) {
     spinSpeed: 1,
     rightDragSpeed: 1,
     leftAuto: 0,
+    leftAutoStep: -1,
     feedback: '',
     feedbackKind: 'good',
     leftQ: [0, 0, 0, 1],
@@ -45,7 +46,7 @@ export function bindGame(ctx) {
   document.getElementById('game-zoom')?.addEventListener('input', event => ctx.state.game.zoom = Number(event.target.value));
   document.getElementById('game-spin-speed')?.addEventListener('input', event => ctx.state.game.spinSpeed = Number(event.target.value));
   document.getElementById('game-drag-speed')?.addEventListener('input', event => ctx.state.game.rightDragSpeed = Number(event.target.value));
-  document.getElementById('game-left')?.addEventListener('pointerdown', () => ctx.state.game.leftAuto = (ctx.state.game.leftAuto + 1) % 3);
+  document.getElementById('game-left')?.addEventListener('pointerdown', () => cycleLeftAutoRotation(ctx.state.game));
   makeDragRotator(document.getElementById('game-right'), () => ctx.state.game.rightQ, q => ctx.state.game.rightQ = q, () => {}, () => ctx.state.game.rightDragSpeed || 1);
   stage?.addEventListener('wheel', event => {
     event.preventDefault();
@@ -60,6 +61,13 @@ function bindGameButtonAudioWarmup(button) {
   const warmup = () => unlockSoundEffects();
   button.addEventListener('pointerdown', warmup);
   button.addEventListener('touchstart', warmup, { passive: true });
+}
+
+function cycleLeftAutoRotation(game) {
+  const cycle = [1, 0, 2, 0];
+  const currentStep = Number.isFinite(Number(game.leftAutoStep)) ? Number(game.leftAutoStep) : -1;
+  game.leftAutoStep = (currentStep + 1) % cycle.length;
+  game.leftAuto = cycle[game.leftAutoStep];
 }
 
 function bindPauseShortcuts(ctx) {
@@ -132,6 +140,7 @@ function loadQuestion(ctx) {
   ctx.state.game.leftQ = normalizeQuat(question?.rot1 || [0, 0, 0, 1]);
   ctx.state.game.rightQ = normalizeQuat(question?.rot2 || [0, 0, 0, 1]);
   ctx.state.game.leftAuto = 0;
+  ctx.state.game.leftAutoStep = -1;
 }
 
 function drawGame(ctx) {

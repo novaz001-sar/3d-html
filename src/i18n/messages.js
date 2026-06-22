@@ -68,7 +68,7 @@ export const I18N = {
     badJson: 'JSON 数据格式不正确',
     manualText: '通过比对左右两侧的三维积木，判断它们是否是同一个物体在不同角度下的形态。编辑器可以创建体素物体、关卡和题目，数据可导入导出。',
     rotateHint: '拖动画布旋转，点击左侧物体切换自动旋转。',
-    leftInteractionHint: '\u70b9\u51fb\u5207\u6362\u505c\u6b62\u3001\u5de6\u8f6c\u6216\u53f3\u8f6c',
+    leftInteractionHint: '\u70b9\u51fb：\u5de6\u53f3\u65cb\u8f6c\u3001\u9759\u6b62\u3001\u4e0a\u4e0b\u65cb\u8f6c\u3001\u9759\u6b62\u5faa\u73af',
     rightInteractionHint: '\u62d6\u52a8\u65cb\u8f6c\uff0c\u7528\u624b\u52bf\u8c03\u6574\u89c2\u5bdf\u89d2\u5ea6'
   },
   en: {
@@ -140,7 +140,7 @@ export const I18N = {
     badJson: 'Invalid JSON data',
     manualText: 'Compare the left and right 3D block models and decide whether they are the same object shown from different angles. The editor can create voxel objects, levels, and questions; data can be imported and exported.',
     rotateHint: 'Drag canvases to rotate; tap the left model to change auto rotation.',
-    leftInteractionHint: 'Tap to switch between stop, left spin, and right spin.',
+    leftInteractionHint: 'Tap to cycle: left-right spin, stop, up-down spin, stop.',
     rightInteractionHint: 'Drag to rotate and inspect the matching angle.'
   }
 };

@@ -46,7 +46,8 @@ export function unlockSoundEffects(options = {}) {
   };
 
   if (ctx.state !== 'running') {
-    return ctx.resume().then(scheduleUnlockFeedback).catch(() => false);
+    scheduleUnlockFeedback();
+    return ctx.resume().then(() => true).catch(() => false);
   }
 
   scheduleUnlockFeedback();
@@ -93,9 +94,8 @@ function playSequence(notes) {
   unlocked = true;
 
   if (ctx.state !== 'running') {
-    ctx.resume()
-      .then(() => notes.forEach(note => playNote(ctx, note, 0.012)))
-      .catch(() => {});
+    notes.forEach(note => playNote(ctx, note, 0.08));
+    ctx.resume().catch(() => {});
     return;
   }
 
